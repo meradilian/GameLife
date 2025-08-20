@@ -1,121 +1,1176 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Life Dashboard</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #121212; color: #f5f5f5; margin: 0; padding: 0; }
-    header { background: #1f1f1f; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #fff; }
-    nav { display: flex; justify-content: center; gap: 20px; background: #222; padding: 10px; }
-    nav button { background: #333; color: #fff; border: none; padding: 10px 20px; cursor: pointer; border-radius: 8px; }
-    nav button:hover { background: #444; }
-    section { display: none; padding: 20px; }
-    section.active { display: block; }
-    .progress-container { margin: 20px 0; }
-    .progress-bar { height: 25px; background: #333; border-radius: 12px; overflow: hidden; }
-    .progress { height: 100%; background: #4caf50; width: 0; text-align: center; color: white; line-height: 25px; }
-    .task { display: flex; align-items: center; margin: 8px 0; }
-    .task input { margin-right: 10px; }
-    .xp { font-weight: bold; color: #ffcc00; }
-    .reward, .malus { background: #1f1f1f; padding: 10px; border-radius: 8px; margin: 10px 0; }
-    .malus { border-left: 5px solid #e74c3c; }
-    .reward { border-left: 5px solid #2ecc71; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Game Life ⭐</title>
+<style>
+:root{
+  --bg:#0b0f14; --bg2:#0f1520; --card:#121826; --text:#e6edf3; --muted:#9fb3c8; --line:rgba(255,255,255,.12);
+  --grad:linear-gradient(90deg,#6ee7ff,#a78bfa); --danger:#ff6b6b; --warning:#ffa726;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
+.top{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform 0.3s ease-in-out}
+.top.hidden{transform:translateY(-100%)}
+.container{width:min(1100px,94vw);margin:0 auto;padding:70px 0 40px}
+.header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
+.title{flex:1;text-align:center} .title h1{margin:0;font-size:1.2rem} .title p{margin:0;font-size:0.75rem} .muted{color:var(--muted)}
+.menu-toggle{background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;padding:8px;border-radius:8px;transition:background 0.2s}
+.menu-toggle:hover{background:rgba(255,255,255,0.1)}
+.back-btn-header{background:none;border:none;color:var(--text);font-size:1rem;cursor:pointer;padding:8px;border-radius:8px;transition:background 0.2s}
+.back-btn-header:hover{background:rgba(255,255,255,0.1)}
+.mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;padding:8px;gap:4px}
+.mobile-menu.show{display:flex}
+.tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer;font-size:0.9rem;text-align:left;width:100%}
+.tab.active{border-color:rgba(255,255,255,.35)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.player{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.bar{height:12px;border-radius:999px;background:#0e1622;border:1px solid var(--line);overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--grad);width:0%}
+.chip{background:#0e1622;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;color:var(--muted);font-size:.9rem}
+button{padding:.55rem .85rem;border-radius:10px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer}
+button.ghost{opacity:.8}
+button.danger{background:#4a1e1e;border-color:#8b3a3a}
+button.warning{background:#5a3a1e;border-color:#8b6a3a}
+.kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+.kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:border-color 0.2s}
+.kpi:hover{border-color:rgba(255,255,255,.25)}
+.kpi.malus{background:#2a1a1a;border-color:#8b3a3a}
+@media(min-width:860px){.kpi{grid-column:span 6}}
+input[type="number"], input[type="text"]{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text);text-align:center;width:100px}
+input[type="text"]{width:auto;min-width:150px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+.half{grid-column:span 12}@media(min-width:860px){.half{grid-column:span 6}}
+#toast{position:fixed;right:14px;bottom:14px;padding:12px 16px;background:#0f1726;border:1px solid var(--line);border-radius:10px;opacity:0;transition:.3s;transform:translateY(20px);z-index:1000}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.success{background:#1a4a3a;border-color:#2d8a5a;color:#4ade80}
+#toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171}
+#toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
+#toast.warning{background:#5a3a1e;border-color:#8b6a3a;color:#ffa726}
+.xp-gain{position:fixed;color:#fbbf24;font-weight:bold;pointer-events:none;animation:xpFloat 2s ease-out forwards;z-index:1001}
+.xp-loss{position:fixed;color:#ff6b6b;font-weight:bold;pointer-events:none;animation:xpFloat 2s ease-out forwards;z-index:1001}
+@keyframes xpFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}
+.level-up{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--grad);color:#000;padding:20px 40px;border-radius:20px;font-size:1.5rem;font-weight:bold;z-index:1002;animation:levelUpPulse 3s ease-out forwards}
+@keyframes levelUpPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}40%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+.card{transition:transform 0.2s, box-shadow 0.2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(110,231,255,0.1)}
+.bar>span{transition:width 0.5s ease-out}
+.quest{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.view{display:none}.view.active{display:block}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;z-index:100;align-items:center;justify-content:center}
+.modal.active{display:flex}
+.modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(500px,90vw);max-height:80vh;overflow-y:auto}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;margin-bottom:8px;color:var(--text)}
+.form-group input{width:100%;text-align:left}
+.back-btn{margin-bottom:16px}
+.category-actions{display:flex;gap:8px;margin-top:12px}
+.task-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
+.task-item .row{margin-bottom:4px}
+.manage-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.manage-item-actions{display:flex;gap:8px}
+select{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text)}
+.malus-item{background:#2a1a1a;border:1px solid #8b3a3a;border-radius:8px;padding:12px;margin-bottom:8px}
+.malus-active{background:#4a1e1e;border-color:#ff6b6b}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
+</style>
 </head>
 <body>
-  <header>⭐ Game Life Dashboard</header>
-  <nav>
-    <button onclick="showSection('objectifs')">🎯 Objectifs</button>
-    <button onclick="showSection('tasks')">✅ Tâches</button>
-    <button onclick="showSection('rewards')">🏆 Récompenses</button>
-    <button onclick="showSection('rules')">📜 Règles</button>
+<header class="top">
+  <div class="header-content">
+    <button id="backButton" class="back-btn-header" style="display: none;">← Retour</button>
+    <div class="title">
+      <h1>⭐ Game Life</h1>
+      <p class="muted">Jauges • Quêtes • XP • Récompenses • Malus</p>
+    </div>
+    <button id="menuToggle" class="menu-toggle">☰</button>
+  </div>
+  <nav id="mobileMenu" class="mobile-menu">
+    <button class="tab active" data-goto="goals">🎯 Objectifs</button>
+    <button class="tab" data-goto="tasks">✅ Tâches</button>
+    <button class="tab" data-goto="rewards">🎁 Récompenses</button>
+    <button class="tab" data-goto="malus">⚠️ Malus</button>
+    <button class="tab" data-goto="stats">📊 Statistiques</button>
+    <button id="exportData" class="ghost">📤 Exporter</button>
   </nav>
+</header>
 
-  <!-- Objectifs -->
-  <section id="objectifs" class="active">
-    <h2>🎯 Objectifs</h2>
-    <div class="progress-container">
-      <p>Finance: <span id="financeXP">0</span>/100 XP</p>
-      <div class="progress-bar"><div id="financeBar" class="progress"></div></div>
-    </div>
-    <div class="progress-container">
-      <p>Sport: <span id="sportXP">0</span>/100 XP</p>
-      <div class="progress-bar"><div id="sportBar" class="progress"></div></div>
-    </div>
-    <div class="progress-container">
-      <p>Dév Perso: <span id="devXP">0</span>/100 XP</p>
-      <div class="progress-bar"><div id="devBar" class="progress"></div></div>
-    </div>
-    <div class="progress-container">
-      <p>Spiritualité: <span id="spiritXP">0</span>/100 XP</p>
-      <div class="progress-bar"><div id="spiritBar" class="progress"></div></div>
+<main class="container">
+  <!-- PLAYER -->
+  <section class="card">
+    <div class="player">
+      <div>
+        <h2>🎮 Joueur - Niveau <span id="level">1</span></h2>
+        <div class="row"><strong>XP</strong><span id="xp_text">0 / 100</span></div>
+        <div class="bar"><span id="xp_bar" style="width:0%"></span></div>
+        <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">
+          <span class="chip">🕌 Streak prières: <b id="streak_pr">0</b> j</span>
+          <span class="chip">⏰ Streak réveil: <b id="streak_wake">0</b> j</span>
+          <span class="chip">🚫 Malus actifs: <b id="active_malus">0</b></span>
+        </div>
+      </div>
+      <div class="row" style="gap:8px">
+        <button id="validateDay">Valider la journée</button>
+        <button id="checkMalus" class="warning">Vérifier malus</button>
+        <button id="importData" class="ghost">📥 Importer</button>
+        <button id="resetAll" class="ghost">🔄 Reset</button>
+      </div>
     </div>
   </section>
 
-  <!-- Tâches -->
-  <section id="tasks">
-    <h2>✅ Tâches Quotidiennes</h2>
-    <div class="task"><input type="checkbox" onclick="gainXP('finance',20)"> 5 Prospections (20 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('finance',50)"> 1 Inscription (50 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('finance',50)"> 1 Collaboration UGC (50 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('sport',10)"> Workout (10 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('sport',5)"> Course (5 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('dev',10)"> Lecture (10 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('dev',10)"> Introspection (10 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('spirit',5)"> Prières (5 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('spirit',10)"> Joumou’ah (10 XP)</div>
-    <h3>⏰ Réveil</h3>
-    <div class="task"><input type="checkbox" onclick="gainXP('dev',10)"> Avant 8h (10 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('dev',20)"> Avant 7h (20 XP)</div>
-    <div class="task"><input type="checkbox" onclick="gainXP('dev',30)"> Avant 6h (30 XP)</div>
+  <!-- GOALS -->
+  <section id="view-goals" class="view active">
+    <section class="card">
+      <h2>Objectifs hebdomadaires</h2>
+      <div id="kpis" class="kpis"></div>
+    </section>
   </section>
 
-  <!-- Récompenses -->
-  <section id="rewards">
-    <h2>🏆 Récompenses</h2>
-    <div class="reward">💆 Sauna/Spa après 200 XP semaine</div>
-    <div class="reward">🍔 Cheat Meal après 5 Workouts</div>
-    <div class="reward">🎉 Sortie entre amis après 500 XP cumulés</div>
-    <div class="reward">🎬 Film/Animé après 5 Lectures</div>
+  <!-- TASKS -->
+  <section id="view-tasks" class="view">
+    <section class="card">
+      <h2>Tâches quotidiennes</h2>
+      <div class="category-actions">
+        <button id="manageDailyTasks" class="ghost">✏️ Gérer les tâches</button>
+        <button id="resetDaily" class="ghost">Réinitialiser la journée</button>
+      </div>
+      <div id="daily_tasks"></div>
+    </section>
+    <section class="card">
+      <h2>Tâches hebdomadaires</h2>
+      <div class="category-actions">
+        <button id="manageWeeklyTasks" class="ghost">✏️ Gérer les tâches</button>
+        <button id="resetWeekly" class="ghost">Réinitialiser la semaine</button>
+      </div>
+      <div id="weekly_tasks"></div>
+    </section>
+    <section class="card">
+      <h2>Tâches mensuelles</h2>
+      <div class="category-actions">
+        <button id="manageMonthlyTasks" class="ghost">✏️ Gérer les tâches</button>
+        <button id="resetMonthly" class="ghost">Réinitialiser le mois</button>
+      </div>
+      <div id="monthly_tasks"></div>
+    </section>
   </section>
 
-  <!-- Règles -->
-  <section id="rules">
-    <h2>📜 Règles & Malus</h2>
-    <div class="malus">❌ Pas 100 XP dans la semaine → +50 prospections obligatoires + 5 appels</div>
-    <div class="malus">❌ Pas de collab UGC dans la semaine → 5 prospections marques en rue</div>
-    <div class="malus">❌ Pas de sport min. 3x semaine → 50 pompes supp</div>
+  <!-- REWARDS -->
+  <section id="view-rewards" class="view">
+    <section class="card">
+      <h2>Récompenses disponibles</h2>
+      <div class="category-actions">
+        <button id="manageRewards" class="ghost">✏️ Gérer les récompenses</button>
+      </div>
+      <div id="rewards_list" class="grid"></div>
+    </section>
+    <section class="card">
+      <h2>Historique des récompenses</h2>
+      <ul id="rewards_log" class="muted"></ul>
+    </section>
   </section>
 
-  <script>
-    // Sauvegarde XP dans localStorage
-    let xp = JSON.parse(localStorage.getItem("xp")) || {finance:0, sport:0, dev:0, spirit:0};
+  <!-- MALUS -->
+  <section id="view-malus" class="view">
+    <section class="card">
+      <h2>⚠️ Système de malus</h2>
+      <div id="malus_status"></div>
+      <button id="applyMalus" class="danger">Appliquer les malus</button>
+    </section>
+  </section>
 
-    function showSection(id){
-      document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
+  <!-- STATS -->
+  <section id="view-stats" class="view">
+    <section class="card">
+      <h2>📊 Statistiques</h2>
+      <div id="stats_content"></div>
+    </section>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<!-- MODALES DE GESTION -->
+<div id="taskModal" class="modal">
+  <div class="modal-content">
+    <h2 id="taskModalTitle">Gérer les tâches</h2>
+    <div id="taskManageList"></div>
+    <button id="addNewTask">+ Ajouter une tâche</button>
+    <div class="category-actions">
+      <button id="closeTaskModal">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div id="rewardModal" class="modal">
+  <div class="modal-content">
+    <h2>Gérer les récompenses</h2>
+    <div id="rewardManageList"></div>
+    <button id="addNewReward">+ Ajouter une récompense</button>
+    <div class="category-actions">
+      <button id="closeRewardModal">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h2 id="editModalTitle">Modifier</h2>
+    <form id="editForm">
+      <div class="form-group">
+        <label for="editName">Nom :</label>
+        <input type="text" id="editName" required>
+      </div>
+      <div class="form-group">
+        <label for="editValue">Valeur :</label>
+        <input type="number" id="editValue" required>
+      </div>
+      <div class="form-group" id="editCategoryGroup">
+        <label for="editCategory">Catégorie :</label>
+        <select id="editCategory">
+          <option value="discipline">Discipline</option>
+          <option value="business">Business</option>
+          <option value="ugc">UGC</option>
+          <option value="sport">Sport</option>
+          <option value="social">Social</option>
+          <option value="dev">Développement</option>
+          <option value="spirituality">Spiritualité</option>
+        </select>
+      </div>
+      <div class="form-group" id="editTagGroup">
+        <label for="editTag">Tag :</label>
+        <input type="text" id="editTag">
+      </div>
+      <div class="category-actions">
+        <button type="submit">Sauvegarder</button>
+        <button type="button" id="cancelEdit">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ====== STATE ====== */
+const KEY="gamelife_v2";
+function dflt(){
+  return {
+    profile:{level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}},
+    goals:{
+      discipline:{label:"⏰ Discipline/Réveil", bars:[
+        {id:"wake_early",label:"Réveils avant 8h",now:0,goal:7},
+        {id:"wake_very_early",label:"Réveils avant 7h",now:0,goal:3},
+        {id:"wake_extreme",label:"Réveils avant 6h",now:0,goal:1}
+      ]},
+      business:{label:"💸 Business MLM", bars:[
+        {id:"mlm_prospects",label:"Prospections MLM",now:0,goal:140},
+        {id:"mlm_presentations",label:"Présentations",now:0,goal:7},
+        {id:"mlm_inscriptions",label:"Inscriptions",now:0,goal:1}
+      ]},
+      ugc:{label:"🎥 UGC", bars:[
+        {id:"ugc_prospects",label:"Prospections marques",now:0,goal:140},
+        {id:"ugc_collabs",label:"Collabs signées",now:0,goal:1}
+      ]},
+      sport:{label:"🏋️ Sport", bars:[
+        {id:"workouts",label:"Workouts",now:0,goal:5},
+        {id:"runs",label:"Courses",now:0,goal:3}
+      ]},
+      social:{label:"📱 Réseaux sociaux", bars:[
+        {id:"reels",label:"Reels postés",now:0,goal:5},
+        {id:"videos",label:"Vidéos produites",now:0,goal:6}
+      ]},
+      dev:{label:"📚 Développement perso", bars:[
+        {id:"lectures",label:"Lectures (20min)",now:0,goal:5},
+        {id:"introspections",label:"Introspections",now:0,goal:5}
+      ]},
+      spirituality:{label:"🕌 Spiritualité", bars:[
+        {id:"daily_prayers",label:"Journées 5 prières",now:0,goal:7},
+        {id:"jumuah",label:"Jumu'ah",now:0,goal:1}
+      ]}
+    },
+    tasks:{
+      daily:[
+        {id:"wake_early",label:"Réveil avant 8h",xp:10,done:false,category:"discipline"},
+        {id:"wake_very_early",label:"Réveil avant 7h",xp:20,done:false,category:"discipline"},
+        {id:"wake_extreme",label:"Réveil avant 6h",xp:30,done:false,category:"discipline"},
+        {id:"prayers_5",label:"5 prières du jour",xp:25,done:false,category:"spirituality"},
+        {id:"mlm_prospect_20",label:"20 prospections MLM",xp:22,done:false,category:"business"},
+        {id:"ugc_prospect_20",label:"20 prospections UGC",xp:22,done:false,category:"ugc"},
+        {id:"workout",label:"1 workout",xp:10,done:false,category:"sport"},
+        {id:"run",label:"1 course",xp:12,done:false,category:"sport"},
+        {id:"reel",label:"1 reel posté",xp:8,done:false,category:"social"},
+        {id:"video",label:"1 vidéo produite",xp:5,done:false,category:"social"},
+        {id:"lecture",label:"Lecture 20min",xp:8,done:false,category:"dev"},
+        {id:"introspection",label:"Introspection courte",xp:8,done:false,category:"dev"}
+      ],
+      weekly:[
+        {id:"jumuah",label:"Jumu'ah",xp:30,done:false,category:"spirituality"},
+        {id:"big_introspection",label:"Grosse introspection",xp:30,done:false,category:"dev"},
+        {id:"mlm_presentation",label:"Présentation MLM",xp:5,done:false,category:"business"},
+        {id:"ugc_collab",label:"Collab UGC signée",xp:50,done:false,category:"ugc"}
+      ],
+      monthly:[]
+    },
+    rewards:{
+      catalog:[
+        {id:"film",name:"Film/épisode (1h30)",cost:100,tag:"Détente",blocked:false},
+        {id:"activity",name:"Activité plaisir (1-2h)",cost:150,tag:"Plaisir",blocked:false},
+        {id:"friends",name:"Soirée amis/famille",cost:200,tag:"Social",blocked:false},
+        {id:"spa",name:"Spa/détente (2h)",cost:250,tag:"Bien-être",blocked:false},
+        {id:"shopping",name:"Shopping ≤50 CHF",cost:300,tag:"Shopping",blocked:false},
+        {id:"day_off",name:"Day off complet",cost:300,tag:"Repos",blocked:false},
+        {id:"weekend",name:"Weekend détente",cost:800,tag:"Voyage",blocked:false}
+      ],
+      log:[]
+    },
+    malus:{
+      active:[],
+      penalties:[]
     }
+  }
+}
+let state = load();
+function load(){ try{return JSON.parse(localStorage.getItem(KEY))||dflt();}catch(e){return dflt();} }
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+const $=s=>document.querySelector(s); const $$=s=>document.querySelectorAll(s);
 
-    function gainXP(type, amount){
-      xp[type]+=amount;
-      updateBars();
-      localStorage.setItem("xp", JSON.stringify(xp));
+function toast(text, type = 'info') {
+  const el = $("#toast");
+  el.textContent = text;
+  el.className = type;
+  el.classList.add('show');
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.className = '', 300);
+  }, 2500);
+}
+
+function showXPGain(amount, element) {
+  const xpEl = document.createElement('div');
+  xpEl.className = amount > 0 ? 'xp-gain' : 'xp-loss';
+  xpEl.textContent = amount > 0 ? `+${amount} XP` : `${amount} XP`;
+  
+  const rect = element.getBoundingClientRect();
+  xpEl.style.left = rect.left + rect.width/2 + 'px';
+  xpEl.style.top = rect.top + 'px';
+  
+  document.body.appendChild(xpEl);
+  setTimeout(() => xpEl.remove(), 2000);
+}
+
+function showLevelUp(level) {
+  const levelEl = document.createElement('div');
+  levelEl.className = 'level-up';
+  levelEl.textContent = `🎉 NIVEAU ${level} ! 🎉`;
+  document.body.appendChild(levelEl);
+  setTimeout(() => levelEl.remove(), 3000);
+}
+
+/* ====== MENU ====== */
+$("#menuToggle").addEventListener("click", () => {
+  const menu = $("#mobileMenu");
+  menu.classList.toggle("show");
+});
+
+document.addEventListener("click", (e) => {
+  const menu = $("#mobileMenu");
+  const toggle = $("#menuToggle");
+  if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+    menu.classList.remove("show");
+  }
+});
+
+$$(".tab").forEach(b=> b.addEventListener("click",()=>{
+  $$(".tab").forEach(t=>t.classList.remove("active")); b.classList.add("active");
+  $$(".view").forEach(v=>v.classList.remove("active")); 
+  const targetView = `view-${b.dataset.goto}`;
+  $("#" + targetView).classList.add("active");
+  $("#mobileMenu").classList.remove("show");
+  
+  const backBtn = $("#backButton");
+  if (b.dataset.goto === "goals") {
+    backBtn.style.display = "none";
+  } else {
+    backBtn.style.display = "block";
+  }
+}));
+
+$("#backButton").addEventListener("click", () => {
+  $$(".view").forEach(v=>v.classList.remove("active"));
+  $("#view-goals").classList.add("active");
+  $$(".tab").forEach(t=>t.classList.remove("active"));
+  $(".tab[data-goto='goals']").classList.add("active");
+  $("#backButton").style.display = "none";
+});
+
+/* ====== XP SYSTEM ====== */
+function xpNeed(l){return 50 + l*50;}
+function updateXP(){ 
+  const need=xpNeed(state.profile.level); 
+  const xp=Math.max(0,state.profile.xp||0);
+  $("#xp_text").textContent = `${xp} / ${need}`; 
+  $("#xp_bar").style.width = Math.min(100,Math.round((xp/need)*100))+"%";
+  $("#level").textContent = state.profile.level;
+}
+
+function addXP(x, sourceElement = null){ 
+  state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
+  state.profile.stats.dailyXP += x;
+  state.profile.stats.weeklyXP += x;
+  state.profile.stats.monthlyXP += x;
+  
+  if (sourceElement) showXPGain(x, sourceElement);
+  
+  while(state.profile.xp>=xpNeed(state.profile.level)){ 
+    state.profile.xp-=xpNeed(state.profile.level); 
+    state.profile.level++; 
+    showLevelUp(state.profile.level);
+    toast(`Félicitations ! Niveau ${state.profile.level} atteint !`, 'success');
+  }
+  save(); updateXP(); updateStreaks();
+}
+
+function updateStreaks(){ 
+  $("#streak_pr").textContent=state.profile.streaks.prayer||0; 
+  $("#streak_wake").textContent=state.profile.streaks.wake||0;
+  $("#active_malus").textContent=state.malus.active.length||0;
+}
+
+/* ====== GOALS ====== */
+function pct(n,g){ n=Math.max(0,+n||0); g=Math.max(0,+g||0); return g?Math.min(100,Math.round(n/g*100)):0; }
+function renderKPIs(){
+  const kpis=$("#kpis"); kpis.innerHTML="";
+  for(const [key,cat] of Object.entries(state.goals)){
+    const card=document.createElement("div"); 
+    card.className=key==="malus"?"kpi malus":"kpi"; 
+    card.dataset.cat=key;
+    let html=`<h3>${cat.label}</h3>`;
+    cat.bars.forEach(b=>{
+      const percentage = pct(b.now,b.goal);
+      html += `<div class="row"><strong>${b.label}</strong>
+        <span><input id="${b.id}_now" type="number" value="${b.now}" min="0"> / <input id="${b.id}_goal" type="number" value="${b.goal}" min="0"></span></div>
+        <div class="bar"><span id="${b.id}_bar" style="width:${percentage}%"></span></div>`;
+    });
+    card.innerHTML=html; kpis.appendChild(card);
+  }
+  
+  // Bindings
+  for(const cat of Object.values(state.goals)){
+    cat.bars.forEach(b=>{
+      const now=$("#"+b.id+"_now"), goal=$("#"+b.id+"_goal"), bar=$("#"+b.id+"_bar");
+      const recalc=()=>{ 
+        b.now=+now.value||0; 
+        b.goal=+goal.value||0; 
+        bar.style.width=pct(b.now,b.goal)+'%'; 
+        save(); 
+        checkBonuses();
+      };
+      now.addEventListener("input",recalc); 
+      goal.addEventListener("input",recalc);
+    });
+  }
+}
+
+function checkBonuses() {
+  // Streak réveil 5 jours
+  if (state.profile.streaks.wake >= 5 && state.profile.streaks.wake % 5 === 0) {
+    addXP(50);
+    toast("🎉 Bonus streak réveil +50 XP!", 'success');
+  }
+  
+  // Streak prières 7 jours
+  if (state.profile.streaks.prayer >= 7 && state.profile.streaks.prayer % 7 === 0) {
+    addXP(50);
+    toast("🎉 Bonus streak prières +50 XP!", 'success');
+  }
+}
+
+/* ====== TASKS ====== */
+function renderTasks(){
+  const mount=(id,list)=>{ 
+    const el=$("#"+id); el.innerHTML=""; 
+    list.forEach(t=>{ 
+      const row=document.createElement("div"); row.className="quest";
+      row.innerHTML=`<label><input type="checkbox" data-scope="${id}" data-id="${t.id}" ${t.done?'checked':''}> ${t.label}</label><span class="muted">+${t.xp} XP</span>`;
+      el.appendChild(row); 
+    }); 
+  };
+  mount("daily_tasks",state.tasks.daily);
+  mount("weekly_tasks",state.tasks.weekly);
+  mount("monthly_tasks",state.tasks.monthly);
+}
+
+document.addEventListener("change",(e)=>{
+  const el=e.target; 
+  if(!el.matches('input[type="checkbox"][data-scope]')) return;
+  const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
+  const list = scope==="daily_tasks"?state.tasks.daily:scope==="weekly_tasks"?state.tasks.weekly:state.tasks.monthly;
+  const t=list.find(x=>x.id===id); if(!t) return;
+  
+  const wasCompleted = t.done;
+  t.done=el.checked;
+  
+  // Gestion des tâches spéciales
+  if (t.id === "prayers_5" && t.done && !wasCompleted) {
+    state.profile.streaks.prayer++;
+    updateGoalFromTask("daily_prayers");
+  } else if (t.id === "prayers_5" && !t.done && wasCompleted) {
+    state.profile.streaks.prayer = Math.max(0, state.profile.streaks.prayer - 1);
+  }
+  
+  if ((t.id === "wake_early" || t.id === "wake_very_early" || t.id === "wake_extreme") && t.done && !wasCompleted) {
+    state.profile.streaks.wake++;
+    updateGoalFromTask(t.id);
+  }
+  
+  // XP et prospections
+  if (t.id === "mlm_prospect_20" && t.done && !wasCompleted) {
+    updateGoalFromTask("mlm_prospects", 20);
+  }
+  if (t.id === "ugc_prospect_20" && t.done && !wasCompleted) {
+    updateGoalFromTask("ugc_prospects", 20);
+  }
+  
+  // Autres tâches simples
+  const taskGoalMap = {
+    "workout": "workouts",
+    "run": "runs", 
+    "reel": "reels",
+    "video": "videos",
+    "lecture": "lectures",
+    "introspection": "introspections",
+    "jumuah": "jumuah",
+    "mlm_presentation": "mlm_presentations",
+    "ugc_collab": "ugc_collabs"
+  };
+  
+  if (taskGoalMap[t.id] && t.done && !wasCompleted) {
+    updateGoalFromTask(taskGoalMap[t.id]);
+  }
+  
+  addXP(t.done?t.xp:-t.xp, el.closest('.quest')); 
+  if (t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`, 'success');
+  save(); renderKPIs();
+});
+
+function updateGoalFromTask(goalId, amount = 1) {
+  for (const cat of Object.values(state.goals)) {
+    const bar = cat.bars.find(b => b.id === goalId);
+    if (bar) {
+      bar.now += amount;
+      break;
     }
+  }
+}
 
-    function updateBars(){
-      document.getElementById("financeXP").innerText = xp.finance;
-      document.getElementById("sportXP").innerText = xp.sport;
-      document.getElementById("devXP").innerText = xp.dev;
-      document.getElementById("spiritXP").innerText = xp.spirit;
+$("#resetDaily").addEventListener("click",()=>{state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks();});
+$("#resetWeekly").addEventListener("click",()=>{state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
+$("#resetMonthly").addEventListener("click",()=>{state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
 
-      document.getElementById("financeBar").style.width = xp.finance+"%";
-      document.getElementById("sportBar").style.width = xp.sport+"%";
-      document.getElementById("devBar").style.width = xp.dev+"%";
-      document.getElementById("spiritBar").style.width = xp.spirit+"%";
+/* ====== VALIDATE DAY ====== */
+$("#validateDay").addEventListener("click",()=>{
+  checkBonuses();
+  
+  // Vérifier les objectifs de bonus hebdomadaires
+  const goals = state.goals;
+  
+  // Sport bonuses
+  if (goals.sport.bars[0].now >= 5) { // 5 workouts
+    addXP(30);
+    toast("🏋️ Bonus 5 workouts +30 XP!", 'success');
+  }
+  if (goals.sport.bars[1].now >= 3) { // 3 courses
+    addXP(20);
+    toast("🏃 Bonus 3 courses +20 XP!", 'success');
+  }
+  
+  // Social bonuses
+  if (goals.social.bars[0].now >= 5) { // 5 reels
+    addXP(40);
+    toast("📱 Bonus 5 reels +40 XP!", 'success');
+  }
+  if (goals.social.bars[1].now >= 6) { // 6 vidéos
+    addXP(30);
+    toast("🎬 Bonus 6 vidéos +30 XP!", 'success');
+  }
+  
+  // Dev bonuses
+  if (goals.dev.bars[0].now >= 5) { // 5 lectures
+    addXP(25);
+    toast("📚 Bonus 5 lectures +25 XP!", 'success');
+  }
+  if (goals.dev.bars[1].now >= 5) { // 5 introspections
+    addXP(25);
+    toast("📝 Bonus 5 introspections +25 XP!", 'success');
+  }
+  
+  // Business bonuses
+  if (goals.business.bars[2].now >= 1) { // 1 inscription
+    addXP(60);
+    toast("💸 Bonus inscription MLM +60 XP!", 'success');
+  }
+  if (goals.business.bars[2].now >= 2) { // 2 inscriptions
+    addXP(150);
+    toast("💸 Bonus 2 inscriptions +150 XP!", 'success');
+  }
+  
+  // UGC bonuses
+  if (goals.ugc.bars[1].now >= 1) { // 1 collab
+    addXP(50);
+    toast("🎥 Bonus collab UGC +50 XP!", 'success');
+  }
+  if (goals.ugc.bars[1].now >= 2) { // 2 collabs
+    addXP(120);
+    toast("🎥 Bonus 2 collabs +120 XP!", 'success');
+  }
+  
+  toast("Journée validée ✅", 'success');
+  save();
+});
+
+/* ====== REWARDS ====== */
+function renderRewards(){
+  const wrap=$("#rewards_list"), log=$("#rewards_log"); 
+  wrap.innerHTML="";
+  
+  state.rewards.catalog.forEach(it=>{
+    const card=document.createElement("div"); 
+    card.className="card half";
+    const isBlocked = it.blocked || !canUseReward(it);
+    card.innerHTML=`
+      <div class="row">
+        <div>
+          <h3 style="margin:.2rem 0">${it.name}</h3>
+          <div class="muted">${it.tag}${isBlocked ? ' - BLOQUÉ' : ''}</div>
+        </div>
+        <b>${it.cost} XP</b>
+      </div>
+      <button data-redeem="${it.id}" ${isBlocked ? 'disabled style="opacity:0.5"' : ''}>
+        ${isBlocked ? 'Bloqué' : `Utiliser ${it.cost} XP`}
+      </button>`;
+    wrap.appendChild(card);
+  });
+  
+  wrap.addEventListener("click",(e)=>{
+    const btn=e.target.closest("[data-redeem]"); 
+    if(!btn || btn.disabled) return;
+    const it=state.rewards.catalog.find(x=>x.id===btn.dataset.redeem); 
+    if(!it) return;
+    if((state.profile.xp||0) < it.cost) return toast("Pas assez d'XP.", 'error');
+    if(!canUseReward(it)) return toast("Récompense bloquée par les malus.", 'error');
+    
+    state.profile.xp -= it.cost; 
+    state.rewards.log.unshift(`🎁 ${it.name} (${it.cost} XP) — ${new Date().toLocaleString()}`);
+    save(); updateXP(); renderRewards(); 
+    toast("Profite bien ! 🎉", 'success');
+  });
+  
+  log.innerHTML = state.rewards.log.slice(0,10).map(x=>`<li>${x}</li>`).join("");
+}
+
+function canUseReward(reward) {
+  // Règles de blocage selon les malus actifs
+  const activeMalus = state.malus.active;
+  if (activeMalus.includes('no_rewards_daily')) return false;
+  if (activeMalus.includes('no_rewards_weekend') && (reward.id === 'weekend' || reward.id === 'day_off')) return false;
+  if (activeMalus.includes('no_shopping') && reward.id === 'shopping') return false;
+  if (activeMalus.includes('no_social') && reward.id === 'friends') return false;
+  if (activeMalus.includes('no_pleasure') && (reward.id === 'activity' || reward.id === 'day_off')) return false;
+  
+  return true;
+}
+
+/* ====== MALUS SYSTEM ====== */
+function renderMalus() {
+  const content = $("#malus_status");
+  const activeMalus = state.malus.active;
+  const penalties = state.malus.penalties;
+  
+  let html = `
+    <h3>Règles de malus</h3>
+    <div class="malus-item">
+      <strong>Malus globaux :</strong>
+      <ul>
+        <li>&lt;100 XP/jour → pas de récompense ce jour-là</li>
+        <li>&lt;250 XP/semaine → pas de récompense le week-end</li>
+        <li>&lt;200 XP/mois → défi exceptionnel</li>
+      </ul>
+    </div>
+    
+    <h3>Malus actifs (${activeMalus.length})</h3>
+  `;
+  
+  if (activeMalus.length === 0) {
+    html += `<p class="muted">Aucun malus actif - Continue comme ça ! 🎉</p>`;
+  } else {
+    activeMalus.forEach(malus => {
+      html += `<div class="malus-item malus-active">${getMalusDescription(malus)}</div>`;
+    });
+  }
+  
+  html += `<h3>Pénalités en cours (${penalties.length})</h3>`;
+  if (penalties.length === 0) {
+    html += `<p class="muted">Aucune pénalité active</p>`;
+  } else {
+    penalties.forEach(penalty => {
+      html += `<div class="malus-item">${penalty}</div>`;
+    });
+  }
+  
+  content.innerHTML = html;
+}
+
+function getMalusDescription(malus) {
+  const descriptions = {
+    'no_rewards_daily': '🚫 Pas de récompense aujourd\'hui (&lt;100 XP)',
+    'no_rewards_weekend': '🚫 Pas de récompense week-end (&lt;250 XP/semaine)',
+    'no_shopping': '🚫 Pas de shopping (&lt;100 XP business/semaine)',
+    'no_social': '🚫 Pas de soirée amis (&lt;3 lectures/semaine)',
+    'no_pleasure': '🚫 Pas d\'activité plaisir (&lt;3 workouts/semaine)',
+    'extra_prospects_mlm': '📈 +50 prospections MLM obligatoires',
+    'extra_calls': '📞 +5 appels obligatoires',
+    'extra_prospects_ugc': '📈 +30 prospections UGC obligatoires',
+    'extra_workout': '🏋️ Workout extra week-end',
+    'long_cardio': '🏃 Cardio long (45min) obligatoire',
+    'sunday_reading': '📚 1h lecture dimanche obligatoire',
+    'quran_reading': '📖 1h lecture coranique obligatoire'
+  };
+  return descriptions[malus] || malus;
+}
+
+$("#checkMalus").addEventListener("click", checkAndApplyMalus);
+$("#applyMalus").addEventListener("click", checkAndApplyMalus);
+
+function checkAndApplyMalus() {
+  const newMalus = [];
+  const newPenalties = [];
+  
+  // Malus globaux
+  if (state.profile.stats.dailyXP < 100) {
+    newMalus.push('no_rewards_daily');
+  }
+  if (state.profile.stats.weeklyXP < 250) {
+    newMalus.push('no_rewards_weekend');
+  }
+  
+  // Malus business
+  const businessXP = calculateCategoryXP('business');
+  if (businessXP < 100) {
+    newMalus.push('no_shopping');
+  }
+  if (state.goals.business.bars[2].now === 0) { // 0 inscription
+    newPenalties.push('+50 prospections MLM obligatoires');
+    newPenalties.push('+5 appels téléphoniques obligatoires');
+  }
+  
+  // Malus UGC
+  if (state.goals.ugc.bars[1].now === 0) { // 0 collab
+    newPenalties.push('+30 prospections UGC obligatoires');
+  }
+  
+  // Malus sport
+  if (state.goals.sport.bars[0].now < 3) { // <3 workouts
+    newPenalties.push('Workout extra le week-end');
+  }
+  if (state.goals.sport.bars[1].now === 0) { // 0 course
+    newPenalties.push('Cardio long (45min) la semaine suivante');
+  }
+  
+  // Malus développement
+  if (state.goals.dev.bars[0].now < 3) { // <3 lectures
+    newMalus.push('no_social');
+    newPenalties.push('1h lecture le dimanche');
+  }
+  
+  // Malus spiritualité
+  const missedPrayers = 7 - state.goals.spirituality.bars[0].now;
+  if (missedPrayers > 0) {
+    newMalus.push('no_rewards_daily');
+  }
+  if (state.goals.spirituality.bars[1].now === 0) { // Jumu'ah manquée
+    newPenalties.push('Lecture coranique (1h) le week-end');
+  }
+  
+  state.malus.active = newMalus;
+  state.malus.penalties = newPenalties;
+  
+  save();
+  renderMalus();
+  renderRewards();
+  updateStreaks();
+  
+  if (newMalus.length > 0 || newPenalties.length > 0) {
+    toast(`⚠️ ${newMalus.length} malus et ${newPenalties.length} pénalités appliqués`, 'warning');
+  } else {
+    toast('✅ Aucun malus - Excellent travail !', 'success');
+  }
+}
+
+function calculateCategoryXP(category) {
+  let xp = 0;
+  ['daily', 'weekly', 'monthly'].forEach(type => {
+    state.tasks[type].forEach(task => {
+      if (task.category === category && task.done) {
+        xp += task.xp;
+      }
+    });
+  });
+  return xp;
+}
+
+/* ====== STATS ====== */
+function renderStats() {
+  const content = $("#stats_content");
+  const stats = state.profile.stats;
+  
+  let html = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>XP Journalier</h3>
+        <div style="font-size:2rem;color:var(--grad)">${stats.dailyXP}</div>
+      </div>
+      <div class="stat-card">
+        <h3>XP Hebdomadaire</h3>
+        <div style="font-size:2rem;color:var(--grad)">${stats.weeklyXP}</div>
+      </div>
+      <div class="stat-card">
+        <h3>XP Mensuel</h3>
+        <div style="font-size:2rem;color:var(--grad)">${stats.monthlyXP}</div>
+      </div>
+      <div class="stat-card">
+        <h3>Niveau</h3>
+        <div style="font-size:2rem;color:var(--grad)">${state.profile.level}</div>
+      </div>
+    </div>
+    
+    <h3>Progression par catégorie</h3>
+  `;
+  
+  for (const [key, cat] of Object.entries(state.goals)) {
+    html += `<div class="card" style="margin-bottom:12px">
+      <h4>${cat.label}</h4>`;
+    
+    cat.bars.forEach(bar => {
+      const percentage = pct(bar.now, bar.goal);
+      html += `
+        <div class="row" style="margin-bottom:8px">
+          <span>${bar.label}</span>
+          <span>${bar.now}/${bar.goal} (${percentage}%)</span>
+        </div>
+        <div class="bar"><span style="width:${percentage}%"></span></div>
+      `;
+    });
+    
+    html += `</div>`;
+  }
+  
+  content.innerHTML = html;
+}
+
+/* ====== EXPORT/IMPORT ====== */
+$("#exportData").addEventListener("click", () => {
+  const dataStr = JSON.stringify(state, null, 2);
+  const dataBlob = new Blob([dataStr], {type: 'application/json'});
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `gamelife-v2-backup-${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  toast("Données exportées avec succès !", 'success');
+});
+
+$("#importData").addEventListener("click", () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        if (confirm("Êtes-vous sûr de vouloir remplacer toutes vos données actuelles ?")) {
+          state = importedData;
+          save();
+          init();
+          toast("Données importées avec succès !", 'success');
+        }
+      } catch (error) {
+        toast("Erreur lors de l'import du fichier", 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+});
+
+$("#resetAll").addEventListener("click",()=>{ 
+  if(!confirm("Tout remettre à zéro ?")) return; 
+  state=dflt(); save(); init(); 
+  toast("Données réinitialisées", 'info'); 
+});
+
+/* ====== GESTION DES TÂCHES ====== */
+let currentEditType = null;
+let currentEditId = null;
+
+$("#manageDailyTasks").addEventListener("click", () => openTaskManager('daily'));
+$("#manageWeeklyTasks").addEventListener("click", () => openTaskManager('weekly'));
+$("#manageMonthlyTasks").addEventListener("click", () => openTaskManager('monthly'));
+
+function openTaskManager(type) {
+  currentEditType = type;
+  $("#taskModalTitle").textContent = `Gérer les tâches ${type === 'daily' ? 'quotidiennes' : type === 'weekly' ? 'hebdomadaires' : 'mensuelles'}`;
+  renderTaskManager(type);
+  $("#taskModal").classList.add("active");
+}
+
+function renderTaskManager(type) {
+  const list = $("#taskManageList");
+  const tasks = state.tasks[type];
+  
+  list.innerHTML = tasks.map(task => `
+    <div class="manage-item">
+      <div>
+        <strong>${task.label}</strong>
+        <div class="muted">${task.xp} XP - ${task.category}</div>
+      </div>
+      <div class="manage-item-actions">
+        <button onclick="editTask('${type}', '${task.id}')">✏️</button>
+        <button onclick="deleteTask('${type}', '${task.id}')" class="danger">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editTask(type, id) {
+  const task = state.tasks[type].find(t => t.id === id);
+  if (!task) return;
+  
+  $("#editModalTitle").textContent = "Modifier la tâche";
+  $("#editName").value = task.label;
+  $("#editValue").value = task.xp;
+  $("#editCategory").value = task.category;
+  $("#editCategoryGroup").style.display = "block";
+  $("#editTagGroup").style.display = "none";
+  
+  currentEditType = type;
+  currentEditId = id;
+  $("#editModal").classList.add("active");
+}
+
+function deleteTask(type, id) {
+  if (!confirm("Supprimer cette tâche ?")) return;
+  state.tasks[type] = state.tasks[type].filter(t => t.id !== id);
+  save();
+  renderTaskManager(type);
+  renderTasks();
+  toast("Tâche supprimée", 'info');
+}
+
+$("#addNewTask").addEventListener("click", () => {
+  $("#editModalTitle").textContent = "Ajouter une tâche";
+  $("#editName").value = "";
+  $("#editValue").value = 10;
+  $("#editCategory").value = "discipline";
+  $("#editCategoryGroup").style.display = "block";
+  $("#editTagGroup").style.display = "none";
+  
+  currentEditId = null;
+  $("#editModal").classList.add("active");
+});
+
+/* ====== GESTION DES RÉCOMPENSES ====== */
+$("#manageRewards").addEventListener("click", () => {
+  renderRewardManager();
+  $("#rewardModal").classList.add("active");
+});
+
+function renderRewardManager() {
+  const list = $("#rewardManageList");
+  const rewards = state.rewards.catalog;
+  
+  list.innerHTML = rewards.map(reward => `
+    <div class="manage-item">
+      <div>
+        <strong>${reward.name}</strong>
+        <div class="muted">${reward.cost} XP - ${reward.tag}</div>
+      </div>
+      <div class="manage-item-actions">
+        <button onclick="editReward('${reward.id}')">✏️</button>
+        <button onclick="deleteReward('${reward.id}')" class="danger">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editReward(id) {
+  const reward = state.rewards.catalog.find(r => r.id === id);
+  if (!reward) return;
+  
+  $("#editModalTitle").textContent = "Modifier la récompense";
+  $("#editName").value = reward.name;
+  $("#editValue").value = reward.cost;
+  $("#editTag").value = reward.tag;
+  $("#editCategoryGroup").style.display = "none";
+  $("#editTagGroup").style.display = "block";
+  
+  currentEditType = 'reward';
+  currentEditId = id;
+  $("#editModal").classList.add("active");
+}
+
+function deleteReward(id) {
+  if (!confirm("Supprimer cette récompense ?")) return;
+  state.rewards.catalog = state.rewards.catalog.filter(r => r.id !== id);
+  save();
+  renderRewardManager();
+  renderRewards();
+  toast("Récompense supprimée", 'info');
+}
+
+$("#addNewReward").addEventListener("click", () => {
+  $("#editModalTitle").textContent = "Ajouter une récompense";
+  $("#editName").value = "";
+  $("#editValue").value = 100;
+  $("#editTag").value = "Détente";
+  $("#editCategoryGroup").style.display = "none";
+  $("#editTagGroup").style.display = "block";
+  
+  currentEditType = 'reward';
+  currentEditId = null;
+  $("#editModal").classList.add("active");
+});
+
+/* ====== FORMULAIRE D'ÉDITION ====== */
+$("#editForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  
+  const name = $("#editName").value.trim();
+  const value = parseInt($("#editValue").value);
+  
+  if (!name || !value) return;
+  
+  if (currentEditType === 'reward') {
+    const tag = $("#editTag").value.trim();
+    
+    if (currentEditId) {
+      // Modifier
+      const reward = state.rewards.catalog.find(r => r.id === currentEditId);
+      if (reward) {
+        reward.name = name;
+        reward.cost = value;
+        reward.tag = tag;
+      }
+    } else {
+      // Ajouter
+      const id = 'reward_' + Date.now();
+      state.rewards.catalog.push({
+        id: id,
+        name: name,
+        cost: value,
+        tag: tag,
+        blocked: false
+      });
     }
+    renderRewardManager();
+    renderRewards();
+  } else {
+    // Tâches
+    const category = $("#editCategory").value;
+    
+    if (currentEditId) {
+      // Modifier
+      const task = state.tasks[currentEditType].find(t => t.id === currentEditId);
+      if (task) {
+        task.label = name;
+        task.xp = value;
+        task.category = category;
+      }
+    } else {
+      // Ajouter
+      const id = 'task_' + Date.now();
+      state.tasks[currentEditType].push({
+        id: id,
+        label: name,
+        xp: value,
+        category: category,
+        done: false
+      });
+    }
+    renderTaskManager(currentEditType);
+    renderTasks();
+  }
+  
+  save();
+  $("#editModal").classList.remove("active");
+  toast("Modifications sauvegardées", 'success');
+});
 
-    updateBars();
-  </script>
+/* ====== FERMETURE DES MODALES ====== */
+$("#closeTaskModal, #closeRewardModal, #cancelEdit").addEventListener("click", (e) => {
+  $("#taskModal").classList.remove("active");
+  $("#rewardModal").classList.remove("active");
+  $("#editModal").classList.remove("active");
+});
+
+// Fermer en cliquant à l'extérieur
+$("#taskModal, #rewardModal, #editModal").addEventListener("click", (e) => {
+  if (e.target.classList.contains("modal")) {
+    e.target.classList.remove("active");
+  }
+});
+
+// Rendre les fonctions globales pour les boutons inline
+window.editTask = editTask;
+window.deleteTask = deleteTask;
+window.editReward = editReward;
+window.deleteReward = deleteReward;
+
+/* ====== AUTO-HIDE NAVIGATION ====== */
+let lastScrollY = 0;
+let ticking = false;
+
+function updateNavbar() {
+  const currentScrollY = window.scrollY;
+  const navbar = $(".top");
+  
+  if (currentScrollY > lastScrollY && currentScrollY > 100) {
+    navbar.classList.add("hidden");
+  } else if (currentScrollY < lastScrollY || currentScrollY <= 100) {
+    navbar.classList.remove("hidden");
+  }
+  
+  lastScrollY = currentScrollY;
+  ticking = false;
+}
+
+function onScroll() {
+  if (!ticking) {
+    requestAnimationFrame(updateNavbar);
+    ticking = true;
+  }
+}
+
+window.addEventListener("scroll", onScroll);
+
+/* ====== INIT ====== */
+function init(){ 
+  renderKPIs(); 
+  renderTasks(); 
+  renderRewards(); 
+  renderMalus();
+  renderStats();
+  updateXP(); 
+  updateStreaks(); 
+}
+init();
+</script>
 </body>
 </html>
