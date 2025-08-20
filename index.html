@@ -527,6 +527,11 @@
       padding: 12px;
       text-align: center
     }
+    /* === Upgrade v1.1: game feel === */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:.3rem .6rem;border-radius:999px;background:#142033;border:1px solid rgba(255,255,255,.12);color:#cde3ff}
+.badge i{font-style:normal;background:#1a2a44;padding:2px 6px;border-radius:6px}
+.gbar{height:12px;border-radius:999px;background:#0e1622;border:1px solid var(--line);overflow:hidden;position:relative}
+.gfill{height:100%;background:var(--grad);width:0%;transition:width .5s}
   </style>
 </head>
 
@@ -552,31 +557,39 @@
 
   <main class="container">
     <!-- PLAYER -->
-    <section class="card">
-      <div class="player">
-        <div>
-          <h2>🎮 Joueur - Niveau <span id="level">1</span></h2>
-          <div class="row"><strong>XP</strong><span id="xp_text">0 / 100</span></div>
-          <div class="bar"><span id="xp_bar" style="width:0%"></span></div>
-          <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">
-            <span class="chip">🕌 Streak prières: <b id="streak_pr">0</b> j</span>
-            <span class="chip">⏰ Streak réveil: <b id="streak_wake">0</b> j</span>
-            <span class="chip">🚫 Malus actifs: <b id="active_malus">0</b></span>
-          </div>
-        </div>
-        <div class="row" style="gap:8px">
-          <button id="validateDay">Valider la journée</button>
-          <button id="checkMalus" class="warning">Vérifier malus</button>
-          <button id="importData" class="ghost">📥 Importer</button>
-          <button id="resetAll" class="ghost">🔄 Reset</button>
-        </div>
+<section class="card">
+  <div class="player">
+    <div>
+      <h2>🎮 Joueur <span class="badge"><i>Lvl</i><b id="level">1</b></span></h2>
+      <div class="row"><strong>XP</strong><span id="xp_text">0 / 100</span></div>
+      <div class="gbar"><span id="xp_bar" class="gfill" style="width:0%"></span></div>
+      <div style="margin-top:8px">
+        <span class="chip">🕌 Streak prières: <b id="streak_pr">0</b> j</span>
+        <span class="chip">⏰ Streak réveil: <b id="streak_wake">0</b> j</span>
+        <span class="chip">🚫 Malus actifs: <b id="active_malus">0</b></span>
       </div>
-    </section>
+    </div>
+    <div class="row" style="gap:8px">
+      <button id="validateDay">Valider la journée</button>
+      <button id="checkMalus" class="warning">Vérifier malus</button>
+      <button id="importData" class="ghost">📥 Importer</button>
+      <button id="resetAll" class="ghost">🔄 Reset</button>
+    </div>
+  </div>
+</section>
 
     <!-- GOALS -->
     <section id="view-goals" class="view active">
       <section class="card">
         <h2>Objectifs hebdomadaires</h2>
+       <!-- Mini jauges secteur (hebdo) -->
+<div id="sector_gauges" class="grid" style="margin-top:8px">
+  <div class="half card"><div class="row"><b>💸 Business</b><span id="g_biz_txt">0/100</span></div><div class="gbar"><span id="g_biz" class="gfill"></span></div></div>
+  <div class="half card"><div class="row"><b>🎥 UGC</b><span id="g_ugc_txt">0/100</span></div><div class="gbar"><span id="g_ugc" class="gfill"></span></div></div>
+  <div class="half card"><div class="row"><b>🏋️ Sport</b><span id="g_sport_txt">0/60</span></div><div class="gbar"><span id="g_sport" class="gfill"></span></div></div>
+  <div class="half card"><div class="row"><b>📚 Dév perso</b><span id="g_dev_txt">0/50</span></div><div class="gbar"><span id="g_dev" class="gfill"></span></div></div>
+  <div class="half card"><div class="row"><b>🕌 Spiritualité</b><span id="g_spi_txt">0/60</span></div><div class="gbar"><span id="g_spi" class="gfill"></span></div></div>
+</div>
         <div id="kpis" class="kpis"></div>
       </section>
     </section>
@@ -873,6 +886,36 @@
     /* ====== XP SYSTEM ====== */
     function xpNeed(l) {return 50 + l * 50;}
     function updateXP() {
+     /* ==== v1.1 sector XP (hebdo) ==== */
+function getWeeklySectorXP(){
+  const W = { biz:0, ugc:0, sport:0, dev:0, spi:0 };
+  ['daily','weekly','monthly'].forEach(scope=>{
+    state.tasks[scope].forEach(t=>{
+      if(!t.done) return;
+      if(t.category==='business')      W.biz   += t.xp;
+      if(t.category==='ugc')           W.ugc   += t.xp;
+      if(t.category==='sport')         W.sport += t.xp;
+      if(t.category==='dev')           W.dev   += t.xp;
+      if(t.category==='spirituality')  W.spi   += t.xp;
+    });
+  });
+  return W;
+}
+function renderSectorGauges(){
+  const W = getWeeklySectorXP();
+  const set = (idFill,idTxt,now,goal)=>{
+    const fill = document.getElementById(idFill);
+    const txt  = document.getElementById(idTxt);
+    const pct = goal ? Math.min(100, Math.round(now/goal*100)) : 0;
+    if(fill) fill.style.width = pct + '%';
+    if(txt)  txt.textContent = `${now}/${goal}`;
+  };
+  set('g_biz','g_biz_txt',W.biz,100);
+  set('g_ugc','g_ugc_txt',W.ugc,100);
+  set('g_sport','g_sport_txt',W.sport,60);
+  set('g_dev','g_dev_txt',W.dev,50);
+  set('g_spi','g_spi_txt',W.spi,60);
+}
       const need = xpNeed(state.profile.level);
       const xp = Math.max(0, state.profile.xp || 0);
       $("#xp_text").textContent = `${xp} / ${need}`;
@@ -1017,7 +1060,7 @@
 
       addXP(t.done ? t.xp : -t.xp, el.closest('.quest'));
       if (t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`, 'success');
-      save(); renderKPIs();
+      save(); renderKPIs(); renderSectorGauges();
     });
 
     function updateGoalFromTask(goalId, amount = 1) {
@@ -1629,6 +1672,7 @@
     /* ====== INIT ====== */
     function init() {
       renderKPIs();
+      renderSectorGauges();
       renderTasks();
       renderRewards();
       renderMalus();
