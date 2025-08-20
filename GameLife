@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Life Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #121212; color: #f5f5f5; margin: 0; padding: 0; }
+    header { background: #1f1f1f; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #fff; }
+    nav { display: flex; justify-content: center; gap: 20px; background: #222; padding: 10px; }
+    nav button { background: #333; color: #fff; border: none; padding: 10px 20px; cursor: pointer; border-radius: 8px; }
+    nav button:hover { background: #444; }
+    section { display: none; padding: 20px; }
+    section.active { display: block; }
+    .progress-container { margin: 20px 0; }
+    .progress-bar { height: 25px; background: #333; border-radius: 12px; overflow: hidden; }
+    .progress { height: 100%; background: #4caf50; width: 0; text-align: center; color: white; line-height: 25px; }
+    .task { display: flex; align-items: center; margin: 8px 0; }
+    .task input { margin-right: 10px; }
+    .xp { font-weight: bold; color: #ffcc00; }
+    .reward, .malus { background: #1f1f1f; padding: 10px; border-radius: 8px; margin: 10px 0; }
+    .malus { border-left: 5px solid #e74c3c; }
+    .reward { border-left: 5px solid #2ecc71; }
+  </style>
+</head>
+<body>
+  <header>⭐ Game Life Dashboard</header>
+  <nav>
+    <button onclick="showSection('objectifs')">🎯 Objectifs</button>
+    <button onclick="showSection('tasks')">✅ Tâches</button>
+    <button onclick="showSection('rewards')">🏆 Récompenses</button>
+    <button onclick="showSection('rules')">📜 Règles</button>
+  </nav>
+
+  <!-- Objectifs -->
+  <section id="objectifs" class="active">
+    <h2>🎯 Objectifs</h2>
+    <div class="progress-container">
+      <p>Finance: <span id="financeXP">0</span>/100 XP</p>
+      <div class="progress-bar"><div id="financeBar" class="progress"></div></div>
+    </div>
+    <div class="progress-container">
+      <p>Sport: <span id="sportXP">0</span>/100 XP</p>
+      <div class="progress-bar"><div id="sportBar" class="progress"></div></div>
+    </div>
+    <div class="progress-container">
+      <p>Dév Perso: <span id="devXP">0</span>/100 XP</p>
+      <div class="progress-bar"><div id="devBar" class="progress"></div></div>
+    </div>
+    <div class="progress-container">
+      <p>Spiritualité: <span id="spiritXP">0</span>/100 XP</p>
+      <div class="progress-bar"><div id="spiritBar" class="progress"></div></div>
+    </div>
+  </section>
+
+  <!-- Tâches -->
+  <section id="tasks">
+    <h2>✅ Tâches Quotidiennes</h2>
+    <div class="task"><input type="checkbox" onclick="gainXP('finance',20)"> 5 Prospections (20 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('finance',50)"> 1 Inscription (50 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('finance',50)"> 1 Collaboration UGC (50 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('sport',10)"> Workout (10 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('sport',5)"> Course (5 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('dev',10)"> Lecture (10 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('dev',10)"> Introspection (10 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('spirit',5)"> Prières (5 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('spirit',10)"> Joumou’ah (10 XP)</div>
+    <h3>⏰ Réveil</h3>
+    <div class="task"><input type="checkbox" onclick="gainXP('dev',10)"> Avant 8h (10 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('dev',20)"> Avant 7h (20 XP)</div>
+    <div class="task"><input type="checkbox" onclick="gainXP('dev',30)"> Avant 6h (30 XP)</div>
+  </section>
+
+  <!-- Récompenses -->
+  <section id="rewards">
+    <h2>🏆 Récompenses</h2>
+    <div class="reward">💆 Sauna/Spa après 200 XP semaine</div>
+    <div class="reward">🍔 Cheat Meal après 5 Workouts</div>
+    <div class="reward">🎉 Sortie entre amis après 500 XP cumulés</div>
+    <div class="reward">🎬 Film/Animé après 5 Lectures</div>
+  </section>
+
+  <!-- Règles -->
+  <section id="rules">
+    <h2>📜 Règles & Malus</h2>
+    <div class="malus">❌ Pas 100 XP dans la semaine → +50 prospections obligatoires + 5 appels</div>
+    <div class="malus">❌ Pas de collab UGC dans la semaine → 5 prospections marques en rue</div>
+    <div class="malus">❌ Pas de sport min. 3x semaine → 50 pompes supp</div>
+  </section>
+
+  <script>
+    // Sauvegarde XP dans localStorage
+    let xp = JSON.parse(localStorage.getItem("xp")) || {finance:0, sport:0, dev:0, spirit:0};
+
+    function showSection(id){
+      document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    function gainXP(type, amount){
+      xp[type]+=amount;
+      updateBars();
+      localStorage.setItem("xp", JSON.stringify(xp));
+    }
+
+    function updateBars(){
+      document.getElementById("financeXP").innerText = xp.finance;
+      document.getElementById("sportXP").innerText = xp.sport;
+      document.getElementById("devXP").innerText = xp.dev;
+      document.getElementById("spiritXP").innerText = xp.spirit;
+
+      document.getElementById("financeBar").style.width = xp.finance+"%";
+      document.getElementById("sportBar").style.width = xp.sport+"%";
+      document.getElementById("devBar").style.width = xp.dev+"%";
+      document.getElementById("spiritBar").style.width = xp.spirit+"%";
+    }
+
+    updateBars();
+  </script>
+</body>
+</html>
