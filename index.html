@@ -541,7 +541,7 @@
       <button id="backButton" class="back-btn-header" style="display: none;">← Retour</button>
       <div class="title">
         <h1>⭐ Game Life</h1>
-        <p class="muted">Jauges • Quêtes • XP • Récompenses • Malus</p>
+        <p class="muted">c'est toi qui choisis de stagner ou d'évoluer</p>
       </div>
       <button id="menuToggle" class="menu-toggle">☰</button>
     </div>
@@ -560,12 +560,20 @@
 <section class="card">
   <div class="player">
     <div>
-      <h2>🎮 Joueur <span class="badge"><i>Lvl</i><b id="level">1</b></span></h2>
+<h2>🎮 Joueur <span class="badge"><i>Lvl</i><b id="level">1</b></span></h2>
+     <div class="row" style="margin:6px 0 4px">
+  <label class="muted">Pseudo :</label>
+  <input id="player_name" type="text" placeholder="Ton nom" style="width:180px">
+</div>
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin:6px 0">
+  <label class="muted">Jour :</label>
+  <input id="selected_date" type="date" />
+  <span class="chip">Validé : <b id="date_validated">non</b></span>
+</div>
       <div class="row"><strong>XP</strong><span id="xp_text">0 / 100</span></div>
       <div class="gbar"><span id="xp_bar" class="gfill" style="width:0%"></span></div>
       <div style="margin-top:8px">
         <span class="chip">🕌 Streak prières: <b id="streak_pr">0</b> j</span>
-        <span class="chip">⏰ Streak réveil: <b id="streak_wake">0</b> j</span>
         <span class="chip">🚫 Malus actifs: <b id="active_malus">0</b></span>
       </div>
     </div>
@@ -810,6 +818,8 @@
       }
     }
     let state = load();
+    if (!state.profile) state.profile = {level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}};
+    if (state.profile.name === undefined) state.profile.name = "";
     function load() {try {return JSON.parse(localStorage.getItem(KEY)) || dflt();} catch (e) {return dflt();} }
     function save() {localStorage.setItem(KEY, JSON.stringify(state));}
     const $ = s => document.querySelector(s); const $$ = s => document.querySelectorAll(s);
@@ -846,6 +856,27 @@
       setTimeout(() => levelEl.remove(), 3000);
     }
 
+    // === Stockage par date (daily) ===
+if (!state.byDate) state.byDate = {}; // { 'YYYY-MM-DD': { dailyDone:{id:true}, dailyXP:number, validated:boolean } }
+
+function todayISO(d=new Date()){ return d.toISOString().slice(0,10); }
+let currentDate = todayISO();
+
+function loadDay(date){
+  const day = state.byDate[date] || { dailyDone:{}, dailyXP:0, validated:false };
+  state.tasks.daily.forEach(t=>{ t.done = !!day.dailyDone[t.id]; });
+  save();
+  renderTasks();
+  document.getElementById('date_validated')?.textContent = day.validated ? 'oui' : 'non';
+}
+
+function saveDay(date){
+  const day = state.byDate[date] || { dailyDone:{}, dailyXP:0, validated:false };
+  state.tasks.daily.forEach(t=>{ day.dailyDone[t.id] = !!t.done; });
+  day.dailyXP = state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);
+  state.byDate[date] = day; save();
+}
+    
     /* ====== MENU ====== */
     $("#menuToggle").addEventListener("click", () => {
       const menu = $("#mobileMenu");
@@ -942,7 +973,6 @@ function renderSectorGauges(){
 
     function updateStreaks() {
       $("#streak_pr").textContent = state.profile.streaks.prayer || 0;
-      $("#streak_wake").textContent = state.profile.streaks.wake || 0;
       $("#active_malus").textContent = state.malus.active.length || 0;
     }
 
@@ -982,11 +1012,6 @@ function renderSectorGauges(){
     }
 
     function checkBonuses() {
-      // Streak réveil 5 jours
-      if (state.profile.streaks.wake >= 5 && state.profile.streaks.wake % 5 === 0) {
-        addXP(50);
-        toast("🎉 Bonus streak réveil +50 XP!", 'success');
-      }
 
       // Streak prières 7 jours
       if (state.profile.streaks.prayer >= 7 && state.profile.streaks.prayer % 7 === 0) {
@@ -1028,11 +1053,6 @@ function renderSectorGauges(){
         state.profile.streaks.prayer = Math.max(0, state.profile.streaks.prayer - 1);
       }
 
-      if ((t.id === "wake_early" || t.id === "wake_very_early" || t.id === "wake_extreme") && t.done && !wasCompleted) {
-        state.profile.streaks.wake++;
-        updateGoalFromTask(t.id);
-      }
-
       // XP et prospections
       if (t.id === "mlm_prospect_20" && t.done && !wasCompleted) {
         updateGoalFromTask("mlm_prospects", 20);
@@ -1060,7 +1080,7 @@ function renderSectorGauges(){
 
       addXP(t.done ? t.xp : -t.xp, el.closest('.quest'));
       if (t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`, 'success');
-      save(); renderKPIs(); renderSectorGauges();
+      saveDay(currentDate); save(); renderKPIs();
     });
 
     function updateGoalFromTask(goalId, amount = 1) {
@@ -1135,6 +1155,9 @@ function renderSectorGauges(){
       }
 
       toast("Journée validée ✅", 'success');
+      if (!state.byDate[currentDate]) state.byDate[currentDate] = { dailyDone:{}, dailyXP:0, validated:false };
+state.byDate[currentDate].validated = true;
+document.getElementById('date_validated').textContent = 'oui';
       save();
     });
 
@@ -1623,11 +1646,14 @@ function renderSectorGauges(){
     });
 
     /* ====== FERMETURE DES MODALES ====== */
-    $("#closeTaskModal, #closeRewardModal, #cancelEdit").addEventListener("click", (e) => {
-      $("#taskModal").classList.remove("active");
-      $("#rewardModal").classList.remove("active");
-      $("#editModal").classList.remove("active");
-    });
+    ['closeTaskModal','closeRewardModal','cancelEdit'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.onclick = ()=> {
+    document.getElementById('taskModal').classList.remove('active');
+    document.getElementById('rewardModal').classList.remove('active');
+    document.getElementById('editModal').classList.remove('active');
+  };
+});
 
     // Fermer en cliquant à l'extérieur
     $("#taskModal, #rewardModal, #editModal").addEventListener("click", (e) => {
@@ -1677,6 +1703,17 @@ function renderSectorGauges(){
       renderRewards();
       renderMalus();
       renderStats();
+      // Pseudo
+const nameEl = document.getElementById("player_name");
+if (nameEl){ nameEl.value = state.profile?.name || ""; nameEl.oninput = ()=>{ state.profile.name = nameEl.value; save(); }; }
+
+// Datepicker
+const dEl = document.getElementById('selected_date');
+if (dEl){
+  dEl.value = currentDate;
+  dEl.onchange = (e)=>{ currentDate = e.target.value || todayISO(); loadDay(currentDate); };
+  loadDay(currentDate);
+}
       updateXP();
       updateStreaks();
     }
