@@ -10,66 +10,76 @@
   --line:rgba(255,255,255,.12);--grad:linear-gradient(90deg,#6ee7ff,#a78bfa);
   --danger:#ff6b6b;--warning:#ffa726;--ok:#4ade80
 }
-*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-  background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
-.top{position:fixed;inset:0 0 auto 0;z-index:10;background:rgba(11,15,20,.95);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s}
-.top.hidden{transform:translateY(-100%)} .container{width:min(1100px,94vw);margin:0 auto;padding:70px 0 40px}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
+.top{position:fixed;inset:0 0 auto 0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s}
+.top.hidden{transform:translateY(-100%)}
+.container{width:min(1100px,94vw);margin:0 auto;padding:70px 0 40px}
 .header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
-.title{flex:1;text-align:center} .title h1{margin:0;font-size:1.2rem} .title p{margin:0;font-size:.75rem}
+.title{flex:1;text-align:center}
+.title h1{margin:0;font-size:1.2rem}
+.title p{margin:0;font-size:.75rem}
 .muted{color:var(--muted)}
 .menu-toggle,.back-btn-header,button{border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer}
 .menu-toggle,.back-btn-header{border:none;font-size:1rem;padding:8px;border-radius:8px}
-.menu-toggle{font-size:1.5rem} .menu-toggle:hover,.back-btn-header:hover{background:rgba(255,255,255,.1)}
-.mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;gap:4px;padding:8px}
-.mobile-menu.show{display:flex} .tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);background:#0d1520;
-  color:var(--text);font-size:.9rem;text-align:left;width:100%} .tab.active{border-color:rgba(255,255,255,.35)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;
-  transition:transform .2s,box-shadow .2s}
+.menu-toggle{font-size:1.5rem}
+.menu-toggle:hover,.back-btn-header:hover{background:rgba(255,255,255,.1)}
+.mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;gap:4px;padding:8px}
+.mobile-menu.show{display:flex}
+.tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);background:#0d1520;color:var(--text);font-size:.9rem;text-align:left;width:100%}
+.tab.active{border-color:rgba(255,255,255,.35)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;transition:transform .2s,box-shadow .2s}
 .card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(110,231,255,.1)}
 .player{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}
 .row{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)} .half{grid-column:span 12}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+.half{grid-column:span 12}
 @media(min-width:860px){.half{grid-column:span 6}}
 .kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-.kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}
-@media(min-width:860px){.kpi{grid-column:span 6}} .kpi:hover{border-color:rgba(255,255,255,.25)}
+.kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px}
+@media(min-width:860px){.kpi{grid-column:span 6}}
+.kpi:hover{border-color:rgba(255,255,255,.25)}
 .kpi.malus{background:#2a1a1a;border-color:#8b3a3a}
-input[type="number"],input[type="text"],input[type="date"]{padding:.45rem;border-radius:10px;border:1px solid var(--line);
-  background:#0c121a;color:var(--text);text-align:center;min-width:90px}
+input[type="number"],input[type="text"],input[type="date"]{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text);text-align:center;min-width:90px}
 input[disabled],select[disabled],button[disabled]{opacity:.55;cursor:not-allowed}
 select{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text)}
 .bar,.gbar{height:12px;border-radius:999px;background:#0e1622;border:1px solid var(--line);overflow:hidden}
 .bar>span,.gfill{display:block;height:100%;background:var(--grad);width:0%}
 .chip{background:#0e1622;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;color:var(--muted);font-size:.9rem}
-button{padding:.55rem .85rem;border-radius:10px} button.ghost{opacity:.85} button.danger{background:#4a1e1e;border-color:#8b3a3a}
-button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#153a2a;border-color:#2d8a5a}
+button{padding:.55rem .85rem;border-radius:10px}
+button.ghost{opacity:.85}
+button.danger{background:#4a1e1e;border-color:#8b3a3a}
+button.warning{background:#5a3a1e;border-color:#8b6a3a}
+button.ok{background:#153a2a;border-color:#2d8a5a}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:.3rem .6rem;border-radius:999px;background:#142033;border:1px solid var(--line);color:#cde3ff}
 .badge i{font-style:normal;background:#1a2a44;padding:2px 6px;border-radius:6px}
-.view{display:none} .view.active{display:block} .hidden{display:none !important}
+.view{display:none}
+.view.active{display:block}
+.hidden{display:none!important}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;z-index:100;align-items:center;justify-content:center}
-.modal.active{display:flex} .modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(520px,92vw);max-height:80vh;overflow:auto}
-.form-group{margin-bottom:12px} .form-group label{display:block;margin-bottom:6px}
-.task-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
+.modal.active{display:flex}
+.modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(520px,92vw);max-height:80vh;overflow:auto}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;margin-bottom:6px}
 .manage-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;align-items:center}
 .manage-item-actions{display:flex;gap:8px}
 .malus-item{background:#2a1a1a;border:1px solid #8b3a3a;border-radius:8px;padding:12px;margin-bottom:8px}
 .malus-active{background:#4a1e1e;border-color:#ff6b6b}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
 .stat-card{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
-#toast{position:fixed;right:14px;bottom:14px;padding:12px 16px;background:#0f1726;border:1px solid var(--line);
-  border-radius:10px;opacity:0;transform:translateY(20px);transition:.3s;z-index:1000}
-#toast.show{opacity:1;transform:translateY(0)} #toast.success{background:#1a4a3a;border-color:#2d8a5a;color:var(--ok)}
-#toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171} #toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
+#toast{position:fixed;right:14px;bottom:14px;padding:12px 16px;background:#0f1726;border:1px solid var(--line);border-radius:10px;opacity:0;transform:translateY(20px);transition:.3s;z-index:1000}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.success{background:#1a4a3a;border-color:#2d8a5a;color:var(--ok)}
+#toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171}
+#toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
 #toast.warning{background:#5a3a1e;border-color:#8b6a3a;color:#ffa726}
 .xp-gain,.xp-loss{position:fixed;font-weight:bold;pointer-events:none;animation:xpFloat 2s ease-out forwards;z-index:1001}
-.xp-gain{color:#fbbf24} .xp-loss{color:#ff6b6b}
+.xp-gain{color:#fbbf24}.xp-loss{color:#ff6b6b}
 @keyframes xpFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}
 .level-up{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--grad);color:#000;padding:20px 40px;border-radius:20px;font-size:1.5rem;font-weight:bold;z-index:1002;animation:levelUpPulse 3s ease-out forwards}
 @keyframes levelUpPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}40%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0}}
-/* sections spécifiques */
-.two-col{display:grid;gap:12px;grid-template-columns:1fr} @media(min-width:920px){.two-col{grid-template-columns:1fr 1fr}}
+.two-col{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:920px){.two-col{grid-template-columns:1fr 1fr}}
 .goal-list li{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0}
 .small{font-size:.85rem}
 </style>
@@ -100,24 +110,24 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
 </header>
 
 <main class="container">
-  <!-- PLAYER / Accueil -->
+  <!-- PLAYER -->
   <section class="card">
     <div class="player">
       <div style="min-width:280px">
         <h2>
-          <span id="player_title_prefix">🎮</span>
-          <span id="player_title_name">Joueur</span>
+          <span>🎮 </span><span id="player_title_name">Joueur</span>
           <span class="badge"><i>Lvl</i><b id="level">1</b></span>
         </h2>
 
-        <div class="row small" style="margin:6px 0 4px">
+        <div class="row small" style="gap:6px;margin:6px 0 4px">
           <label class="muted">Pseudo :</label>
           <input id="player_name" type="text" placeholder="Ton nom" style="width:180px">
+          <button id="save_name" class="ok">Valider</button>
         </div>
 
         <div class="row small" style="gap:8px;flex-wrap:wrap;margin:6px 0">
           <label class="muted">Jour :</label>
-          <input id="selected_date" type="date" />
+          <input id="selected_date" type="date"/>
           <span class="chip">Validé : <b id="date_validated">non</b></span>
         </div>
 
@@ -140,36 +150,39 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
     </div>
   </section>
 
-  <!-- ARGENT semaine / mois -->
+  <!-- ARGENT SEMAINE / MOIS -->
   <section class="card">
     <h2>💰 Objectifs argent</h2>
     <div class="grid">
       <div class="half card">
         <div class="row"><b>Semaine</b>
           <span class="small">
-            Fait: <b id="money_week_done">0</b> / Objectif:
+            Fait :
+            <input id="money_week_done_input" type="number" min="0" step="1" style="width:120px">
+            <button id="save_money_week_done" class="ok">Valider</button>
+            &nbsp; / Objectif :
             <input id="money_week_target" type="number" min="0" step="1" data-editable>
           </span>
         </div>
-        <div class="row small">
-          <span>Reste</span><b id="money_week_left">0</b>
-        </div>
+        <div class="row small"><span>Reste</span><b id="money_week_left">0</b></div>
       </div>
+
       <div class="half card">
         <div class="row"><b>Mois</b>
           <span class="small">
-            Fait: <b id="money_month_done">0</b> / Objectif:
+            Fait :
+            <input id="money_month_done_input" type="number" min="0" step="1" style="width:120px">
+            <button id="save_money_month_done" class="ok">Valider</button>
+            &nbsp; / Objectif :
             <input id="money_month_target" type="number" min="0" step="1" data-editable>
           </span>
         </div>
-        <div class="row small">
-          <span>Reste</span><b id="money_month_left">0</b>
-        </div>
+        <div class="row small"><span>Reste</span><b id="money_month_left">0</b></div>
       </div>
     </div>
   </section>
 
-  <!-- Mini jauges secteurs -->
+  <!-- SECTEURS -->
   <section class="card">
     <h2>📈 Progression hebdo par secteur</h2>
     <div id="sector_gauges" class="grid" style="margin-top:8px">
@@ -181,7 +194,7 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
     </div>
   </section>
 
-  <!-- Objectifs proches / lointains -->
+  <!-- PRIORITÉS -->
   <section class="card">
     <h2>🧭 Priorités</h2>
     <div class="two-col">
@@ -204,12 +217,11 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
     </section>
   </section>
 
-  <!-- TASKS (par catégorie) -->
+  <!-- TASKS -->
   <section id="view-tasks" class="view">
     <section class="card">
       <h2>✅ Tâches (par catégorie)</h2>
       <div id="tasks_by_cat" class="grid"></div>
-
       <div class="category-actions">
         <button id="manageDailyTasks" class="ghost hidden">✏️ Gérer Quotidiennes</button>
         <button id="manageWeeklyTasks" class="ghost hidden">✏️ Gérer Hebdo</button>
@@ -243,29 +255,17 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
       <div class="grid">
         <div class="half card">
           <h3>Règles (éditer en mode édition)</h3>
-          <div class="form-group small">
-            <label>XP min / jour</label>
-            <input id="rule_day_min" type="number" step="1" min="0" data-editable>
-          </div>
-          <div class="form-group small">
-            <label>XP min / semaine</label>
-            <input id="rule_week_min" type="number" step="1" min="0" data-editable>
-          </div>
-          <div class="form-group small">
-            <label>XP Business min / semaine</label>
-            <input id="rule_biz_min" type="number" step="1" min="0" data-editable>
-          </div>
-          <div class="form-group small">
-            <label>Lectures min / semaine</label>
-            <input id="rule_read_min" type="number" step="1" min="0" data-editable>
-          </div>
+          <div class="form-group small"><label>XP min / jour</label><input id="rule_day_min" type="number" step="1" min="0" data-editable></div>
+          <div class="form-group small"><label>XP min / semaine</label><input id="rule_week_min" type="number" step="1" min="0" data-editable></div>
+          <div class="form-group small"><label>XP Business min / semaine</label><input id="rule_biz_min" type="number" step="1" min="0" data-editable></div>
+          <div class="form-group small"><label>Lectures min / semaine</label><input id="rule_read_min" type="number" step="1" min="0" data-editable></div>
         </div>
         <div class="half card">
           <h3>Aperçu</h3>
           <div id="malus_preview"></div>
           <div class="row" style="gap:8px;margin-top:8px">
             <button id="btnPreviewMalus" class="ghost">🔍 Calculer aperçu</button>
-            <button id="applyMalus2" class="danger">🚨 Appliquer maintenant</button>
+            <button id="applyMalus" class="danger">🚨 Appliquer maintenant</button>
           </div>
         </div>
       </div>
@@ -296,7 +296,7 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
   </section>
 </main>
 
-<!-- Modales génériques -->
+<!-- MODALES -->
 <div id="taskModal" class="modal"><div class="modal-content">
   <h2 id="taskModalTitle">Gérer les tâches</h2>
   <div id="taskManageList"></div>
@@ -329,7 +329,7 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
         <option value="sport">Sport</option>
         <option value="social">Social</option>
         <option value="dev">Développement</option>
-        <option value="spirituality">Spiritualité</option>
+        <option value="spiritualité">Spiritualité</option>
       </select>
     </div>
     <div class="form-group" id="editTagGroup">
@@ -345,7 +345,7 @@ button.warning{background:#5a3a1e;border-color:#8b6a3a} button.ok{background:#15
 <div id="toast"></div>
 
 <script>
-/* ================== STATE / STORAGE ================== */
+/* ========== STATE / STORAGE ========== */
 const KEY="gamelife_v3";
 function dflt(){
   return {
@@ -417,20 +417,14 @@ function dflt(){
         {id:"day_off",name:"Day off complet",cost:300,tag:"Repos"},
         {id:"weekend",name:"Weekend détente",cost:800,tag:"Voyage"}
       ],
-      inventory:{},  // {id: count}
+      inventory:{},
       log:[]
     },
-    malus:{
-      rules:{dayMin:100,weekMin:250,bizMin:100,readMin:3},
-      active:[],
-      penalties:[]
-    },
-    bonus:[  // exploits custom
-      // {id:'b1',name:'1k abonnés',xp:100,claimed:false}
-    ],
-    byDate:{}, // 'YYYY-MM-DD': { dailyDone:{id:true}, dailyXP:number, validated:boolean }
+    malus:{rules:{dayMin:100,weekMin:250,bizMin:100,readMin:3},active:[],penalties:[]},
+    bonus:[],
+    byDate:{},
     _history:[]
-  };
+  }
 }
 let state=load();
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||dflt()}catch(e){return dflt()}}
@@ -440,89 +434,89 @@ function undo(){if(!state._history||!state._history.length){toast("Rien à annul
   const snap=state._history.pop();try{state=JSON.parse(snap)}catch(e){return} save(); init(); toast("Action annulée","info")}
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 
-/* =============== UI Helpers =============== */
+/* ========== HELPERS UI ========== */
 function toast(t,typ="info"){const el=$("#toast");el.textContent=t;el.className=typ;el.classList.add("show");
-  setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.className="",300)},2500)}
+  setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.className="",300)},2200)}
 function xpNeed(l){return 50+l*50}
-function showXPGain(amount,el){const n=document.createElement("div");n.className=amount>0?'xp-gain':'xp-loss';
-  n.textContent=(amount>0?'+':'')+amount+' XP';const r=el.getBoundingClientRect();n.style.left=(r.left+r.width/2)+'px';n.style.top=r.top+'px';
-  document.body.appendChild(n);setTimeout(()=>n.remove(),2000)}
-function showLevelUp(level){const el=document.createElement("div");el.className='level-up';el.textContent=`🎉 NIVEAU ${level} ! 🎉`;
-  document.body.appendChild(el);setTimeout(()=>el.remove(),3000)}
 function todayISO(d=new Date()){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
-let currentDate=todayISO();
 
-/* ====== EDIT MODE ====== */
+/* ========== NAV ========== */
+$("#menuToggle").onclick=()=>$("#mobileMenu").classList.toggle("show");
+document.addEventListener("click",(e)=>{const m=$("#mobileMenu"),t=$("#menuToggle");if(!m.contains(e.target)&&!t.contains(e.target))m.classList.remove("show")});
+$$(".tab").forEach(b=>b.addEventListener("click",()=>{$$(".tab").forEach(t=>t.classList.remove("active"));b.classList.add("active");$$(".view").forEach(v=>v.classList.remove("active"));$("#view-"+b.dataset.goto).classList.add("active");$("#mobileMenu").classList.remove("show");$("#backButton").style.display=b.dataset.goto==="goals"?"none":"block"}));
+$("#backButton").onclick=()=>{$$(".view").forEach(v=>v.classList.remove("active"));$("#view-goals").classList.add("active");$$(".tab").forEach(t=>t.classList.remove("active"));$('.tab[data-goto="goals"]').classList.add("active");$("#backButton").style.display="none"};
+
+/* ========== EDIT MODE ========== */
 function applyEditModeUI(){
   const on=!!state.edit;
-  $("#toggleEdit").textContent = on? "✏️ Modifier (ON)" : "✏️ Modifier (OFF)";
-  // inputs marqués data-editable
-  $$('[data-editable], input[type="number"], input[type="text"], select').forEach(i=>{
-    if(i.hasAttribute('data-editable')) i.disabled=!on;
-  });
-  // boutons de gestion
-  ["manageDailyTasks","manageWeeklyTasks","manageMonthlyTasks","manageRewards","addBonus"]
-    .forEach(id=>{const b=$("#"+id); if(!b) return; b.classList.toggle("hidden",!on)});
-  // les inputs objectifs (now/goal)
+  $("#toggleEdit").textContent=on?"✏️ Modifier (ON)":"✏️ Modifier (OFF)";
+  $$("[data-editable]").forEach(i=>i.disabled=!on);
+  ["manageDailyTasks","manageWeeklyTasks","manageMonthlyTasks","manageRewards","addBonus"].forEach(id=>{const b=$("#"+id);if(b)b.classList.toggle("hidden",!on)});
   $$('#kpis input[type="number"]').forEach(i=>i.disabled=!on);
 }
-$("#toggleEdit").onclick=()=>{state.edit=!state.edit; save(); applyEditModeUI(); toast(state.edit?"Mode édition ON":"Mode édition OFF","info")};
-$("#undoBtn").onclick=()=>undo();
+$("#toggleEdit").onclick=()=>{state.edit=!state.edit;save();applyEditModeUI();toast(state.edit?"Mode édition ON":"Mode édition OFF","info")}
+$("#undoBtn").onclick=undo;
 
-/* =============== Header / Nav =============== */
-$("#menuToggle").onclick=()=>$("#mobileMenu").classList.toggle("show");
-document.addEventListener("click",(e)=>{
-  const m=$("#mobileMenu"),t=$("#menuToggle"); if(!m.contains(e.target)&&!t.contains(e.target)) m.classList.remove("show");
-});
-$$(".tab").forEach(b=>b.addEventListener("click",()=>{
-  $$(".tab").forEach(t=>t.classList.remove("active")); b.classList.add("active");
-  $$(".view").forEach(v=>v.classList.remove("active")); $("#view-"+b.dataset.goto).classList.add("active");
-  $("#mobileMenu").classList.remove("show");
-  $("#backButton").style.display=b.dataset.goto==="goals"?"none":"block";
-}));
-$("#backButton").onclick=()=>{
-  $$(".view").forEach(v=>v.classList.remove("active")); $("#view-goals").classList.add("active");
-  $$(".tab").forEach(t=>t.classList.remove("active")); $('.tab[data-goto="goals"]').classList.add("active"); $("#backButton").style.display="none";
-};
+/* ========== PROFILE / XP ========== */
+function drawPlayerName(){ $("#player_title_name").textContent= state.profile.name ? state.profile.name : "Joueur" }
+$("#save_name").onclick=()=>{ const val=$("#player_name").value.trim(); pushHistory(); state.profile.name=val; save(); drawPlayerName(); toast("Pseudo sauvegardé","success") };
+function updateXP(){ const need=xpNeed(state.profile.level); const xp=Math.max(0,state.profile.xp||0); $("#xp_text").textContent=`${xp} / ${need}`; $("#xp_bar").style.width=Math.min(100,Math.round(xp/need*100))+"%"; $("#level").textContent=state.profile.level }
+function showLevelUp(level){const el=document.createElement("div");el.className='level-up';el.textContent=`🎉 NIVEAU ${level} ! 🎉`;document.body.appendChild(el);setTimeout(()=>el.remove(),3000)}
+function addXP(x,srcEl=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);state.profile.stats.dailyXP+=x;state.profile.stats.weeklyXP+=x;state.profile.stats.monthlyXP+=x;while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level);state.profile.level++;showLevelUp(state.profile.level)}save();updateXP();updateStreaks();}
 
-/* =============== XP / Profile =============== */
-function updateXP(){
-  const need=xpNeed(state.profile.level); const xp=Math.max(0,state.profile.xp||0);
-  $("#xp_text").textContent=`${xp} / ${need}`; $("#xp_bar").style.width=Math.min(100,Math.round(xp/need*100))+"%";
-  $("#level").textContent=state.profile.level;
-}
-function addXP(x,srcEl=null){
-  pushHistory();
-  state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
-  state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
-  if(srcEl) showXPGain(x,srcEl);
-  while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level); state.profile.level++; showLevelUp(state.profile.level)}
-  save(); updateXP(); updateStreaks();
-}
-function updateStreaks(){
-  $("#streak_pr").textContent=state.profile.streaks.prayer||0;
-  $("#active_malus").textContent=state.malus.active.length||0;
-}
-const nameEl=$("#player_name");
-nameEl.oninput=()=>{state.profile.name=nameEl.value; save(); drawPlayerName()};
-function drawPlayerName(){
-  $("#player_title_name").textContent= state.profile.name? state.profile.name : "Joueur";
-}
-
-/* =============== Argent (semaine/mois) =============== */
+/* ========== MONEY ========== */
 function renderMoney(){
   $("#money_week_target").value = state.money.week.target||0;
   $("#money_month_target").value = state.money.month.target||0;
-  $("#money_week_done").textContent = state.money.week.done||0;
-  $("#money_month_done").textContent = state.money.month.done||0;
+  $("#money_week_done_input").value = state.money.week.done||0;
+  $("#money_month_done_input").value = state.money.month.done||0;
   $("#money_week_left").textContent = Math.max(0,(state.money.week.target||0)-(state.money.week.done||0));
   $("#money_month_left").textContent = Math.max(0,(state.money.month.target||0)-(state.money.month.done||0));
 }
-$("#money_week_target").oninput=()=>{if(!state.edit) return; pushHistory(); state.money.week.target=+$("#money_week_target").value||0; save(); renderMoney()};
-$("#money_month_target").oninput=()=>{if(!state.edit) return; pushHistory(); state.money.month.target=+$("#money_month_target").value||0; save(); renderMoney()};
+$("#money_week_target").oninput=()=>{ if(!state.edit) return; pushHistory(); state.money.week.target=+$("#money_week_target").value||0; save(); renderMoney() };
+$("#money_month_target").oninput=()=>{ if(!state.edit) return; pushHistory(); state.money.month.target=+$("#money_month_target").value||0; save(); renderMoney() };
+$("#save_money_week_done").onclick=()=>{ pushHistory(); state.money.week.done=+$("#money_week_done_input").value||0; save(); renderMoney(); toast("Montant semaine sauvegardé","success") };
+$("#save_money_month_done").onclick=()=>{ pushHistory(); state.money.month.done=+$("#money_month_done_input").value||0; save(); renderMoney(); toast("Montant mois sauvegardé","success") };
 
-/* =============== Objectifs (KPIs) =============== */
-function pct(n,g){n=Math.max(0,+n||0); g=Math.max(0,+g||0); return g?Math.min(100,Math.round(n/g*100)):0}
+// ====== ENTER TO VALIDATE (pseudo + argent) ======
+const enterClick = (inputId, buttonId, onEnter) => {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (typeof onEnter === 'function') return onEnter(e);
+      const btn = document.getElementById(buttonId);
+      if (btn) btn.click();
+    }
+  });
+};
+
+// Pseudo => Enter = clique sur "Valider"
+enterClick('player_name', 'save_name');
+
+// Argent: "Fait" semaine => Enter = clique sur "Valider"
+enterClick('money_week_done_input', 'save_money_week_done');
+
+// Argent: "Fait" mois => Enter = clique sur "Valider"
+enterClick('money_month_done_input', 'save_money_month_done');
+
+// (Optionnel) Objectifs argent: Enter sauvegarde si mode édition ON
+enterClick('money_week_target', null, () => {
+  if (!state.edit) return;
+  pushHistory();
+  state.money.week.target = +document.getElementById('money_week_target').value || 0;
+  save(); renderMoney(); toast("Objectif semaine sauvegardé", "success");
+});
+enterClick('money_month_target', null, () => {
+  if (!state.edit) return;
+  pushHistory();
+  state.money.month.target = +document.getElementById('money_month_target').value || 0;
+  save(); renderMoney(); toast("Objectif mois sauvegardé", "success");
+});
+  
+/* ========== TASKS / GOALS ========== */
+function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0}
 function renderKPIs(){
   const wrap=$("#kpis"); wrap.innerHTML="";
   for(const [key,cat] of Object.entries(state.goals)){
@@ -531,67 +525,44 @@ function renderKPIs(){
     cat.bars.forEach(b=>{
       const p=pct(b.now,b.goal);
       html+=`<div class="row"><strong>${b.label}</strong>
-        <span>
-          <input data-editable id="${b.id}_now" type="number" value="${b.now}" min="0" ${state.edit?"":"disabled"}>
-          /
-          <input data-editable id="${b.id}_goal" type="number" value="${b.goal}" min="0" ${state.edit?"":"disabled"}>
-        </span></div>
-        <div class="bar"><span id="${b.id}_bar" style="width:${p}%"></span></div>`;
+      <span><input data-editable id="${b.id}_now" type="number" value="${b.now}" min="0" ${state.edit?"":"disabled"}> / 
+      <input data-editable id="${b.id}_goal" type="number" value="${b.goal}" min="0" ${state.edit?"":"disabled"}></span></div>
+      <div class="bar"><span id="${b.id}_bar" style="width:${p}%"></span></div>`;
     });
     card.innerHTML=html; wrap.appendChild(card);
   }
-  // Bindings
   for(const cat of Object.values(state.goals)){
     cat.bars.forEach(b=>{
       const now=$("#"+b.id+"_now"), goal=$("#"+b.id+"_goal"), bar=$("#"+b.id+"_bar");
-      const recalc=()=>{ if(!state.edit) return;
-        pushHistory(); b.now=+now.value||0; b.goal=+goal.value||0; bar.style.width=pct(b.now,b.goal)+'%'; save();
-        renderPriorities();
-      };
+      const recalc=()=>{ if(!state.edit) return; pushHistory(); b.now=+now.value||0; b.goal=+goal.value||0; bar.style.width=pct(b.now,b.goal)+'%'; save(); renderPriorities() };
       now.oninput=recalc; goal.oninput=recalc;
     });
   }
 }
-
-/* =============== Priorités (plus proche / plus loin) =============== */
 function allGoalBars(){
-  const list=[];
-  for(const [ck,cat] of Object.entries(state.goals)){
-    cat.bars.forEach(b=>{
-      const remaining=Math.max(0,(b.goal||0)-(b.now||0));
-      list.push({cat:cat.label,id:b.id,label:b.label,now:b.now,goal:b.goal,remaining});
-    });
-  }
+  const list=[]; for(const cat of Object.values(state.goals)){ cat.bars.forEach(b=>{ const remaining=Math.max(0,(b.goal||0)-(b.now||0)); list.push({label:b.label,now:b.now,goal:b.goal,remaining}) }) }
   return list;
 }
 function renderPriorities(){
   const bars=allGoalBars().filter(b=>b.goal>0);
-  const sorted=[...bars].sort((a,b)=>a.remaining-b.remaining);
-  const closest=sorted.slice(0,5), farthest=[...bars].sort((a,b)=>b.remaining-a.remaining).slice(0,5);
+  const closest=[...bars].sort((a,b)=>a.remaining-b.remaining).slice(0,5);
+  const farthest=[...bars].sort((a,b)=>b.remaining-a.remaining).slice(0,5);
   $("#goals_closest").innerHTML=closest.map(x=>`<li><span>${x.label}</span><b>${x.now}/${x.goal} (reste ${x.remaining})</b></li>`).join("");
   $("#goals_farthest").innerHTML=farthest.map(x=>`<li><span>${x.label}</span><b>${x.now}/${x.goal} (reste ${x.remaining})</b></li>`).join("");
 }
-
-/* =============== TÂCHES (par catégorie) =============== */
 function tasksGroupedByCategory(){
   const map={}; const push=(t,scope)=>{(map[t.category]=map[t.category]||[]).push({...t,_scope:scope})};
-  state.tasks.daily.forEach(t=>push(t,'daily'));
-  state.tasks.weekly.forEach(t=>push(t,'weekly'));
-  state.tasks.monthly.forEach(t=>push(t,'monthly'));
+  state.tasks.daily.forEach(t=>push(t,'daily')); state.tasks.weekly.forEach(t=>push(t,'weekly')); state.tasks.monthly.forEach(t=>push(t,'monthly'));
   return map;
 }
 function renderTasksByCategory(){
-  const mount=$("#tasks_by_cat"); mount.innerHTML="";
-  const groups=tasksGroupedByCategory();
+  const mount=$("#tasks_by_cat"); mount.innerHTML=""; const groups=tasksGroupedByCategory();
   Object.entries(groups).forEach(([cat,items])=>{
     const box=document.createElement("div"); box.className="half card";
     let html=`<h3>${cat.toUpperCase()}</h3>`;
     items.forEach(t=>{
-      const scopeChip = t._scope==='daily'?'🗓️Q':'🗓️H' && t._scope==='weekly'?'🗓️H':(t._scope==='monthly'?'🗓️M':'');
-      html+=`<div class="row"><label>
-        <input type="checkbox" data-scope="${t._scope}" data-id="${t.id}" ${t.done?'checked':''}>
-        ${t.label} <span class="muted small">${scopeChip}</span></label>
-        <span class="muted">+${t.xp} XP</span></div>`;
+      const scopeChip = t._scope==='daily'?'🗓️Q':t._scope==='weekly'?'🗓️H':'🗓️M';
+      html+=`<div class="row"><label><input type="checkbox" data-scope="${t._scope}" data-id="${t.id}" ${t.done?'checked':''}> ${t.label} <span class="muted small">${scopeChip}</span></label><span class="muted">+${t.xp} XP</span></div>`;
     });
     box.innerHTML=html; mount.appendChild(box);
   });
@@ -601,30 +572,23 @@ document.addEventListener("change",(e)=>{
   const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
   const list=scope==="daily"?state.tasks.daily:scope==="weekly"?state.tasks.weekly:state.tasks.monthly;
   const t=list.find(x=>x.id===id); if(!t) return;
-
   pushHistory();
   const was=t.done; t.done=el.checked;
 
-  // règles spéciales qui mettent à jour les objectifs correspondants
   if(t.id==="prayers_5" && t.done && !was){ state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers"); }
   if(t.id==="mlm_prospect_20" && t.done && !was){ updateGoalFromTask("mlm_prospects",20) }
   if(t.id==="ugc_prospect_20" && t.done && !was){ updateGoalFromTask("ugc_prospects",20) }
 
-  const map={ "workout":"workouts","run":"runs","reel":"reels","video":"videos",
-    "lecture":"lectures","introspection":"introspections","jumuah":"jumuah",
-    "mlm_presentation":"mlm_presentations","ugc_collab":"ugc_collabs",
-    "wake_early":"wake_early","wake_very_early":"wake_very_early","wake_extreme":"wake_extreme"
-  };
+  const map={ "workout":"workouts","run":"runs","reel":"reels","video":"videos","lecture":"lectures","introspection":"introspections","jumuah":"jumuah","mlm_presentation":"mlm_presentations","ugc_collab":"ugc_collabs","wake_early":"wake_early","wake_very_early":"wake_very_early","wake_extreme":"wake_extreme" };
   if(map[t.id] && t.done && !was) updateGoalFromTask(map[t.id]);
 
   addXP(t.done? t.xp : -t.xp, el.closest('.row')||el);
   saveDay(currentDate); save(); renderKPIs(); renderPriorities(); renderSectorGauges();
 });
-function updateGoalFromTask(goalId,amount=1){
-  for(const cat of Object.values(state.goals)){ const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount;break} }
-}
+function updateGoalFromTask(goalId,amount=1){ for(const cat of Object.values(state.goals)){ const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount;break} } }
 
-/* =============== Stockage par date (quotidien) =============== */
+/* ========== DATE STORAGE ========== */
+let currentDate=todayISO();
 function loadDay(date){
   const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};
   state.tasks.daily.forEach(t=>{ t.done=!!day.dailyDone[t.id] });
@@ -640,9 +604,7 @@ function saveDay(date){
 const dEl=$("#selected_date"); dEl.value=currentDate;
 dEl.onchange=(e)=>{currentDate=e.target.value||todayISO(); loadDay(currentDate)};
 
-$("#validateDay").onclick=()=>{ // valide le jour affiché + bonus hebdo usuels
-  pushHistory();
-  // Bonus divers déjà présents
+$("#validateDay").onclick=()=>{ pushHistory();
   const g=state.goals;
   if(g.sport.bars[0].now>=5) addXP(30);
   if(g.sport.bars[1].now>=3) addXP(20);
@@ -656,12 +618,10 @@ $("#validateDay").onclick=()=>{ // valide le jour affiché + bonus hebdo usuels
   if(g.ugc.bars[1].now>=2) addXP(120);
 
   const day=state.byDate[currentDate]||{dailyDone:{},dailyXP:0,validated:false};
-  day.validated=true; state.byDate[currentDate]=day;
-  $("#date_validated").textContent='oui';
-  save(); toast("Journée validée ✅","success");
+  day.validated=true; state.byDate[currentDate]=day; $("#date_validated").textContent='oui'; save(); toast("Journée validée ✅","success");
 };
 
-/* =============== Récompenses + Inventaire =============== */
+/* ========== REWARDS ========== */
 function canUseReward(reward){
   const a=state.malus.active;
   if(a.includes('no_rewards_daily')) return false;
@@ -684,7 +644,7 @@ function renderRewards(){
         <b>${it.cost} XP</b>
       </div>
       <div class="row" style="gap:8px;flex-wrap:wrap">
-        <button data-buy="${it.id}" class="ok">Acheter (+1)</button>
+        <button data-buy="${it.id}" class="ok" ${blocked?'disabled':''}>Acheter (+1)</button>
         <button data-use="${it.id}" ${inv<=0?'disabled':''}>Utiliser (reste: ${inv})</button>
         <button data-editreward="${it.id}" class="ghost ${state.edit?'':'hidden'}">✏️ Modifier</button>
         <button data-delreward="${it.id}" class="danger ${state.edit?'':'hidden'}">🗑️</button>
@@ -692,8 +652,7 @@ function renderRewards(){
     wrap.appendChild(card);
   });
   wrap.onclick=(e)=>{
-    const buy=e.target.closest("[data-buy]"), use=e.target.closest("[data-use]"),
-          ed=e.target.closest("[data-editreward]"), del=e.target.closest("[data-delreward]");
+    const buy=e.target.closest("[data-buy]"), use=e.target.closest("[data-use]"), ed=e.target.closest("[data-editreward]"), del=e.target.closest("[data-delreward]");
     if(buy){ const id=buy.dataset.buy; const it=state.rewards.catalog.find(x=>x.id===id); if(!it) return;
       if((state.profile.xp||0)<it.cost){toast("Pas assez d'XP","error");return}
       pushHistory(); state.profile.xp-=it.cost; state.rewards.inventory[id]=(state.rewards.inventory[id]||0)+1;
@@ -706,7 +665,7 @@ function renderRewards(){
       state.rewards.log.unshift(`🎁 Utilisé: ${it?it.name:id} — ${new Date().toLocaleString()}`);
       save(); renderRewards(); toast("Utilisation OK","success"); return;
     }
-    if(ed){ if(!state.edit) return; const id=ed.dataset.editreward; openRewardEditor(id); return; }
+    if(ed){ if(!state.edit) return; openRewardEditor(ed.dataset.editreward); return; }
     if(del){ if(!state.edit) return; const id=del.dataset.delreward;
       pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id); delete state.rewards.inventory[id];
       save(); renderRewards(); toast("Récompense supprimée","info"); return;
@@ -722,52 +681,7 @@ function openRewardEditor(id){
   currentEditType='reward'; currentEditId=id; $("#editModal").classList.add("active");
 }
 
-/* =============== MALUS =============== */
-function malusPreview(){
-  const rules=state.malus.rules, newMalus=[], newPen=[];
-  if(state.profile.stats.dailyXP < (rules.dayMin||0)) newMalus.push('no_rewards_daily');
-  if(state.profile.stats.weeklyXP < (rules.weekMin||0)) newMalus.push('no_rewards_weekend');
-  const bizXP=calculateCategoryXP('business');
-  if(bizXP < (rules.bizMin||0)) newMalus.push('no_shopping');
-
-  const devLect = (state.goals.dev.bars.find(b=>b.id==='lectures')||{now:0}).now;
-  if(devLect < (rules.readMin||0)) { newMalus.push('no_social'); newPen.push('1h lecture le dimanche') }
-
-  if((state.goals.business.bars.find(b=>b.id==='mlm_inscriptions')||{now:0}).now===0){
-    newPen.push('+50 prospections MLM obligatoires'); newPen.push('+5 appels téléphoniques obligatoires');
-  }
-  if((state.goals.ugc.bars.find(b=>b.id==='ugc_collabs')||{now:0}).now===0){
-    newPen.push('+30 prospections UGC obligatoires');
-  }
-  if((state.goals.sport.bars.find(b=>b.id==='workouts')||{now:0}).now<3){
-    newPen.push('Workout extra le week-end');
-  }
-  if((state.goals.sport.bars.find(b=>b.id==='runs')||{now:0}).now===0){
-    newPen.push('Cardio long (45min) la semaine suivante');
-  }
-  if((state.goals.spirituality.bars.find(b=>b.id==='jumuah')||{now:0}).now===0){
-    newPen.push('Lecture coranique (1h) le week-end');
-  }
-  return {newMalus,newPen};
-}
-function renderMalus(){
-  const active=state.malus.active, pen=state.malus.penalties, rules=state.malus.rules;
-  $("#rule_day_min").value=rules.dayMin||0;
-  $("#rule_week_min").value=rules.weekMin||0;
-  $("#rule_biz_min").value=rules.bizMin||0;
-  $("#rule_read_min").value=rules.readMin||0;
-  $("#malus_status").innerHTML = active.length? active.map(m=>`<div class="malus-item malus-active">${getMalusDescription(m)}</div>`).join("")
-    : `<p class="muted">Aucun malus actif</p>` ;
-  $("#malus_status").insertAdjacentHTML("beforeend", `<h4>Pénalités</h4>`+
-    (pen.length? pen.map(p=>`<div class="malus-item">${p}</div>`).join("") : `<p class="muted">Aucune pénalité</p>`));
-}
-function renderMalusPreviewBox(){
-  const {newMalus,newPen}=malusPreview();
-  $("#malus_preview").innerHTML = `
-    <div><b>Malus potentiels (${newMalus.length})</b><ul class="small">${newMalus.map(m=>`<li>${getMalusDescription(m)}</li>`).join("")||"<li>—</li>"}</ul></div>
-    <div style="margin-top:6px"><b>Pénalités potentielles (${newPen.length})</b><ul class="small">${newPen.map(p=>`<li>${p}</li>`).join("")||"<li>—</li>"}</ul></div>
-  `;
-}
+/* ========== MALUS ========== */
 function getMalusDescription(m){
   const d={
     'no_rewards_daily':"🚫 Pas de récompense aujourd'hui (< min/jour)",
@@ -775,96 +689,66 @@ function getMalusDescription(m){
     'no_shopping':"🚫 Pas de shopping (Business < min)",
     'no_social':"🚫 Pas de soirée amis (Lectures < min)",
     'no_pleasure':"🚫 Pas d'activité plaisir (<3 workouts/semaine)"
-  };
-  return d[m]||m;
+  }; return d[m]||m;
 }
-function calculateCategoryXP(cat){
-  let xp=0; ['daily','weekly','monthly'].forEach(scope=>{
-    state.tasks[scope].forEach(t=>{ if(t.category===cat && t.done) xp+=t.xp; })
-  }); return xp;
+function calculateCategoryXP(cat){ let xp=0; ['daily','weekly','monthly'].forEach(scope=>{ state.tasks[scope].forEach(t=>{ if(t.category===cat && t.done) xp+=t.xp; }) }); return xp; }
+function malusPreview(){
+  const rules=state.malus.rules, newMalus=[], newPen=[];
+  if(state.profile.stats.dailyXP < (rules.dayMin||0)) newMalus.push('no_rewards_daily');
+  if(state.profile.stats.weeklyXP < (rules.weekMin||0)) newMalus.push('no_rewards_weekend');
+  const bizXP=calculateCategoryXP('business'); if(bizXP < (rules.bizMin||0)) newMalus.push('no_shopping');
+  const devLect=(state.goals.dev.bars.find(b=>b.id==='lectures')||{now:0}).now;
+  if(devLect < (rules.readMin||0)) { newMalus.push('no_social'); newPen.push('1h lecture le dimanche') }
+  if((state.goals.business.bars.find(b=>b.id==='mlm_inscriptions')||{now:0}).now===0){ newPen.push('+50 prospections MLM obligatoires'); newPen.push('+5 appels téléphoniques obligatoires') }
+  if((state.goals.ugc.bars.find(b=>b.id==='ugc_collabs')||{now:0}).now===0){ newPen.push('+30 prospections UGC obligatoires') }
+  if((state.goals.sport.bars.find(b=>b.id==='workouts')||{now:0}).now<3){ newPen.push('Workout extra le week-end') }
+  if((state.goals.sport.bars.find(b=>b.id==='runs')||{now:0}).now===0){ newPen.push('Cardio long (45min) la semaine suivante') }
+  if((state.goals.spirituality.bars.find(b=>b.id==='jumuah')||{now:0}).now===0){ newPen.push('Lecture coranique (1h) le week-end') }
+  return {newMalus:newMalus,newPen:newPen};
 }
-$("#btnPreviewMalus").onclick=()=>{renderMalusPreviewBox(); toast("Aperçu calculé","info")};
-$("#applyMalus,#applyMalus2").forEach?null: (Object.defineProperty(HTMLElement.prototype,'forEach',{value:function(){}}));
-document.getElementById("applyMalus").onclick=applyMalusNow;
-document.getElementById("applyMalus2").onclick=applyMalusNow;
-function applyMalusNow(){
-  pushHistory();
-  const {newMalus,newPen}=malusPreview();
-  state.malus.active=newMalus; state.malus.penalties=newPen;
-  save(); renderMalus(); updateStreaks();
-  toast(`Malus appliqués (${newMalus.length})`,"warning");
+function renderMalus(){
+  const active=state.malus.active, pen=state.malus.penalties, rules=state.malus.rules;
+  $("#rule_day_min").value=rules.dayMin||0; $("#rule_week_min").value=rules.weekMin||0; $("#rule_biz_min").value=rules.bizMin||0; $("#rule_read_min").value=rules.readMin||0;
+  $("#malus_status").innerHTML = (active.length? active.map(m=>`<div class="malus-item malus-active">${getMalusDescription(m)}</div>`).join("") : `<p class="muted">Aucun malus actif</p>`)
+    + `<h4>Pénalités</h4>` + (pen.length? pen.map(p=>`<div class="malus-item">${p}</div>`).join("") : `<p class="muted">Aucune pénalité</p>`);
 }
-["rule_day_min","rule_week_min","rule_biz_min","rule_read_min"].forEach(id=>{
-  const el=document.getElementById(id);
-  el.oninput=()=>{ if(!state.edit) return; pushHistory();
-    const v=+el.value||0; if(id==="rule_day_min") state.malus.rules.dayMin=v;
-    if(id==="rule_week_min") state.malus.rules.weekMin=v;
-    if(id==="rule_biz_min") state.malus.rules.bizMin=v;
-    if(id==="rule_read_min") state.malus.rules.readMin=v;
-    save(); renderMalusPreviewBox();
-  };
-});
+function renderMalusPreviewBox(){ const {newMalus,newPen}=malusPreview(); $("#malus_preview").innerHTML=`<div><b>Malus potentiels (${newMalus.length})</b><ul class="small">${newMalus.map(m=>`<li>${getMalusDescription(m)}</li>`).join("")||"<li>—</li>"}</ul></div><div style="margin-top:6px"><b>Pénalités potentielles (${newPen.length})</b><ul class="small">${newPen.map(p=>`<li>${p}</li>`).join("")||"<li>—</li>"}</ul></div>` }
+$("#btnPreviewMalus").onclick=()=>{renderMalusPreviewBox();toast("Aperçu calculé","info")}
+$("#applyMalus").onclick=()=>{ pushHistory(); const {newMalus,newPen}=malusPreview(); state.malus.active=newMalus; state.malus.penalties=newPen; save(); renderMalus(); updateStreaks(); toast(`Malus appliqués (${newMalus.length})`,"warning") };
 
-/* =============== BONUS (exploits) =============== */
+/* ========== BONUS ========== */
 function renderBonus(){
   const wrap=$("#bonus_list");
-  if(!state.bonus.length){
-    wrap.innerHTML=`<p class="muted">Aucun bonus. (Mode édition → “+ Ajouter un bonus”)</p>`;
-    return;
-  }
-  wrap.innerHTML=state.bonus.map(b=>{
-    return `<div class="manage-item">
+  if(!state.bonus.length){wrap.innerHTML=`<p class="muted">Aucun bonus. (Mode édition → “+ Ajouter un bonus”)</p>`;return}
+  wrap.innerHTML=state.bonus.map(b=>`
+    <div class="manage-item">
       <div><strong>${b.name}</strong><div class="muted small">+${b.xp} XP — ${b.claimed?"déjà réclamé":"disponible"}</div></div>
       <div class="manage-item-actions">
         <button data-claim="${b.id}" ${b.claimed?"disabled":""}>Réclamer</button>
         <button data-editbonus="${b.id}" class="ghost ${state.edit?'':'hidden'}">✏️</button>
         <button data-delbonus="${b.id}" class="danger ${state.edit?'':'hidden'}">🗑️</button>
       </div>
-    </div>`;
-  }).join("");
+    </div>`).join("");
   wrap.onclick=(e)=>{
     const c=e.target.closest("[data-claim]"), ed=e.target.closest("[data-editbonus]"), del=e.target.closest("[data-delbonus]");
     if(c){ const id=c.dataset.claim; const b=state.bonus.find(x=>x.id===id); if(!b||b.claimed) return;
       pushHistory(); b.claimed=true; save(); addXP(b.xp,c); renderBonus(); toast("Bonus réclamé 🎉","success"); }
     if(ed){ if(!state.edit) return; const id=ed.dataset.editbonus; openBonusEditor(id); }
-    if(del){ if(!state.edit) return; const id=del.dataset.delbonus; pushHistory();
-      state.bonus=state.bonus.filter(x=>x.id!==id); save(); renderBonus(); toast("Bonus supprimé","info"); }
+    if(del){ if(!state.edit) return; const id=del.dataset.delbonus; pushHistory(); state.bonus=state.bonus.filter(x=>x.id!==id); save(); renderBonus(); toast("Bonus supprimé","info"); }
   };
 }
-$("#addBonus").onclick=()=>{ if(!state.edit) return;
-  currentEditType='bonus'; currentEditId=null;
-  $("#editModalTitle").textContent="Ajouter un bonus"; $("#editName").value=""; $("#editValue").value=50;
-  $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="none";
-  $("#editModal").classList.add("active");
-};
-function openBonusEditor(id){
-  const b=state.bonus.find(x=>x.id===id); if(!b) return;
-  currentEditType='bonus'; currentEditId=id;
-  $("#editModalTitle").textContent="Modifier le bonus";
-  $("#editName").value=b.name; $("#editValue").value=b.xp;
-  $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="none";
-  $("#editModal").classList.add("active");
-}
+$("#addBonus").onclick=()=>{ if(!state.edit) return; currentEditType='bonus'; currentEditId=null; $("#editModalTitle").textContent="Ajouter un bonus"; $("#editName").value=""; $("#editValue").value=50; $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="none"; $("#editModal").classList.add("active") };
+function openBonusEditor(id){ const b=state.bonus.find(x=>x.id===id); if(!b) return; currentEditType='bonus'; currentEditId=id; $("#editModalTitle").textContent="Modifier le bonus"; $("#editName").value=b.name; $("#editValue").value=b.xp; $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="none"; $("#editModal").classList.add("active") }
 
-/* =============== Export / Import / Reset =============== */
-$("#exportData").onclick=()=>{
-  const dataStr=JSON.stringify(state,null,2);
-  const blob=new Blob([dataStr],{type:'application/json'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`gamelife-backup-${new Date().toISOString().slice(0,10)}.json`;
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); toast("Export OK","success");
-};
-$("#importData").onclick=()=>{
-  const input=document.createElement('input'); input.type='file'; input.accept='.json';
-  input.onchange=(e)=>{
-    const file=e.target.files[0]; if(!file) return; const rd=new FileReader();
-    rd.onload=(ev)=>{ try{ pushHistory(); state=JSON.parse(ev.target.result); save(); init(); toast("Import OK","success"); }
-      catch(err){ toast("Import invalide","error") } }; rd.readAsText(file);
-  }; input.click();
-};
+/* ========== EXPORT / IMPORT / RESET ========== */
+$("#exportData").onclick=()=>{ const s=JSON.stringify(state,null,2); const blob=new Blob([s],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`gamelife-backup-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); toast("Export OK","success") };
+$("#importData").onclick=()=>{ const input=document.createElement('input'); input.type='file'; input.accept='.json'; input.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=(ev)=>{ try{ pushHistory(); state=JSON.parse(ev.target.result); save(); init(); toast("Import OK","success") }catch(err){ toast("Import invalide","error") } }; rd.readAsText(f) }; input.click() };
 $("#resetAll").onclick=()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info") };
 
-/* =============== Modales (tâches / récompenses / form) =============== */
+/* ========== MODALES (tâches & rewards & form) ========== */
 let currentEditType=null, currentEditId=null;
+
+// Tâches
 function renderTaskManager(type){
   const list=$("#taskManageList"); const tasks=state.tasks[type];
   list.innerHTML = tasks.map(t=>`
@@ -882,25 +766,13 @@ function openTaskManager(type){ if(!state.edit){toast("Active le mode édition p
 $("#manageDailyTasks").onclick=()=>openTaskManager('daily');
 $("#manageWeeklyTasks").onclick=()=>openTaskManager('weekly');
 $("#manageMonthlyTasks").onclick=()=>openTaskManager('monthly');
-window.editTask=(type,id)=>{
-  const t=state.tasks[type].find(x=>x.id===id); if(!t) return;
-  $("#editModalTitle").textContent="Modifier la tâche";
-  $("#editName").value=t.label; $("#editValue").value=t.xp; $("#editCategory").value=t.category;
-  $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
-  currentEditType=type; currentEditId=id; $("#editModal").classList.add("active");
-};
-window.deleteTask=(type,id)=>{ if(!confirm("Supprimer cette tâche ?")) return; pushHistory();
-  state.tasks[type]=state.tasks[type].filter(t=>t.id!==id); save(); renderTaskManager(type); renderTasksByCategory(); toast("Tâche supprimée","info") };
-$("#addNewTask").onclick=()=>{ if(!currentEditType) return;
-  $("#editModalTitle").textContent="Ajouter une tâche";
-  $("#editName").value=""; $("#editValue").value=10; $("#editCategory").value="discipline";
-  $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
-  currentEditId=null; $("#editModal").classList.add("active");
-};
+window.editTask=(type,id)=>{ const t=state.tasks[type].find(x=>x.id===id); if(!t) return;
+  $("#editModalTitle").textContent="Modifier la tâche"; $("#editName").value=t.label; $("#editValue").value=t.xp; $("#editCategory").value=t.category; $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none"; currentEditType=type; currentEditId=id; $("#editModal").classList.add("active") };
+window.deleteTask=(type,id)=>{ if(!confirm("Supprimer cette tâche ?")) return; pushHistory(); state.tasks[type]=state.tasks[type].filter(t=>t.id!==id); save(); renderTaskManager(type); renderTasksByCategory(); toast("Tâche supprimée","info") };
+$("#addNewTask").onclick=()=>{ if(!currentEditType) return; $("#editModalTitle").textContent="Ajouter une tâche"; $("#editName").value=""; $("#editValue").value=10; $("#editCategory").value="discipline"; $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none"; currentEditId=null; $("#editModal").classList.add("active") };
 
-$("#manageRewards").onclick=()=>{ if(!state.edit){toast("Active le mode édition","info");return}
-  renderRewardManager(); $("#rewardModal").classList.add("active");
-});
+// Rewards manager
+$("#manageRewards").onclick=()=>{ if(!state.edit){toast("Active le mode édition","info");return} renderRewardManager(); $("#rewardModal").classList.add("active") };
 function renderRewardManager(){
   const list=$("#rewardManageList"), R=state.rewards.catalog;
   list.innerHTML=R.map(r=>`
@@ -913,30 +785,18 @@ function renderRewardManager(){
     </div>`).join("");
 }
 window.editReward=(id)=>openRewardEditor(id);
-window.deleteReward=(id)=>{ if(!confirm("Supprimer ?")) return; pushHistory();
-  state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id); delete state.rewards.inventory[id];
-  save(); renderRewardManager(); renderRewards(); toast("Supprimé","info");
-};
+window.deleteReward=(id)=>{ if(!confirm("Supprimer ?")) return; pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id); delete state.rewards.inventory[id]; save(); renderRewardManager(); renderRewards(); toast("Supprimé","info") };
 
-$("#closeTaskModal,#closeRewardModal,#cancelEdit").forEach?null:(Object.defineProperty(HTMLElement.prototype,'forEach',{value:function(){}}));
-["closeTaskModal","closeRewardModal","cancelEdit"].forEach(id=>{
-  const el=document.getElementById(id); if(!el) return;
-  el.onclick=()=>{ $("#taskModal").classList.remove("active"); $("#rewardModal").classList.remove("active"); $("#editModal").classList.remove("active") };
-});
-document.getElementById("taskModal").addEventListener("click",e=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active") });
-document.getElementById("rewardModal").addEventListener("click",e=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active") });
-document.getElementById("editModal").addEventListener("click",e=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active") });
-
-/* ====== Formulaire d’édition (tâches / reward / bonus) ====== */
+// Formulaire d’édition (tâches / reward / bonus)
 document.getElementById("editForm").addEventListener("submit",(e)=>{
   e.preventDefault();
   const name=$("#editName").value.trim(), value=parseInt($("#editValue").value);
-  if(!name || !value){toast("Champs invalides","error");return}
+  if(!name || isNaN(value)){toast("Champs invalides","error");return}
   pushHistory();
   if(currentEditType==='reward'){
     const tag=$("#editTag").value.trim();
     if(currentEditId){ const r=state.rewards.catalog.find(x=>x.id===currentEditId); if(r){r.name=name;r.cost=value;r.tag=tag} }
-    else{ state.rewards.catalog.push({id:'rw_'+Date.now(),name,cost:value,tag}); }
+    else{ state.rewards.catalog.push({id:'rw_'+Date.now(),name,cost:value,tag}) }
     save(); renderRewardManager(); renderRewards();
   }else if(currentEditType==='bonus'){
     if(currentEditId){ const b=state.bonus.find(x=>x.id===currentEditId); if(b){b.name=name;b.xp=value} }
@@ -951,57 +811,60 @@ document.getElementById("editForm").addEventListener("submit",(e)=>{
   $("#editModal").classList.remove("active"); toast("Sauvegardé","success");
 });
 
-/* =============== Bonus de streak prières (7 jours) =============== */
-function checkBonuses(){
-  if(state.profile.streaks.prayer>=7 && state.profile.streaks.prayer%7===0){
-    addXP(50); toast("🎉 Bonus streak prières +50 XP!","success");
-  }
+// Fermer modales
+["closeTaskModal","closeRewardModal","cancelEdit"].forEach(id=>{
+  const el=document.getElementById(id); if(!el) return;
+  el.onclick=()=>{ ["taskModal","rewardModal","editModal"].forEach(mid=>{const m=document.getElementById(mid); if(m) m.classList.remove("active")}) };
+});
+["taskModal","rewardModal","editModal"].forEach(mid=>{
+  const m=document.getElementById(mid); if(!m) return;
+  m.addEventListener("click",(e)=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active") });
+});
+
+// Resets rapides
+$("#resetDaily").onclick=()=>{ state.tasks.daily.forEach(t=>t.done=false); save(); renderTasksByCategory(); toast("Quotidien réinitialisé","info") };
+$("#resetWeekly").onclick=()=>{ state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasksByCategory(); toast("Hebdo réinitialisé","info") };
+$("#resetMonthly").onclick=()=>{ state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasksByCategory(); toast("Mensuel réinitialisé","info") };
+
+/* ========== CHECKS / STATS ========== */
+function updateStreaks(){ $("#streak_pr").textContent=state.profile.streaks.prayer||0; $("#active_malus").textContent=state.malus.active.length||0 }
+function renderStats(){
+  const stats=state.profile.stats; const content=$("#stats_content");
+  let html=`<div class="stats-grid">
+    <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem;">${stats.dailyXP}</div></div>
+    <div class="stat-card"><h3>XP Hebdomadaire</h3><div style="font-size:2rem;">${stats.weeklyXP}</div></div>
+    <div class="stat-card"><h3>XP Mensuel</h3><div style="font-size:2rem;">${stats.monthlyXP}</div></div>
+    <div class="stat-card"><h3>Niveau</h3><div style="font-size:2rem;">${state.profile.level}</div></div>
+  </div>`;
+  content.innerHTML=html;
 }
 
-/* =============== Sector Gauges =============== */
-function getWeeklySectorXP(){
-  const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
-  ['daily','weekly','monthly'].forEach(scope=>{
-    state.tasks[scope].forEach(t=>{
-      if(!t.done) return;
-      if(t.category==='business') W.biz+=t.xp;
-      if(t.category==='ugc') W.ugc+=t.xp;
-      if(t.category==='sport') W.sport+=t.xp;
-      if(t.category==='dev') W.dev+=t.xp;
-      if(t.category==='spirituality') W.spi+=t.xp;
-    });
-  }); return W;
+/* ========== SECTORS ========== */
+function getWeeklySectorXP(){ const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
+  ['daily','weekly','monthly'].forEach(scope=>{ state.tasks[scope].forEach(t=>{ if(!t.done) return;
+    if(t.category==='business') W.biz+=t.xp; if(t.category==='ugc') W.ugc+=t.xp; if(t.category==='sport') W.sport+=t.xp; if(t.category==='dev') W.dev+=t.xp; if(t.category==='spirituality') W.spi+=t.xp; }) });
+  return W;
 }
-function renderSectorGauges(){
-  const W=getWeeklySectorXP();
-  const set=(fill,txt,now,goal)=>{ const f=$("#"+fill), t=$("#"+txt), p=goal?Math.min(100,Math.round(now/goal*100)):0; if(f) f.style.width=p+"%"; if(t) t.textContent=`${now}/${goal}`; };
-  set('g_biz','g_biz_txt',W.biz,100);
-  set('g_ugc','g_ugc_txt',W.ugc,100);
-  set('g_sport','g_sport_txt',W.sport,60);
-  set('g_dev','g_dev_txt',W.dev,50);
-  set('g_spi','g_spi_txt',W.spi,60);
+function renderSectorGauges(){ const W=getWeeklySectorXP(); const set=(fill,txt,now,goal)=>{const f=$("#"+fill),t=$("#"+txt),p=goal?Math.min(100,Math.round(now/goal*100)):0; if(f) f.style.width=p+"%"; if(t) t.textContent=`${now}/${goal}`};
+  set('g_biz','g_biz_txt',W.biz,100); set('g_ugc','g_ugc_txt',W.ugc,100); set('g_sport','g_sport_txt',W.sport,60); set('g_dev','g_dev_txt',W.dev,50); set('g_spi','g_spi_txt',W.spi,60);
 }
 
-/* =============== Auto-hide nav =============== */
+/* ========== AUTO-HIDE NAV ========== */
 let lastScrollY=0,ticking=false;
-function updateNavbar(){
-  const y=window.scrollY, nav=$(".top");
-  if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden");
-  lastScrollY=y; ticking=false;
-}
+function updateNavbar(){ const y=window.scrollY, nav=$(".top"); if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden"); lastScrollY=y; ticking=false }
 window.addEventListener("scroll",()=>{ if(!ticking){ requestAnimationFrame(updateNavbar); ticking=true }});
 
-/* =============== INIT =============== */
+/* ========== INIT ========== */
 function init(){
-  // sécurité migration anciennes clés
   if(!state.profile) state.profile={name:"",level:1,xp:0,streaks:{prayer:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}};
-  if(!state.malus||!state.malus.rules) state.malus={rules:{dayMin:100,weekMin:250,bizMin:100,readMin:3},active:[],penalties:[]};
   drawPlayerName();
   $("#player_name").value=state.profile.name||"";
-  $("#selected_date").value=currentDate;
-  renderKPIs(); renderTasksByCategory(); renderRewards(); renderMalus(); renderMalusPreviewBox(); renderBonus(); renderMoney();
-  renderPriorities(); renderSectorGauges(); updateXP(); updateStreaks(); applyEditModeUI(); loadDay(currentDate);
+  currentDate=todayISO(); $("#selected_date").value=currentDate; loadDay(currentDate);
+
+  renderKPIs(); renderTasksByCategory(); renderRewards(); renderMalus(); renderMalusPreviewBox(); renderBonus(); renderMoney(); renderPriorities(); renderSectorGauges(); renderStats();
+  updateXP(); updateStreaks(); applyEditModeUI();
 }
+function renderMalusPreviewBox(){ const P=malusPreview(); $("#malus_preview").innerHTML=`<div><b>Malus potentiels (${P.newMalus.length})</b><ul class="small">${P.newMalus.map(m=>`<li>${getMalusDescription(m)}</li>`).join("")||"<li>—</li>"}</ul></div><div style="margin-top:6px"><b>Pénalités potentielles (${P.newPen.length})</b><ul class="small">${P.newPen.map(p=>`<li>${p}</li>`).join("")||"<li>—</li>"}</ul></div>` }
 init();
 </script>
 </body>
