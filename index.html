@@ -17,7 +17,7 @@
     .top{position:fixed;inset:0 0 auto 0;z-index:10;background:rgba(11,15,20,.95);
       backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s}
     .top.hidden{transform:translateY(-100%)}
-    .container{width:min(1100px,94vw);margin:0 auto;padding:72px 0 40px}
+    .container{width:min(1100px,94vw);margin:0 auto;padding:116px 0 40px}
     .header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
     .title{flex:1;text-align:center}
     .title h1{margin:0;font-size:1.2rem}
@@ -29,11 +29,18 @@
       padding:8px;border-radius:8px;transition:background .2s;font-size:1rem
     }
     .menu-toggle:hover,.back-btn-header:hover,.mini:hover{background:rgba(255,255,255,.08)}
+
+    /* NAV MOBILE (menu burger) */
     .mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);
       backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;gap:6px;padding:8px}
     .mobile-menu.show{display:flex}
+
+    /* NAV DESKTOP (toujours visible) */
+    .tabs-desktop{display:none;gap:8px;justify-content:center;padding:8px;border-top:1px solid var(--line)}
+    @media(min-width:760px){.tabs-desktop{display:flex}}
+
     .tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);
-      background:#0d1520;color:var(--text);cursor:pointer;font-size:.95rem;text-align:left;width:100%}
+      background:#0d1520;color:var(--text);cursor:pointer;font-size:.95rem;text-align:center}
     .tab.active{border-color:rgba(255,255,255,.35)}
 
     .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;
@@ -111,13 +118,25 @@
         <button id="menuToggle" class="menu-toggle">☰</button>
       </div>
     </div>
+
+    <!-- barre d'onglets desktop (toujours visible) -->
+    <nav class="tabs-desktop" id="tabsDesktop">
+      <button class="tab active" data-goto="goals">🎯 Objectifs</button>
+      <button class="tab" data-goto="tasks">✅ Tâches</button>
+      <button class="tab" data-goto="rewards">🎁 Récompenses</button>
+      <button class="tab" data-goto="malus">⚠️ Malus</button>
+      <button class="tab" data-goto="stats">📊 Statistiques</button>
+      <button id="exportData" class="tab ghost" style="border-style:dashed">📤 Exporter</button>
+    </nav>
+
+    <!-- menu mobile (ouvrir avec ☰) -->
     <nav id="mobileMenu" class="mobile-menu">
       <button class="tab active" data-goto="goals">🎯 Objectifs</button>
       <button class="tab" data-goto="tasks">✅ Tâches</button>
       <button class="tab" data-goto="rewards">🎁 Récompenses</button>
       <button class="tab" data-goto="malus">⚠️ Malus</button>
       <button class="tab" data-goto="stats">📊 Statistiques</button>
-      <button id="exportData" class="ghost">📤 Exporter</button>
+      <button id="exportDataMobile" class="ghost">📤 Exporter</button>
     </nav>
   </header>
 
@@ -202,7 +221,6 @@
       <section class="card">
         <h2>Objectifs hebdomadaires</h2>
 
-        <!-- Mini jauges secteur -->
         <div id="sector_gauges" class="grid" style="margin-top:8px">
           <div class="half card"><div class="row"><b>💸 Business</b><span id="g_biz_txt">0/100</span></div><div class="gbar"><span id="g_biz" class="gfill"></span></div></div>
           <div class="half card"><div class="row"><b>🎥 UGC</b><span id="g_ugc_txt">0/100</span></div><div class="gbar"><span id="g_ugc" class="gfill"></span></div></div>
@@ -211,7 +229,6 @@
           <div class="half card"><div class="row"><b>🕌 Spiritualité</b><span id="g_spi_txt">0/80</span></div><div class="gbar"><span id="g_spi" class="gfill"></span></div></div>
         </div>
 
-        <!-- 2 colonnes “reste le moins / le plus” sur les bars -->
         <div class="col2" style="margin-top:10px">
           <div class="card soft">
             <h3 style="margin:.2rem 0">🔽 Reste le moins</h3>
@@ -306,7 +323,7 @@
 
   <div id="toast"></div>
 
-  <!-- MODALES (gestion listes) -->
+  <!-- MODALES -->
   <div id="taskModal" class="modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.8);z-index:100">
     <div class="modal-content">
       <h2 id="taskModalTitle">Gérer les tâches</h2>
@@ -338,7 +355,7 @@
             <option value="sport">Sport</option>
             <option value="social">Social</option>
             <option value="dev">Développement</option>
-            <option value="spirituality">Spiritualité</option>
+            <option value="spiritualité">Spiritualité</option>
           </select>
         </div>
         <div class="form-group" id="editTagGroup"><label for="editTag">Tag :</label><input type="text" id="editTag"></div>
@@ -434,143 +451,89 @@ function dflt(){
       rules:{dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3},
       pending:[],active:[],penalties:[]
     },
-    byDate:{}, // { 'YYYY-MM-DD': {dailyDone:{},dailyXP:0,validated:false} }
-    _history:[] // undo stack
+    byDate:{},
+    _history:[]
   }
 }
 
 let state = load();
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||dflt();}catch(e){return dflt();}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));}
-function pushHistory(){ // snapshot for undo
-  state._history = (state._history||[]);
-  state._history.push(JSON.stringify(state));
-  if(state._history.length>10) state._history.shift();
-}
-function undo(){
-  if(!state._history||state._history.length===0){toast("Rien à annuler","info");return;}
-  const last = state._history.pop();
-  try{
-    const prev = JSON.parse(last);
-    // keep history stack of previous within bounds
-    prev._history = state._history;
-    state = prev; save(); init(); toast("Annulé.","info");
-  }catch(e){toast("Impossible d'annuler","error");}
-}
-
+function pushHistory(){state._history=state._history||[];state._history.push(JSON.stringify(state));if(state._history.length>10)state._history.shift();}
+function undo(){if(!state._history||state._history.length===0){toast("Rien à annuler","info");return;}
+  const last=state._history.pop();try{const prev=JSON.parse(last);prev._history=state._history;state=prev;save();init();toast("Annulé.","info");}catch(e){toast("Impossible d'annuler","error");}}
 const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);
-function toast(text,type='info'){const el=$("#toast");if(!el)return;
-  el.textContent=text;el.className=type;el.classList.add('show');
-  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.className='',280);},2400);
-}
-function showXPGain(amount,element){
-  const xpEl=document.createElement('div');xpEl.className=amount>0?'xp-gain':'xp-loss';
-  xpEl.textContent=amount>0?`+${amount} XP`:`${amount} XP`;
-  const rect=(element?.getBoundingClientRect?.()||{left:window.innerWidth/2,top:40,width:0});
-  xpEl.style.left=(rect.left+rect.width/2)+'px';xpEl.style.top=rect.top+'px';
-  document.body.appendChild(xpEl);setTimeout(()=>xpEl.remove(),2000);
-}
-function showLevelUp(level){const el=document.createElement('div');el.className='level-up';
-  el.textContent=`🎉 NIVEAU ${level} ! 🎉`;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
-}
+function toast(text,type='info'){const el=$("#toast");if(!el)return;el.textContent=text;el.className=type;el.classList.add('show');setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.className='',280);},2400);}
+function showXPGain(a,el){const d=document.createElement('div');d.className=a>0?'xp-gain':'xp-loss';d.textContent=a>0?`+${a} XP`:`${a} XP`;const r=(el&&el.getBoundingClientRect?el.getBoundingClientRect():{left:innerWidth/2,top:40,width:0});d.style.left=(r.left+r.width/2)+'px';d.style.top=r.top+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),2000);}
+function showLevelUp(l){const d=document.createElement('div');d.className='level-up';d.textContent=`🎉 NIVEAU ${l} ! 🎉`;document.body.appendChild(d);setTimeout(()=>d.remove(),3000);}
 
-/* ============ DATE STORAGE (daily) ============ */
-let currentDate = todayISO();
-function loadDay(date){
-  const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
-  // reload daily done flags
-  state.tasks.daily.forEach(t=>{t.done=!!day.dailyDone[t.id];});
-  save(); renderTasks(); $("#date_validated")?.textContent = day.validated?'oui':'non';
-}
-function saveDay(date){
-  const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
-  state.tasks.daily.forEach(t=>{day.dailyDone[t.id]=!!t.done;});
-  day.dailyXP = state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);
-  state.byDate[date]=day; save();
-}
+/* DATE STORAGE */
+let currentDate=todayISO();
+function loadDay(date){const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};state.tasks.daily.forEach(t=>{t.done=!!day.dailyDone[t.id];});save();renderTasks();const dv=document.getElementById('date_validated');if(dv) dv.textContent=day.validated?'oui':'non';}
+function saveDay(date){const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};state.tasks.daily.forEach(t=>{day.dailyDone[t.id]=!!t.done;});day.dailyXP=state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);state.byDate[date]=day;save();}
 
-/* ============ MENU / NAV ============ */
-$("#menuToggle")?.addEventListener("click",()=>$("#mobileMenu")?.classList.toggle("show"));
+/* MENU / NAV */
+const mobileMenu=document.getElementById("mobileMenu");
+const menuToggle=document.getElementById("menuToggle");
+if(menuToggle){menuToggle.addEventListener("click",()=>{if(mobileMenu) mobileMenu.classList.toggle("show");});}
 document.addEventListener("click",e=>{
-  const menu=$("#mobileMenu"),toggle=$("#menuToggle");
-  if(!menu||!toggle) return;
-  if(!menu.contains(e.target)&&!toggle.contains(e.target)) menu.classList.remove("show");
+  if(!mobileMenu||!menuToggle) return;
+  if(!mobileMenu.contains(e.target) && !menuToggle.contains(e.target)){mobileMenu.classList.remove("show");}
 });
 
+/* gestion centralisée des onglets (desktop + mobile) */
+function onTabClick(targetBtn){
+  const goto=targetBtn.getAttribute("data-goto");
+  if(!goto) return;
+  // activer bon onglet dans les deux barres
+  $$(".tab").forEach(t=>t.classList.remove("active"));
+  // activer tous les boutons portant le même data-goto
+  document.querySelectorAll(`.tab[data-goto="${goto}"]`).forEach(t=>t.classList.add("active"));
+  // afficher la vue
+  $$(".view").forEach(v=>v.classList.remove("active"));
+  const view=document.getElementById(`view-${goto}`);
+  if(view) view.classList.add("active");
+  // bouton retour
+  const backBtn=document.getElementById("backButton");
+  if(backBtn) backBtn.style.display = (goto==="goals") ? "none":"block";
+  // fermer le menu mobile
+  if(mobileMenu) mobileMenu.classList.remove("show");
+}
 document.addEventListener("click",(e)=>{
   const tab = e.target.closest(".tab");
-  if(!tab) return;
-  $$(".tab").forEach(t=>t.classList.remove("active")); tab.classList.add("active");
-  const target = document.getElementById(`view-${tab.dataset.goto}`);
-  if(target){$$(".view").forEach(v=>v.classList.remove("active")); target.classList.add("active");}
-  const backBtn=$("#backButton"); if(backBtn) backBtn.style.display = (tab.dataset.goto==="goals")?"none":"block";
-  $("#mobileMenu")?.classList.remove("show");
+  if(tab && tab.hasAttribute("data-goto")) onTabClick(tab);
 });
 
-$("#backButton")?.addEventListener("click",()=>{
-  $$(".view").forEach(v=>v.classList.remove("active"));
-  $("#view-goals")?.classList.add("active");
-  $$(".tab").forEach(t=>t.classList.remove("active"));
-  document.querySelector(".tab[data-goto='goals']")?.classList.add("active");
-  $("#backButton").style.display="none";
-});
-
-/* ============ EDIT MODE ============ */
+/* EDIT MODE */
 function setEditMode(on){
   state.edit=!!on; save();
-  // editable inputs
-  $("#player_name")?.toggleAttribute("disabled",!state.edit);
-  $("#save_name")?.toggleAttribute("disabled",!state.edit);
-  $("#week_target")?.toggleAttribute("disabled",!state.edit);
-  $("#save_week_target")?.toggleAttribute("disabled",!state.edit);
-  $("#month_target")?.toggleAttribute("disabled",!state.edit);
-  $("#save_month_target")?.toggleAttribute("disabled",!state.edit);
-
-  // malus rules
-  $("#rule_daily_min")?.toggleAttribute("disabled",!state.edit);
-  $("#rule_weekly_min")?.toggleAttribute("disabled",!state.edit);
-  $("#rule_business_weekly_min")?.toggleAttribute("disabled",!state.edit);
-  $("#rule_reads_min")?.toggleAttribute("disabled",!state.edit);
-  $("#rule_workouts_min")?.toggleAttribute("disabled",!state.edit);
-
-  // rewards inline editing fields (name/cost/tag/qty)
-  $$(".reward-edit").forEach(inp=>inp.toggleAttribute("disabled",!state.edit));
-
-  const btn=$("#toggleEdit");
-  if(btn) btn.textContent = state.edit ? "✅ Terminer" : "✏️ Modifier";
+  const toggle=(id)=>{const el=document.getElementById(id); if(el){ if(state.edit) el.removeAttribute("disabled"); else el.setAttribute("disabled",""); }};
+  ["player_name","save_name","week_target","save_week_target","month_target","save_month_target",
+   "rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(toggle);
+  document.querySelectorAll(".reward-edit").forEach(inp=>{if(state.edit) inp.removeAttribute("disabled"); else inp.setAttribute("disabled","");});
+  const btn=document.getElementById("toggleEdit"); if(btn) btn.textContent = state.edit ? "✅ Terminer" : "✏️ Modifier";
 }
-$("#toggleEdit")?.addEventListener("click",()=> setEditMode(!state.edit));
-$("#undoBtn")?.addEventListener("click",undo);
+document.getElementById("toggleEdit")?.addEventListener("click",()=> setEditMode(!state.edit));
+document.getElementById("undoBtn")?.addEventListener("click",undo);
 
-/* ============ XP SYSTEM ============ */
+/* XP SYSTEM */
 function xpNeed(l){return 50 + l*50;}
-function updateXP(){
-  const need=xpNeed(state.profile.level);
-  const xp=Math.max(0,state.profile.xp||0);
-  $("#xp_text").textContent=`${xp} / ${need}`;
-  $("#xp_bar").style.width=Math.min(100,Math.round((xp/need)*100))+"%";
-  $("#level").textContent=state.profile.level;
-}
-function addXP(x, sourceEl=null){
-  pushHistory();
-  state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
+function updateXP(){const need=xpNeed(state.profile.level);const xp=Math.max(0,state.profile.xp||0);
+  document.getElementById("xp_text").textContent=`${xp} / ${need}`;
+  document.getElementById("xp_bar").style.width=Math.min(100,Math.round((xp/need)*100))+"%";
+  document.getElementById("level").textContent=state.profile.level;}
+function addXP(x, src=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
   state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
-  if(sourceEl) showXPGain(x,sourceEl);
-  while(state.profile.xp>=xpNeed(state.profile.level)){
-    state.profile.xp-=xpNeed(state.profile.level); state.profile.level++; showLevelUp(state.profile.level);
-    toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');
-  }
-  save(); updateXP(); updateStreaks();
-}
-function updateStreaks(){
-  $("#streak_pr").textContent=state.profile.streaks.prayer||0;
-  $("#active_malus").textContent=state.malus.active.length||0;
-}
+  if(src) showXPGain(x,src);
+  while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level);state.profile.level++;showLevelUp(state.profile.level);toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');}
+  save(); updateXP(); updateStreaks();}
+function updateStreaks(){document.getElementById("streak_pr").textContent=state.profile.streaks.prayer||0;
+  document.getElementById("active_malus").textContent=state.malus.active.length||0;}
 
-/* ============ GOALS RENDERING ============ */
+/* GOALS */
 function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0;}
 function renderKPIs(){
-  const kpis=$("#kpis"); if(!kpis) return; kpis.innerHTML="";
+  const kpis=document.getElementById("kpis"); if(!kpis) return; kpis.innerHTML="";
   for(const [key,cat] of Object.entries(state.goals)){
     const card=document.createElement("div"); card.className="kpi"; card.dataset.cat=key;
     let html=`<h3>${cat.label}</h3>`;
@@ -587,49 +550,29 @@ function renderKPIs(){
     });
     card.innerHTML=html; kpis.appendChild(card);
   }
-  // bindings
   for(const cat of Object.values(state.goals)){
     cat.bars.forEach(b=>{
-      const now=$("#"+b.id+"_now"), goal=$("#"+b.id+"_goal"), bar=$("#"+b.id+"_bar");
-      const recalc=()=>{
-        b.now=+now.value||0; b.goal=+goal.value||0; bar.style.width=pct(b.now,b.goal)+'%';
-        save(); checkBonuses(); renderLeastMost();
-      };
-      now?.addEventListener("input",recalc); goal?.addEventListener("input",recalc);
+      const now=document.getElementById(b.id+"_now"), goal=document.getElementById(b.id+"_goal"), bar=document.getElementById(b.id+"_bar");
+      const recalc=()=>{b.now=+now.value||0; b.goal=+goal.value||0; bar.style.width=pct(b.now,b.goal)+'%'; save(); checkBonuses(); renderLeastMost();};
+      if(now) now.addEventListener("input",recalc);
+      if(goal) goal.addEventListener("input",recalc);
     });
   }
   renderLeastMost();
 }
-
-/* 5 bars avec moins / plus de “reste” */
-function collectBars(){
-  const list=[];
-  for(const [key,cat] of Object.entries(state.goals)){
-    cat.bars.forEach(b=>{list.push({cat:key,id:b.id,label:`${cat.label} — ${b.label}`,now:b.now,goal:b.goal,rest:Math.max(0,(b.goal||0)-(b.now||0))});});
-  }
-  return list;
-}
+function collectBars(){const list=[]; for(const [k,cat] of Object.entries(state.goals)){cat.bars.forEach(b=>list.push({cat:k,id:b.id,label:`${cat.label} — ${b.label}`,now:b.now,goal:b.goal,rest:Math.max(0,(b.goal||0)-(b.now||0))}));} return list;}
 function renderLeastMost(){
-  const least=$("#least_remaining"), most=$("#most_remaining");
-  if(!least||!most) return;
-  const bars=collectBars();
-  const hasGoal = bars.filter(x=>x.goal>0);
+  const least=document.getElementById("least_remaining"), most=document.getElementById("most_remaining");
+  if(!least||!most) return; const bars=collectBars(); const hasGoal=bars.filter(x=>x.goal>0);
   const asc=[...hasGoal].sort((a,b)=>a.rest-b.rest).slice(0,5);
   const desc=[...hasGoal].sort((a,b)=>b.rest-a.rest).slice(0,5);
   least.innerHTML=asc.map(x=>`<li>${x.label}: reste <b>${x.rest}</b></li>`).join("")||"<li>—</li>";
   most.innerHTML=desc.map(x=>`<li>${x.label}: reste <b>${x.rest}</b></li>`).join("")||"<li>—</li>";
 }
+function checkBonuses(){if(state.profile.streaks.prayer>=7 && state.profile.streaks.prayer%7===0){addXP(50);toast("🎉 Bonus streak prières +50 XP!",'success');}}
 
-/* ====== bonuses ====== */
-function checkBonuses(){
-  if(state.profile.streaks.prayer>=7 && state.profile.streaks.prayer%7===0){
-    addXP(50); toast("🎉 Bonus streak prières +50 XP!",'success');
-  }
-}
-
-/* ====== sector gauges (weekly XP per category) ====== */
-function getWeeklySectorXP(){
-  const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
+/* Sector gauges */
+function getWeeklySectorXP(){const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
   ['daily','weekly','monthly'].forEach(scope=>{
     state.tasks[scope].forEach(t=>{
       if(!t.done) return;
@@ -639,96 +582,55 @@ function getWeeklySectorXP(){
       if(t.category==='dev') W.dev+=t.xp;
       if(t.category==='spirituality') W.spi+=t.xp;
     });
-  });
-  return W;
-}
-function renderSectorGauges(){
-  const W=getWeeklySectorXP();
-  const set=(idFill,idTxt,now,goal)=>{
-    const fill=document.getElementById(idFill), txt=document.getElementById(idTxt);
-    const p=goal?Math.min(100,Math.round(now/goal*100)):0;
-    fill&&(fill.style.width=p+'%');
-    txt&&(txt.textContent=`${now}/${goal}`);
-  };
-  set('g_biz','g_biz_txt',W.biz,100);
-  set('g_ugc','g_ugc_txt',W.ugc,100);
-  set('g_sport','g_sport_txt',W.sport,60);
-  set('g_dev','g_dev_txt',W.dev,50);
-  set('g_spi','g_spi_txt',W.spi,80);
-}
+  }); return W;}
+function renderSectorGauges(){const W=getWeeklySectorXP();
+  const set=(idFill,idTxt,now,goal)=>{const fill=document.getElementById(idFill),txt=document.getElementById(idTxt);
+    const p=goal?Math.min(100,Math.round(now/goal*100)):0; if(fill) fill.style.width=p+'%'; if(txt) txt.textContent=`${now}/${goal}`;};
+  set('g_biz','g_biz_txt',W.biz,100); set('g_ugc','g_ugc_txt',W.ugc,100); set('g_sport','g_sport_txt',W.sport,60); set('g_dev','g_dev_txt',W.dev,50); set('g_spi','g_spi_txt',W.spi,80);}
 
-/* ============ TASKS ============ */
+/* TASKS */
 function renderTasks(){
-  const mount=(id,list)=>{
-    const el=$("#"+id); if(!el) return; el.innerHTML="";
-    list.forEach(t=>{
-      const row=document.createElement("div"); row.className="quest";
+  const mount=(id,list)=>{const el=document.getElementById(id); if(!el) return; el.innerHTML="";
+    list.forEach(t=>{const row=document.createElement("div"); row.className="quest";
       row.innerHTML=`<label><input type="checkbox" data-scope="${id}" data-id="${t.id}" ${t.done?'checked':''}> ${t.label}</label><span class="muted">+${t.xp} XP</span>`;
-      el.appendChild(row);
-    });
-  };
+      el.appendChild(row);});};
   mount("daily_tasks",state.tasks.daily);
   mount("weekly_tasks",state.tasks.weekly);
   mount("monthly_tasks",state.tasks.monthly);
 }
-
 document.addEventListener("change",(e)=>{
-  const el=e.target;
-  if(!el.matches('input[type="checkbox"][data-scope]')) return;
+  const el=e.target; if(!el.matches('input[type="checkbox"][data-scope]')) return;
   const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
   const list= scope==="daily_tasks"? state.tasks.daily : scope==="weekly_tasks"? state.tasks.weekly : state.tasks.monthly;
   const t=list.find(x=>x.id===id); if(!t) return;
+  pushHistory(); const was=t.done; t.done=el.checked;
 
-  pushHistory();
-  const wasCompleted=t.done;
-  t.done=el.checked;
+  if(t.id==="prayers_5" && t.done && !was){state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers");}
+  else if(t.id==="prayers_5" && !t.done && was){state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1);}
 
-  // tâches spéciales (streak prière + mise à jour bar correspondante)
-  if(t.id==="prayers_5" && t.done && !wasCompleted){
-    state.profile.streaks.prayer++;
-    updateGoalFromTask("daily_prayers");
-  }else if(t.id==="prayers_5" && !t.done && wasCompleted){
-    state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1);
-  }
-
-  // fajr
-  if(t.id==="fajr" && t.done && !wasCompleted){ updateGoalFromTask("fajr_on_time"); }
-
-  // réveils 9/8/7
+  if(t.id==="fajr" && t.done && !was){ updateGoalFromTask("fajr_on_time"); }
   const wakeMap={"wake_9":"wake_9","wake_8":"wake_8","wake_7":"wake_7"};
-  if(wakeMap[t.id] && t.done && !wasCompleted){ updateGoalFromTask(wakeMap[t.id]); }
+  if(wakeMap[t.id] && t.done && !was){ updateGoalFromTask(wakeMap[t.id]); }
 
-  // prospections par 20
-  if(t.id==="mlm_prospect_20" && t.done && !wasCompleted){ updateGoalFromTask("mlm_prospects",20); }
-  if(t.id==="ugc_prospect_20" && t.done && !wasCompleted){ updateGoalFromTask("ugc_prospects",20); }
+  if(t.id==="mlm_prospect_20" && t.done && !was){ updateGoalFromTask("mlm_prospects",20); }
+  if(t.id==="ugc_prospect_20" && t.done && !was){ updateGoalFromTask("ugc_prospects",20); }
 
-  // autres simples
-  const taskGoalMap={
-    "workout":"workouts","run":"runs","reel":"reels","video":"videos",
-    "lecture":"lectures","introspection":"introspections","jumuah":"jumuah",
-    "mlm_presentation":"mlm_presentations","ugc_collab":"ugc_collabs"
-  };
-  if(taskGoalMap[t.id] && t.done && !wasCompleted){ updateGoalFromTask(taskGoalMap[t.id]); }
+  const taskGoalMap={"workout":"workouts","run":"runs","reel":"reels","video":"videos","lecture":"lectures","introspection":"introspections","jumuah":"jumuah","mlm_presentation":"mlm_presentations","ugc_collab":"ugc_collabs"};
+  if(taskGoalMap[t.id] && t.done && !was){ updateGoalFromTask(taskGoalMap[t.id]); }
 
   addXP(t.done ? t.xp : -t.xp, el.closest('.quest'));
   if(t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`,'success');
   saveDay(currentDate); save(); renderKPIs(); renderSectorGauges();
 });
-
 function updateGoalFromTask(goalId,amount=1){
-  for(const cat of Object.values(state.goals)){
-    const bar=cat.bars.find(b=>b.id===goalId);
-    if(bar){ bar.now+=amount; break; }
-  }
+  for(const cat of Object.values(state.goals)){const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount; break;}}
 }
+document.getElementById("resetDaily")?.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});
+document.getElementById("resetWeekly")?.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
+document.getElementById("resetMonthly")?.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
 
-/* reset boutons */
-$("#resetDaily")?.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});
-$("#resetWeekly")?.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
-$("#resetMonthly")?.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
-
-/* ====== VALIDATE DAY ====== */
-$("#validateDay")?.addEventListener("click",()=>{
+/* VALIDATE DAY */
+document.getElementById("validateDay")?.addEventListener("click",()=>{
   checkBonuses();
   const g=state.goals;
   if(g.sport.bars.find(b=>b.id==="workouts")?.now>=5){ addXP(30); toast("🏋️ Bonus 5 workouts +30 XP!",'success'); }
@@ -745,17 +647,16 @@ $("#validateDay")?.addEventListener("click",()=>{
   pushHistory();
   if(!state.byDate[currentDate]) state.byDate[currentDate]={dailyDone:{},dailyXP:0,validated:false};
   state.byDate[currentDate].validated=true;
-  $("#date_validated").textContent='oui';
-  save();
-  toast("Journée validée ✅",'success');
+  const dv=document.getElementById('date_validated'); if(dv) dv.textContent='oui';
+  save(); toast("Journée validée ✅",'success');
 });
 
-/* ============ REWARDS (inline edit + stock) ============ */
+/* REWARDS */
 function renderRewards(){
-  const wrap=$("#rewards_list"),log=$("#rewards_log"); if(!wrap) return;
+  const wrap=document.getElementById("rewards_list"),log=document.getElementById("rewards_log"); if(!wrap) return;
   wrap.innerHTML="";
   state.rewards.catalog.forEach(it=>{
-    const isBlocked = it.blocked || !canUseReward(it);
+    const isBlocked=it.blocked || !canUseReward(it);
     const card=document.createElement("div"); card.className="third card";
     card.innerHTML=`
       <div class="stack">
@@ -780,7 +681,6 @@ function renderRewards(){
     wrap.appendChild(card);
   });
 
-  // inline edit
   wrap.querySelectorAll(".reward-edit").forEach(inp=>{
     inp.addEventListener("change",()=>{
       const id=inp.dataset.rid, field=inp.dataset.field;
@@ -797,16 +697,14 @@ function renderRewards(){
       const id=buy.dataset.buy; const it=state.rewards.catalog.find(x=>x.id===id); if(!it) return;
       if((state.profile.xp||0)<it.cost) return toast("Pas assez d'XP.","error");
       if(!canUseReward(it)) return toast("Récompense bloquée par les malus.","error");
-      pushHistory();
-      state.profile.xp-=it.cost; it.qty=(it.qty||0)+1;
+      pushHistory(); state.profile.xp-=it.cost; it.qty=(it.qty||0)+1;
       state.rewards.log.unshift(`🛒 Achat ${it.name} (${it.cost} XP) — ${new Date().toLocaleString()}`);
       save(); updateXP(); renderRewards(); toast("Acheté ✔️",'success');
     }
     if(use){
       const id=use.dataset.use; const it=state.rewards.catalog.find(x=>x.id===id); if(!it) return;
       if((it.qty||0)<=0) return;
-      pushHistory();
-      it.qty--; state.rewards.log.unshift(`🎁 Utilisé ${it.name} — ${new Date().toLocaleString()}`);
+      pushHistory(); it.qty--; state.rewards.log.unshift(`🎁 Utilisé ${it.name} — ${new Date().toLocaleString()}`);
       save(); renderRewards(); toast("Utilisé ✔️",'success');
     }
   });
@@ -823,146 +721,103 @@ function canUseReward(reward){
   return true;
 }
 
-/* ============ MALUS: vérifier vs appliquer ============ */
-function malusDescriptions(code){
-  const d={
-    'no_rewards_daily':"🚫 Pas de récompense aujourd'hui (< seuil journalier)",
-    'no_rewards_weekend':"🚫 Pas de récompense week-end (< seuil hebdo)",
-    'no_shopping':"🚫 Pas de shopping (< business hebdo)",
-    'no_social':"🚫 Pas de soirée amis (< lectures/semaine)",
-    'no_pleasure':"🚫 Pas d'activité plaisir (< workouts/semaine)"
-  }; return d[code]||code;
-}
+/* MALUS */
+function malusDescriptions(code){const d={
+  'no_rewards_daily':"🚫 Pas de récompense aujourd'hui (< seuil journalier)",
+  'no_rewards_weekend':"🚫 Pas de récompense week-end (< seuil hebdo)",
+  'no_shopping':"🚫 Pas de shopping (< business hebdo)",
+  'no_social':"🚫 Pas de soirée amis (< lectures/semaine)",
+  'no_pleasure':"🚫 Pas d'activité plaisir (< workouts/semaine)"
+}; return d[code]||code;}
 function simulateMalus(){
-  const rules=state.malus.rules;
-  const pending=[]; const penalties=[];
-  // seuils sur stats
+  const rules=state.malus.rules; const pending=[]; const penalties=[];
   if(state.profile.stats.dailyXP < rules.dailyMin) pending.push('no_rewards_daily');
   if(state.profile.stats.weeklyXP < rules.weeklyMin) pending.push('no_rewards_weekend');
-  // business hebdo
-  const businessXP=calculateCategoryXP('business');
-  if(businessXP < rules.businessWeeklyMin) pending.push('no_shopping');
-  // dev lectures
-  const readsBar = state.goals.dev.bars.find(b=>b.id==='lectures');
-  if((readsBar?.now||0) < rules.readsMin) pending.push('no_social');
-  // sport workouts
-  const woBar = state.goals.sport.bars.find(b=>b.id==='workouts');
-  if((woBar?.now||0) < rules.workoutsMin) pending.push('no_pleasure');
+  const businessXP=calculateCategoryXP('business'); if(businessXP < rules.businessWeeklyMin) pending.push('no_shopping');
+  const readsBar=state.goals.dev.bars.find(b=>b.id==='lectures'); if((readsBar?.now||0) < rules.readsMin) pending.push('no_social');
+  const woBar=state.goals.sport.bars.find(b=>b.id==='workouts'); if((woBar?.now||0) < rules.workoutsMin) pending.push('no_pleasure');
 
-  // pénalités indicatives (exemples)
-  if(state.goals.business.bars.find(b=>b.id==='mlm_inscriptions')?.now===0){
-    penalties.push('+50 prospections MLM'); penalties.push('+5 appels');
-  }
-  if(state.goals.ugc.bars.find(b=>b.id==='ugc_collabs')?.now===0){
-    penalties.push('+30 prospections UGC');
-  }
-  if(state.goals.sport.bars.find(b=>b.id==='runs')?.now===0){ penalties.push('Cardio long (45min)'); }
+  if(state.goals.business.bars.find(b=>b.id==='mlm_inscriptions')?.now===0){penalties.push('+50 prospections MLM');penalties.push('+5 appels');}
+  if(state.goals.ugc.bars.find(b=>b.id==='ugc_collabs')?.now===0){penalties.push('+30 prospections UGC');}
+  if(state.goals.sport.bars.find(b=>b.id==='runs')?.now===0){penalties.push('Cardio long (45min)');}
 
-  state.malus.pending=[...new Set(pending)];
-  state.malus.penalties=penalties;
-  save(); renderMalus();
+  state.malus.pending=[...new Set(pending)]; state.malus.penalties=penalties; save(); renderMalus();
 }
-function applyMalus(){
-  pushHistory();
-  state.malus.active=[...new Set([...(state.malus.active||[]), ...(state.malus.pending||[])])];
-  state.malus.pending=[];
-  save(); renderMalus(); updateStreaks(); renderRewards();
-  toast("Malus appliqués.","warning");
-}
+function applyMalus(){pushHistory(); state.malus.active=[...new Set([...(state.malus.active||[]),...(state.malus.pending||[])])]; state.malus.pending=[]; save(); renderMalus(); updateStreaks(); renderRewards(); toast("Malus appliqués.","warning");}
 function renderMalus(){
-  // rules inputs
-  $("#rule_daily_min").value=state.malus.rules.dailyMin;
-  $("#rule_weekly_min").value=state.malus.rules.weeklyMin;
-  $("#rule_business_weekly_min").value=state.malus.rules.businessWeeklyMin;
-  $("#rule_reads_min").value=state.malus.rules.readsMin;
-  $("#rule_workouts_min").value=state.malus.rules.workoutsMin;
+  document.getElementById("rule_daily_min").value=state.malus.rules.dailyMin;
+  document.getElementById("rule_weekly_min").value=state.malus.rules.weeklyMin;
+  document.getElementById("rule_business_weekly_min").value=state.malus.rules.businessWeeklyMin;
+  document.getElementById("rule_reads_min").value=state.malus.rules.readsMin;
+  document.getElementById("rule_workouts_min").value=state.malus.rules.workoutsMin;
 
-  $("#rule_daily_min").onchange=()=>{pushHistory(); state.malus.rules.dailyMin=parseInt($("#rule_daily_min").value)||0; save();};
-  $("#rule_weekly_min").onchange=()=>{pushHistory(); state.malus.rules.weeklyMin=parseInt($("#rule_weekly_min").value)||0; save();};
-  $("#rule_business_weekly_min").onchange=()=>{pushHistory(); state.malus.rules.businessWeeklyMin=parseInt($("#rule_business_weekly_min").value)||0; save();};
-  $("#rule_reads_min").onchange=()=>{pushHistory(); state.malus.rules.readsMin=parseInt($("#rule_reads_min").value)||0; save();};
-  $("#rule_workouts_min").onchange=()=>{pushHistory(); state.malus.rules.workoutsMin=parseInt($("#rule_workouts_min").value)||0; save();};
+  ["rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.onchange=()=>{pushHistory(); state.malus.rules={
+      dailyMin: +document.getElementById("rule_daily_min").value||0,
+      weeklyMin:+document.getElementById("rule_weekly_min").value||0,
+      businessWeeklyMin:+document.getElementById("rule_business_weekly_min").value||0,
+      readsMin:+document.getElementById("rule_reads_min").value||0,
+      workoutsMin:+document.getElementById("rule_workouts_min").value||0
+    }; save();};
+  });
 
-  const box=$("#malus_status"); if(!box) return;
+  const box=document.getElementById("malus_status"); if(!box) return;
   const pending=state.malus.pending||[], active=state.malus.active||[], pen=state.malus.penalties||[];
   let html=`<div class="malus-item"><strong>Proposés (${pending.length})</strong>${pending.length?'<ul>'+pending.map(m=>`<li>${malusDescriptions(m)}</li>`).join('')+'</ul>':'<p class="muted">Aucun</p>'}</div>`;
   html+=`<div class="malus-item"><strong>Actifs (${active.length})</strong>${active.length?'<ul>'+active.map(m=>`<li>${malusDescriptions(m)}</li>`).join('')+'</ul>':'<p class="muted">Aucun malus actif</p>'}</div>`;
   html+=`<div class="malus-item"><strong>Pénalités (${pen.length})</strong>${pen.length?'<ul>'+pen.map(p=>`<li>${p}</li>`).join('')+'</ul>':'<p class="muted">Aucune pénalité</p>'}</div>`;
   box.innerHTML=html;
 }
-$("#btnSimuler")?.addEventListener("click",simulateMalus);
-$("#checkMalus")?.addEventListener("click",simulateMalus);
-$("#applyMalus")?.addEventListener("click",applyMalus);
+document.getElementById("btnSimuler")?.addEventListener("click",simulateMalus);
+document.getElementById("checkMalus")?.addEventListener("click",simulateMalus);
+document.getElementById("applyMalus")?.addEventListener("click",applyMalus);
 
-function calculateCategoryXP(category){
-  let xp=0; ['daily','weekly','monthly'].forEach(type=>{
-    state.tasks[type].forEach(task=>{ if(task.category===category && task.done) xp+=task.xp; });
-  }); return xp;
-}
+function calculateCategoryXP(category){let xp=0; ['daily','weekly','monthly'].forEach(type=>{state.tasks[type].forEach(task=>{if(task.category===category && task.done) xp+=task.xp;});}); return xp;}
 
-/* ============ STATS ============ */
+/* STATS */
 function renderStats(){
-  const content=$("#stats_content"); if(!content) return;
-  const stats=state.profile.stats;
-  let html=`
-    <div class="stats-grid">
-      <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem">${stats.dailyXP}</div></div>
-      <div class="stat-card"><h3>XP Hebdomadaire</h3><div style="font-size:2rem">${stats.weeklyXP}</div></div>
-      <div class="stat-card"><h3>XP Mensuel</h3><div style="font-size:2rem">${stats.monthlyXP}</div></div>
+  const content=document.getElementById("stats_content"); if(!content) return;
+  const s=state.profile.stats;
+  let html=`<div class="stats-grid">
+      <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem">${s.dailyXP}</div></div>
+      <div class="stat-card"><h3>XP Hebdomadaire</h3><div style="font-size:2rem">${s.weeklyXP}</div></div>
+      <div class="stat-card"><h3>XP Mensuel</h3><div style="font-size:2rem">${s.monthlyXP}</div></div>
       <div class="stat-card"><h3>Niveau</h3><div style="font-size:2rem">${state.profile.level}</div></div>
-    </div>
-    <h3>Progression par catégorie</h3>`;
-  for(const [key,cat] of Object.entries(state.goals)){
+    </div><h3>Progression par catégorie</h3>`;
+  for(const [k,cat] of Object.entries(state.goals)){
     html+=`<div class="card" style="margin-bottom:12px"><h4>${cat.label}</h4>`;
-    cat.bars.forEach(bar=>{
-      const p=pct(bar.now,bar.goal);
+    cat.bars.forEach(bar=>{const p=pct(bar.now,bar.goal);
       html+=`<div class="row" style="margin-bottom:8px"><span>${bar.label}</span><span>${bar.now}/${bar.goal} (${p}%)</span></div>
-             <div class="bar"><span style="width:${p}%"></span></div>`;
-    });
+             <div class="bar"><span style="width:${p}%"></span></div>`;});
     html+=`</div>`;
   }
   content.innerHTML=html;
 }
 
-/* ============ EXPORT / IMPORT / RESET ============ */
-$("#exportData")?.addEventListener("click",()=>{
-  const dataStr=JSON.stringify(state,null,2);
-  const blob=new Blob([dataStr],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`gamelife-backup-${new Date().toISOString().slice(0,10)}.json`;
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  toast("Données exportées","success");
-});
-$("#importData")?.addEventListener("click",()=>{
+/* EXPORT / IMPORT / RESET */
+function doExport(){const dataStr=JSON.stringify(state,null,2);const blob=new Blob([dataStr],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`gamelife-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast("Données exportées","success");}
+document.getElementById("exportData")?.addEventListener("click",doExport);
+document.getElementById("exportDataMobile")?.addEventListener("click",()=>{doExport();const m=document.getElementById("mobileMenu"); if(m) m.classList.remove("show");});
+
+document.getElementById("importData")?.addEventListener("click",()=>{
   const input=document.createElement('input'); input.type='file'; input.accept='.json';
-  input.onchange=(e)=>{
-    const file=e.target.files[0]; if(!file) return;
-    const reader=new FileReader();
-    reader.onload=(ev)=>{
-      try{
-        pushHistory();
-        const imported=JSON.parse(ev.target.result); state=imported; save(); init(); toast("Import OK","success");
-      }catch(err){toast("Import invalide","error");}
-    };
-    reader.readAsText(file);
-  }; input.click();
+  input.onchange=(e)=>{const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader(); reader.onload=(ev)=>{try{pushHistory(); const imported=JSON.parse(ev.target.result); state=imported; save(); init(); toast("Import OK","success");}catch(err){toast("Import invalide","error");}}; reader.readAsText(file);};
+  input.click();
 });
-$("#resetAll")?.addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info");});
+document.getElementById("resetAll")?.addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info");});
 
-/* ============ MODALES (gestion) ============ */
+/* MODALES (gestion) */
 let currentEditType=null,currentEditId=null;
-$("#manageDailyTasks")?.addEventListener("click",()=>openTaskManager('daily'));
-$("#manageWeeklyTasks")?.addEventListener("click",()=>openTaskManager('weekly'));
-$("#manageMonthlyTasks")?.addEventListener("click",()=>openTaskManager('monthly'));
+document.getElementById("manageDailyTasks")?.addEventListener("click",()=>openTaskManager('daily'));
+document.getElementById("manageWeeklyTasks")?.addEventListener("click",()=>openTaskManager('weekly'));
+document.getElementById("manageMonthlyTasks")?.addEventListener("click",()=>openTaskManager('monthly'));
 
-function openTaskManager(type){
-  currentEditType=type;
-  $("#taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`;
-  renderTaskManager(type);
-  $("#taskModal").style.display='flex';
-}
+function openTaskManager(type){currentEditType=type; document.getElementById("taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`; renderTaskManager(type); document.getElementById("taskModal").style.display='flex';}
 function renderTaskManager(type){
-  const list=$("#taskManageList"); const tasks=state.tasks[type];
+  const list=document.getElementById("taskManageList"); const tasks=state.tasks[type];
   list.innerHTML=tasks.map(task=>`
     <div class="manage-item">
       <div><strong>${task.label}</strong><div class="muted">${task.xp} XP - ${task.category}</div></div>
@@ -974,27 +829,26 @@ function renderTaskManager(type){
 }
 window.editTask=function(type,id){
   const task=state.tasks[type].find(t=>t.id===id); if(!task) return;
-  $("#editModalTitle").textContent="Modifier la tâche";
-  $("#editName").value=task.label; $("#editValue").value=task.xp;
-  $("#editCategory").value=task.category; $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
-  currentEditType=type; currentEditId=id; $("#editModal").style.display='flex';
+  document.getElementById("editModalTitle").textContent="Modifier la tâche";
+  document.getElementById("editName").value=task.label; document.getElementById("editValue").value=task.xp;
+  document.getElementById("editCategory").value=task.category; document.getElementById("editCategoryGroup").style.display="block"; document.getElementById("editTagGroup").style.display="none";
+  currentEditType=type; currentEditId=id; document.getElementById("editModal").style.display='flex';
 }
 window.deleteTask=function(type,id){
   if(!confirm("Supprimer cette tâche ?")) return;
-  pushHistory();
-  state.tasks[type]=state.tasks[type].filter(t=>t.id!==id);
+  pushHistory(); state.tasks[type]=state.tasks[type].filter(t=>t.id!==id);
   save(); renderTaskManager(type); renderTasks(); toast("Tâche supprimée","info");
 }
-$("#addNewTask")?.addEventListener("click",()=>{
-  $("#editModalTitle").textContent="Ajouter une tâche";
-  $("#editName").value=""; $("#editValue").value=10; $("#editCategory").value="discipline";
-  $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
-  currentEditId=null; $("#editModal").style.display='flex';
+document.getElementById("addNewTask")?.addEventListener("click",()=>{
+  document.getElementById("editModalTitle").textContent="Ajouter une tâche";
+  document.getElementById("editName").value=""; document.getElementById("editValue").value=10; document.getElementById("editCategory").value="discipline";
+  document.getElementById("editCategoryGroup").style.display="block"; document.getElementById("editTagGroup").style.display="none";
+  currentEditId=null; document.getElementById("editModal").style.display='flex';
 });
 
-$("#manageRewards")?.addEventListener("click",()=>{ renderRewardManager(); $("#rewardModal").style.display='flex'; });
+document.getElementById("manageRewards")?.addEventListener("click",()=>{ renderRewardManager(); document.getElementById("rewardModal").style.display='flex'; });
 function renderRewardManager(){
-  const list=$("#rewardManageList"); const rewards=state.rewards.catalog;
+  const list=document.getElementById("rewardManageList"); const rewards=state.rewards.catalog;
   list.innerHTML=rewards.map(reward=>`
     <div class="manage-item">
       <div><strong>${reward.name}</strong><div class="muted">${reward.cost} XP - ${reward.tag} — stock: ${reward.qty||0}</div></div>
@@ -1006,122 +860,92 @@ function renderRewardManager(){
 }
 window.editReward=function(id){
   const r=state.rewards.catalog.find(x=>x.id===id); if(!r) return;
-  $("#editModalTitle").textContent="Modifier la récompense";
-  $("#editName").value=r.name; $("#editValue").value=r.cost; $("#editTag").value=r.tag;
-  $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block";
-  currentEditType='reward'; currentEditId=id; $("#editModal").style.display='flex';
+  document.getElementById("editModalTitle").textContent="Modifier la récompense";
+  document.getElementById("editName").value=r.name; document.getElementById("editValue").value=r.cost; document.getElementById("editTag").value=r.tag;
+  document.getElementById("editCategoryGroup").style.display="none"; document.getElementById("editTagGroup").style.display="block";
+  currentEditType='reward'; currentEditId=id; document.getElementById("editModal").style.display='flex';
 }
 window.deleteReward=function(id){
   if(!confirm("Supprimer cette récompense ?")) return;
-  pushHistory();
-  state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id);
+  pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id);
   save(); renderRewardManager(); renderRewards(); toast("Récompense supprimée","info");
 }
-$("#addNewReward")?.addEventListener("click",()=>{
-  $("#editModalTitle").textContent="Ajouter une récompense";
-  $("#editName").value=""; $("#editValue").value=100; $("#editTag").value="Détente";
-  $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block";
-  currentEditType='reward'; currentEditId=null; $("#editModal").style.display='flex';
+document.getElementById("addNewReward")?.addEventListener("click",()=>{
+  document.getElementById("editModalTitle").textContent="Ajouter une récompense";
+  document.getElementById("editName").value=""; document.getElementById("editValue").value=100; document.getElementById("editTag").value="Détente";
+  document.getElementById("editCategoryGroup").style.display="none"; document.getElementById("editTagGroup").style.display="block";
+  currentEditType='reward'; currentEditId=null; document.getElementById("editModal").style.display='flex';
 });
 
-/* form edit modal (tâches / récompenses) */
-$("#editForm")?.addEventListener("submit",(e)=>{
+/* FORM MODAL */
+document.getElementById("editForm")?.addEventListener("submit",(e)=>{
   e.preventDefault();
-  const name=$("#editName").value.trim(); const value=parseInt($("#editValue").value);
-  if(!name||!value) return;
-  pushHistory();
+  const name=document.getElementById("editName").value.trim(); const value=parseInt(document.getElementById("editValue").value);
+  if(!name||!value) return; pushHistory();
   if(currentEditType==='reward'){
-    const tag=$("#editTag").value.trim();
-    if(currentEditId){
-      const r=state.rewards.catalog.find(x=>x.id===currentEditId);
-      if(r){ r.name=name; r.cost=value; r.tag=tag; }
-    }else{
-      const id='reward_'+Date.now();
-      state.rewards.catalog.push({id,name,cost:value,tag,qty:0,blocked:false});
-    }
+    const tag=document.getElementById("editTag").value.trim();
+    if(currentEditId){const r=state.rewards.catalog.find(x=>x.id===currentEditId); if(r){r.name=name;r.cost=value;r.tag=tag;}}
+    else{const id='reward_'+Date.now(); state.rewards.catalog.push({id,name,cost:value,tag,qty:0,blocked:false});}
     renderRewardManager(); renderRewards();
   }else{
-    const category=$("#editCategory").value;
-    if(currentEditId){
-      const t=state.tasks[currentEditType].find(x=>x.id===currentEditId);
-      if(t){ t.label=name; t.xp=value; t.category=category; }
-    }else{
-      const id='task_'+Date.now();
-      state.tasks[currentEditType].push({id,label:name,xp:value,category,done:false});
-    }
+    const category=document.getElementById("editCategory").value;
+    if(currentEditId){const t=state.tasks[currentEditType].find(x=>x.id===currentEditId); if(t){t.label=name;t.xp=value;t.category=category;}}
+    else{const id='task_'+Date.now(); state.tasks[currentEditType].push({id,label:name,xp:value,category,done:false});}
     renderTaskManager(currentEditType); renderTasks();
   }
-  save(); $("#editModal").style.display='none'; toast("Modifications sauvegardées","success");
+  save(); document.getElementById("editModal").style.display='none'; toast("Modifications sauvegardées","success");
 });
 ["closeTaskModal","closeRewardModal","cancelEdit"].forEach(id=>{
-  document.getElementById(id)?.addEventListener("click",()=>{
-    $("#taskModal").style.display='none';
-    $("#rewardModal").style.display='none';
-    $("#editModal").style.display='none';
-  });
+  const el=document.getElementById(id);
+  if(el){el.addEventListener("click",()=>{document.getElementById('taskModal').style.display='none';document.getElementById('rewardModal').style.display='none';document.getElementById('editModal').style.display='none';});}
 });
 ["taskModal","rewardModal","editModal"].forEach(mid=>{
-  document.getElementById(mid)?.addEventListener("click",(e)=>{ if(e.target.id===mid) e.currentTarget.style.display='none'; });
+  const el=document.getElementById(mid);
+  if(el){el.addEventListener("click",(e)=>{if(e.target.id===mid) el.style.display='none';});}
 });
 
-/* ============ MONEY + PSEUDO bindings ============ */
+/* MONEY + PSEUDO */
 function refreshMoneyUI(){
   const wT=state.money.week.target||0, wD=state.money.week.done||0;
   const mT=state.money.month.target||0, mD=state.money.month.done||0;
-  $("#week_target").value=wT; $("#week_done").value=wD; $("#week_left").textContent = Math.max(0, wT - wD);
-  $("#month_target").value=mT; $("#month_done").value=mD; $("#month_left").textContent = Math.max(0, mT - mD);
+  document.getElementById("week_target").value=wT; document.getElementById("week_done").value=wD; document.getElementById("week_left").textContent=Math.max(0,wT-wD);
+  document.getElementById("month_target").value=mT; document.getElementById("month_done").value=mD; document.getElementById("month_left").textContent=Math.max(0,mT-mD);
 }
-$("#save_week_target")?.addEventListener("click",()=>{pushHistory(); state.money.week.target=parseInt($("#week_target").value)||0; save(); refreshMoneyUI(); toast("Cible semaine enregistrée","success");});
-$("#save_month_target")?.addEventListener("click",()=>{pushHistory(); state.money.month.target=parseInt($("#month_target").value)||0; save(); refreshMoneyUI(); toast("Cible mois enregistrée","success");});
-$("#save_week_done")?.addEventListener("click",()=>{pushHistory(); state.money.week.done=parseInt($("#week_done").value)||0; save(); refreshMoneyUI(); toast("Montant semaine enregistré","success");});
-$("#save_month_done")?.addEventListener("click",()=>{pushHistory(); state.money.month.done=parseInt($("#month_done").value)||0; save(); refreshMoneyUI(); toast("Montant mois enregistré","success");});
+document.getElementById("save_week_target")?.addEventListener("click",()=>{pushHistory(); state.money.week.target=parseInt(document.getElementById("week_target").value)||0; save(); refreshMoneyUI(); toast("Cible semaine enregistrée","success");});
+document.getElementById("save_month_target")?.addEventListener("click",()=>{pushHistory(); state.money.month.target=parseInt(document.getElementById("month_target").value)||0; save(); refreshMoneyUI(); toast("Cible mois enregistrée","success");});
+document.getElementById("save_week_done")?.addEventListener("click",()=>{pushHistory(); state.money.week.done=parseInt(document.getElementById("week_done").value)||0; save(); refreshMoneyUI(); toast("Montant semaine enregistré","success");});
+document.getElementById("save_month_done")?.addEventListener("click",()=>{pushHistory(); state.money.month.done=parseInt(document.getElementById("month_done").value)||0; save(); refreshMoneyUI(); toast("Montant mois enregistré","success");});
 
-function refreshPlayerLabel(){
-  const label = (state.profile.name||"").trim() || "Joueur";
-  $("#player_label").textContent=label;
-}
-$("#save_name")?.addEventListener("click",()=>{pushHistory(); state.profile.name=$("#player_name").value.trim(); save(); refreshPlayerLabel(); toast("Pseudo enregistré","success");});
+function refreshPlayerLabel(){const label=(state.profile.name||"").trim()||"Joueur"; document.getElementById("player_label").textContent=label;}
+document.getElementById("save_name")?.addEventListener("click",()=>{pushHistory(); state.profile.name=document.getElementById("player_name").value.trim(); save(); refreshPlayerLabel(); toast("Pseudo enregistré","success");});
 
-/* ============ DATE PICKER ============ */
+/* DATE PICKER */
 const dEl=document.getElementById('selected_date');
 if(dEl){ dEl.value=currentDate; dEl.onchange=(e)=>{ currentDate=e.target.value||todayISO(); loadDay(currentDate); }; }
 
-/* ============ INIT ============ */
+/* INIT */
 function init(){
-  // ensure required fields exist (migrations)
   if(!state.profile) state.profile={name:"",level:1,xp:0,streaks:{prayer:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}};
   if(!state.money) state.money={week:{target:0,done:0},month:{target:0,done:0}};
   if(!state.malus?.rules) state.malus.rules={dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3};
   save();
 
-  // UI
-  $("#player_name").value=state.profile.name||"";
+  document.getElementById("player_name").value=state.profile.name||"";
   refreshPlayerLabel();
 
-  // date
   if(dEl){ dEl.value=currentDate; loadDay(currentDate); }
 
-  renderKPIs();
-  renderTasks();
-  renderRewards();
-  renderMalus();
-  renderStats();
-  renderSectorGauges();
-  updateXP();
-  updateStreaks();
-  refreshMoneyUI();
-
+  renderKPIs(); renderTasks(); renderRewards(); renderMalus(); renderStats(); renderSectorGauges();
+  updateXP(); updateStreaks(); refreshMoneyUI();
   setEditMode(state.edit||false);
 }
 init();
 
-/* ============ AUTO-HIDE NAVBAR ============ */
+/* AUTO-HIDE NAVBAR */
 let lastScrollY=0, ticking=false;
-function updateNavbar(){
-  const y=window.scrollY, nav=$(".top");
+function updateNavbar(){const y=window.scrollY, nav=document.querySelector(".top");
   if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden");
-  lastScrollY=y; ticking=false;
-}
+  lastScrollY=y; ticking=false;}
 window.addEventListener("scroll",()=>{ if(!ticking){requestAnimationFrame(updateNavbar); ticking=true;} });
 
 </script>
