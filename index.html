@@ -30,12 +30,10 @@
     }
     .menu-toggle:hover,.back-btn-header:hover,.mini:hover{background:rgba(255,255,255,.08)}
 
-    /* NAV MOBILE (menu burger) */
     .mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);
       backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;gap:6px;padding:8px}
     .mobile-menu.show{display:flex}
 
-    /* NAV DESKTOP (toujours visible) */
     .tabs-desktop{display:none;gap:8px;justify-content:center;padding:8px;border-top:1px solid var(--line)}
     @media(min-width:760px){.tabs-desktop{display:flex}}
 
@@ -119,7 +117,6 @@
       </div>
     </div>
 
-    <!-- barre d'onglets desktop (toujours visible) -->
     <nav class="tabs-desktop" id="tabsDesktop">
       <button class="tab active" data-goto="goals">🎯 Objectifs</button>
       <button class="tab" data-goto="tasks">✅ Tâches</button>
@@ -129,7 +126,6 @@
       <button id="exportData" class="tab ghost" style="border-style:dashed">📤 Exporter</button>
     </nav>
 
-    <!-- menu mobile (ouvrir avec ☰) -->
     <nav id="mobileMenu" class="mobile-menu">
       <button class="tab active" data-goto="goals">🎯 Objectifs</button>
       <button class="tab" data-goto="tasks">✅ Tâches</button>
@@ -355,7 +351,7 @@
             <option value="sport">Sport</option>
             <option value="social">Social</option>
             <option value="dev">Développement</option>
-            <option value="spiritualité">Spiritualité</option>
+            <option value="spirituality">Spiritualité</option>
           </select>
         </div>
         <div class="form-group" id="editTagGroup"><label for="editTag">Tag :</label><input type="text" id="editTag"></div>
@@ -481,22 +477,15 @@ document.addEventListener("click",e=>{
   if(!mobileMenu.contains(e.target) && !menuToggle.contains(e.target)){mobileMenu.classList.remove("show");}
 });
 
-/* gestion centralisée des onglets (desktop + mobile) */
+/* Onglets (desktop + mobile) */
 function onTabClick(targetBtn){
   const goto=targetBtn.getAttribute("data-goto");
   if(!goto) return;
-  // activer bon onglet dans les deux barres
   $$(".tab").forEach(t=>t.classList.remove("active"));
-  // activer tous les boutons portant le même data-goto
   document.querySelectorAll(`.tab[data-goto="${goto}"]`).forEach(t=>t.classList.add("active"));
-  // afficher la vue
   $$(".view").forEach(v=>v.classList.remove("active"));
-  const view=document.getElementById(`view-${goto}`);
-  if(view) view.classList.add("active");
-  // bouton retour
-  const backBtn=document.getElementById("backButton");
-  if(backBtn) backBtn.style.display = (goto==="goals") ? "none":"block";
-  // fermer le menu mobile
+  const view=document.getElementById(`view-${goto}`); if(view) view.classList.add("active");
+  const backBtn=document.getElementById("backButton"); if(backBtn) backBtn.style.display = (goto==="goals") ? "none":"block";
   if(mobileMenu) mobileMenu.classList.remove("show");
 }
 document.addEventListener("click",(e)=>{
@@ -512,23 +501,26 @@ function setEditMode(on){
    "rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(toggle);
   document.querySelectorAll(".reward-edit").forEach(inp=>{if(state.edit) inp.removeAttribute("disabled"); else inp.setAttribute("disabled","");});
   const btn=document.getElementById("toggleEdit"); if(btn) btn.textContent = state.edit ? "✅ Terminer" : "✏️ Modifier";
+  renderKPIs(); renderRewards(); // refléter disabled sur UI recréée
 }
-document.getElementById("toggleEdit")?.addEventListener("click",()=> setEditMode(!state.edit));
-document.getElementById("undoBtn")?.addEventListener("click",undo);
+const tgl=document.getElementById("toggleEdit"); if(tgl){tgl.addEventListener("click",()=> setEditMode(!state.edit));}
+const undoBtn=document.getElementById("undoBtn"); if(undoBtn){undoBtn.addEventListener("click",undo);}
 
 /* XP SYSTEM */
 function xpNeed(l){return 50 + l*50;}
 function updateXP(){const need=xpNeed(state.profile.level);const xp=Math.max(0,state.profile.xp||0);
-  document.getElementById("xp_text").textContent=`${xp} / ${need}`;
-  document.getElementById("xp_bar").style.width=Math.min(100,Math.round((xp/need)*100))+"%";
-  document.getElementById("level").textContent=state.profile.level;}
+  const xpText=document.getElementById("xp_text"); const xpBar=document.getElementById("xp_bar"); const lvl=document.getElementById("level");
+  if(xpText) xpText.textContent=`${xp} / ${need}`;
+  if(xpBar) xpBar.style.width=Math.min(100,Math.round((xp/need)*100))+"%";
+  if(lvl) lvl.textContent=state.profile.level;
+}
 function addXP(x, src=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
   state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
   if(src) showXPGain(x,src);
   while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level);state.profile.level++;showLevelUp(state.profile.level);toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');}
   save(); updateXP(); updateStreaks();}
-function updateStreaks(){document.getElementById("streak_pr").textContent=state.profile.streaks.prayer||0;
-  document.getElementById("active_malus").textContent=state.malus.active.length||0;}
+function updateStreaks(){const pr=document.getElementById("streak_pr"); if(pr) pr.textContent=state.profile.streaks.prayer||0;
+  const am=document.getElementById("active_malus"); if(am) am.textContent=state.malus.active.length||0;}
 
 /* GOALS */
 function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0;}
@@ -625,12 +617,13 @@ document.addEventListener("change",(e)=>{
 function updateGoalFromTask(goalId,amount=1){
   for(const cat of Object.values(state.goals)){const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount; break;}}
 }
-document.getElementById("resetDaily")?.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});
-document.getElementById("resetWeekly")?.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
-document.getElementById("resetMonthly")?.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
+const btnRD=document.getElementById("resetDaily"); if(btnRD){btnRD.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});}
+const btnRW=document.getElementById("resetWeekly"); if(btnRW){btnRW.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});}
+const btnRM=document.getElementById("resetMonthly"); if(btnRM){btnRM.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});}
 
 /* VALIDATE DAY */
-document.getElementById("validateDay")?.addEventListener("click",()=>{
+const btnVal=document.getElementById("validateDay");
+if(btnVal){btnVal.addEventListener("click",()=>{
   checkBonuses();
   const g=state.goals;
   if(g.sport.bars.find(b=>b.id==="workouts")?.now>=5){ addXP(30); toast("🏋️ Bonus 5 workouts +30 XP!",'success'); }
@@ -647,9 +640,10 @@ document.getElementById("validateDay")?.addEventListener("click",()=>{
   pushHistory();
   if(!state.byDate[currentDate]) state.byDate[currentDate]={dailyDone:{},dailyXP:0,validated:false};
   state.byDate[currentDate].validated=true;
+  saveDay(currentDate); // on persiste aussi les tâches du jour
   const dv=document.getElementById('date_validated'); if(dv) dv.textContent='oui';
   save(); toast("Journée validée ✅",'success');
-});
+});}
 
 /* REWARDS */
 function renderRewards(){
@@ -709,7 +703,7 @@ function renderRewards(){
     }
   });
 
-  log.innerHTML=state.rewards.log.slice(0,12).map(x=>`<li>${x}</li>`).join("");
+  if(log) log.innerHTML=state.rewards.log.slice(0,12).map(x=>`<li>${x}</li>`).join("");
 }
 function canUseReward(reward){
   const active=state.malus.active;
@@ -745,11 +739,11 @@ function simulateMalus(){
 }
 function applyMalus(){pushHistory(); state.malus.active=[...new Set([...(state.malus.active||[]),...(state.malus.pending||[])])]; state.malus.pending=[]; save(); renderMalus(); updateStreaks(); renderRewards(); toast("Malus appliqués.","warning");}
 function renderMalus(){
-  document.getElementById("rule_daily_min").value=state.malus.rules.dailyMin;
-  document.getElementById("rule_weekly_min").value=state.malus.rules.weeklyMin;
-  document.getElementById("rule_business_weekly_min").value=state.malus.rules.businessWeeklyMin;
-  document.getElementById("rule_reads_min").value=state.malus.rules.readsMin;
-  document.getElementById("rule_workouts_min").value=state.malus.rules.workoutsMin;
+  const r1=document.getElementById("rule_daily_min"); if(r1) r1.value=state.malus.rules.dailyMin;
+  const r2=document.getElementById("rule_weekly_min"); if(r2) r2.value=state.malus.rules.weeklyMin;
+  const r3=document.getElementById("rule_business_weekly_min"); if(r3) r3.value=state.malus.rules.businessWeeklyMin;
+  const r4=document.getElementById("rule_reads_min"); if(r4) r4.value=state.malus.rules.readsMin;
+  const r5=document.getElementById("rule_workouts_min"); if(r5) r5.value=state.malus.rules.workoutsMin;
 
   ["rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(id=>{
     const el=document.getElementById(id); if(!el) return;
@@ -769,9 +763,9 @@ function renderMalus(){
   html+=`<div class="malus-item"><strong>Pénalités (${pen.length})</strong>${pen.length?'<ul>'+pen.map(p=>`<li>${p}</li>`).join('')+'</ul>':'<p class="muted">Aucune pénalité</p>'}</div>`;
   box.innerHTML=html;
 }
-document.getElementById("btnSimuler")?.addEventListener("click",simulateMalus);
-document.getElementById("checkMalus")?.addEventListener("click",simulateMalus);
-document.getElementById("applyMalus")?.addEventListener("click",applyMalus);
+const bSim=document.getElementById("btnSimuler"); if(bSim){bSim.addEventListener("click",simulateMalus);}
+const bChk=document.getElementById("checkMalus"); if(bChk){bChk.addEventListener("click",simulateMalus);}
+const bApp=document.getElementById("applyMalus"); if(bApp){bApp.addEventListener("click",applyMalus);}
 
 function calculateCategoryXP(category){let xp=0; ['daily','weekly','monthly'].forEach(type=>{state.tasks[type].forEach(task=>{if(task.category===category && task.done) xp+=task.xp;});}); return xp;}
 
@@ -798,26 +792,27 @@ function renderStats(){
 /* EXPORT / IMPORT / RESET */
 function doExport(){const dataStr=JSON.stringify(state,null,2);const blob=new Blob([dataStr],{type:'application/json'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`gamelife-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast("Données exportées","success");}
-document.getElementById("exportData")?.addEventListener("click",doExport);
-document.getElementById("exportDataMobile")?.addEventListener("click",()=>{doExport();const m=document.getElementById("mobileMenu"); if(m) m.classList.remove("show");});
+const ex1=document.getElementById("exportData"); if(ex1){ex1.addEventListener("click",doExport);}
+const ex2=document.getElementById("exportDataMobile"); if(ex2){ex2.addEventListener("click",()=>{doExport();if(mobileMenu) mobileMenu.classList.remove("show");});}
 
-document.getElementById("importData")?.addEventListener("click",()=>{
+const imp=document.getElementById("importData");
+if(imp){imp.addEventListener("click",()=>{
   const input=document.createElement('input'); input.type='file'; input.accept='.json';
   input.onchange=(e)=>{const file=e.target.files[0]; if(!file) return;
     const reader=new FileReader(); reader.onload=(ev)=>{try{pushHistory(); const imported=JSON.parse(ev.target.result); state=imported; save(); init(); toast("Import OK","success");}catch(err){toast("Import invalide","error");}}; reader.readAsText(file);};
   input.click();
-});
-document.getElementById("resetAll")?.addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info");});
+});}
+const rst=document.getElementById("resetAll"); if(rst){rst.addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info");});}
 
 /* MODALES (gestion) */
 let currentEditType=null,currentEditId=null;
-document.getElementById("manageDailyTasks")?.addEventListener("click",()=>openTaskManager('daily'));
-document.getElementById("manageWeeklyTasks")?.addEventListener("click",()=>openTaskManager('weekly'));
-document.getElementById("manageMonthlyTasks")?.addEventListener("click",()=>openTaskManager('monthly'));
+const mD=document.getElementById("manageDailyTasks"); if(mD){mD.addEventListener("click",()=>openTaskManager('daily'));}
+const mW=document.getElementById("manageWeeklyTasks"); if(mW){mW.addEventListener("click",()=>openTaskManager('weekly'));}
+const mM=document.getElementById("manageMonthlyTasks"); if(mM){mM.addEventListener("click",()=>openTaskManager('monthly'));}
 
-function openTaskManager(type){currentEditType=type; document.getElementById("taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`; renderTaskManager(type); document.getElementById("taskModal").style.display='flex';}
+function openTaskManager(type){currentEditType=type; const ttl=document.getElementById("taskModalTitle"); if(ttl) ttl.textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`; renderTaskManager(type); const md=document.getElementById("taskModal"); if(md) md.style.display='flex';}
 function renderTaskManager(type){
-  const list=document.getElementById("taskManageList"); const tasks=state.tasks[type];
+  const list=document.getElementById("taskManageList"); const tasks=state.tasks[type]; if(!list) return;
   list.innerHTML=tasks.map(task=>`
     <div class="manage-item">
       <div><strong>${task.label}</strong><div class="muted">${task.xp} XP - ${task.category}</div></div>
@@ -829,26 +824,34 @@ function renderTaskManager(type){
 }
 window.editTask=function(type,id){
   const task=state.tasks[type].find(t=>t.id===id); if(!task) return;
-  document.getElementById("editModalTitle").textContent="Modifier la tâche";
-  document.getElementById("editName").value=task.label; document.getElementById("editValue").value=task.xp;
-  document.getElementById("editCategory").value=task.category; document.getElementById("editCategoryGroup").style.display="block"; document.getElementById("editTagGroup").style.display="none";
-  currentEditType=type; currentEditId=id; document.getElementById("editModal").style.display='flex';
+  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Modifier la tâche";
+  const n=document.getElementById("editName"); if(n) n.value=task.label;
+  const v=document.getElementById("editValue"); if(v) v.value=task.xp;
+  const c=document.getElementById("editCategory"); if(c) c.value=task.category;
+  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="block";
+  const tg=document.getElementById("editTagGroup"); if(tg) tg.style.display="none";
+  currentEditType=type; currentEditId=id;
+  const em=document.getElementById("editModal"); if(em) em.style.display='flex';
 }
 window.deleteTask=function(type,id){
   if(!confirm("Supprimer cette tâche ?")) return;
   pushHistory(); state.tasks[type]=state.tasks[type].filter(t=>t.id!==id);
   save(); renderTaskManager(type); renderTasks(); toast("Tâche supprimée","info");
 }
-document.getElementById("addNewTask")?.addEventListener("click",()=>{
-  document.getElementById("editModalTitle").textContent="Ajouter une tâche";
-  document.getElementById("editName").value=""; document.getElementById("editValue").value=10; document.getElementById("editCategory").value="discipline";
-  document.getElementById("editCategoryGroup").style.display="block"; document.getElementById("editTagGroup").style.display="none";
-  currentEditId=null; document.getElementById("editModal").style.display='flex';
-});
+const addTaskBtn=document.getElementById("addNewTask");
+if(addTaskBtn){addTaskBtn.addEventListener("click",()=>{
+  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Ajouter une tâche";
+  const n=document.getElementById("editName"); if(n) n.value="";
+  const v=document.getElementById("editValue"); if(v) v.value=10;
+  const c=document.getElementById("editCategory"); if(c) c.value="discipline";
+  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="block";
+  const tg=document.getElementById("editTagGroup"); if(tg) tg.style.display="none";
+  currentEditId=null; const em=document.getElementById("editModal"); if(em) em.style.display='flex';
+});}
 
-document.getElementById("manageRewards")?.addEventListener("click",()=>{ renderRewardManager(); document.getElementById("rewardModal").style.display='flex'; });
+const mR=document.getElementById("manageRewards"); if(mR){mR.addEventListener("click",()=>{ renderRewardManager(); const rm=document.getElementById("rewardModal"); if(rm) rm.style.display='flex'; });}
 function renderRewardManager(){
-  const list=document.getElementById("rewardManageList"); const rewards=state.rewards.catalog;
+  const list=document.getElementById("rewardManageList"); const rewards=state.rewards.catalog; if(!list) return;
   list.innerHTML=rewards.map(reward=>`
     <div class="manage-item">
       <div><strong>${reward.name}</strong><div class="muted">${reward.cost} XP - ${reward.tag} — stock: ${reward.qty||0}</div></div>
@@ -860,44 +863,60 @@ function renderRewardManager(){
 }
 window.editReward=function(id){
   const r=state.rewards.catalog.find(x=>x.id===id); if(!r) return;
-  document.getElementById("editModalTitle").textContent="Modifier la récompense";
-  document.getElementById("editName").value=r.name; document.getElementById("editValue").value=r.cost; document.getElementById("editTag").value=r.tag;
-  document.getElementById("editCategoryGroup").style.display="none"; document.getElementById("editTagGroup").style.display="block";
-  currentEditType='reward'; currentEditId=id; document.getElementById("editModal").style.display='flex';
+  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Modifier la récompense";
+  const n=document.getElementById("editName"); if(n) n.value=r.name;
+  const v=document.getElementById("editValue"); if(v) v.value=r.cost;
+  const tg=document.getElementById("editTag"); if(tg) tg.value=r.tag;
+  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="none";
+  const tgg=document.getElementById("editTagGroup"); if(tgg) tgg.style.display="block";
+  currentEditType='reward'; currentEditId=id; const em=document.getElementById("editModal"); if(em) em.style.display='flex';
 }
 window.deleteReward=function(id){
   if(!confirm("Supprimer cette récompense ?")) return;
   pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id);
   save(); renderRewardManager(); renderRewards(); toast("Récompense supprimée","info");
 }
-document.getElementById("addNewReward")?.addEventListener("click",()=>{
-  document.getElementById("editModalTitle").textContent="Ajouter une récompense";
-  document.getElementById("editName").value=""; document.getElementById("editValue").value=100; document.getElementById("editTag").value="Détente";
-  document.getElementById("editCategoryGroup").style.display="none"; document.getElementById("editTagGroup").style.display="block";
-  currentEditType='reward'; currentEditId=null; document.getElementById("editModal").style.display='flex';
-});
+const addRw=document.getElementById("addNewReward");
+if(addRw){addRw.addEventListener("click",()=>{
+  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Ajouter une récompense";
+  const n=document.getElementById("editName"); if(n) n.value="";
+  const v=document.getElementById("editValue"); if(v) v.value=100;
+  const tg=document.getElementById("editTag"); if(tg) tg.value="Détente";
+  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="none";
+  const tgg=document.getElementById("editTagGroup"); if(tgg) tgg.style.display="block";
+  currentEditType='reward'; currentEditId=null; const em=document.getElementById("editModal"); if(em) em.style.display='flex';
+});}
 
 /* FORM MODAL */
-document.getElementById("editForm")?.addEventListener("submit",(e)=>{
+const editForm=document.getElementById("editForm");
+if(editForm){editForm.addEventListener("submit",(e)=>{
   e.preventDefault();
-  const name=document.getElementById("editName").value.trim(); const value=parseInt(document.getElementById("editValue").value);
-  if(!name||!value) return; pushHistory();
+  const nameEl=document.getElementById("editName");
+  const valueEl=document.getElementById("editValue");
+  const name=nameEl?nameEl.value.trim():"";
+  const value=valueEl?parseInt(valueEl.value):NaN;
+  if(!name || isNaN(value)) return;
+  pushHistory();
+
   if(currentEditType==='reward'){
-    const tag=document.getElementById("editTag").value.trim();
+    const tagEl=document.getElementById("editTag"); const tag=tagEl?tagEl.value.trim():"";
     if(currentEditId){const r=state.rewards.catalog.find(x=>x.id===currentEditId); if(r){r.name=name;r.cost=value;r.tag=tag;}}
     else{const id='reward_'+Date.now(); state.rewards.catalog.push({id,name,cost:value,tag,qty:0,blocked:false});}
     renderRewardManager(); renderRewards();
   }else{
-    const category=document.getElementById("editCategory").value;
+    const catEl=document.getElementById("editCategory"); const category=catEl?catEl.value:"discipline";
     if(currentEditId){const t=state.tasks[currentEditType].find(x=>x.id===currentEditId); if(t){t.label=name;t.xp=value;t.category=category;}}
     else{const id='task_'+Date.now(); state.tasks[currentEditType].push({id,label:name,xp:value,category,done:false});}
     renderTaskManager(currentEditType); renderTasks();
   }
-  save(); document.getElementById("editModal").style.display='none'; toast("Modifications sauvegardées","success");
-});
+
+  save(); const em=document.getElementById("editModal"); if(em) em.style.display='none'; toast("Modifications sauvegardées","success");
+});}
 ["closeTaskModal","closeRewardModal","cancelEdit"].forEach(id=>{
   const el=document.getElementById(id);
-  if(el){el.addEventListener("click",()=>{document.getElementById('taskModal').style.display='none';document.getElementById('rewardModal').style.display='none';document.getElementById('editModal').style.display='none';});}
+  if(el){el.addEventListener("click",()=>{const a=document.getElementById('taskModal'); if(a) a.style.display='none';
+                                          const b=document.getElementById('rewardModal'); if(b) b.style.display='none';
+                                          const c=document.getElementById('editModal'); if(c) c.style.display='none';});}
 });
 ["taskModal","rewardModal","editModal"].forEach(mid=>{
   const el=document.getElementById(mid);
@@ -908,16 +927,20 @@ document.getElementById("editForm")?.addEventListener("submit",(e)=>{
 function refreshMoneyUI(){
   const wT=state.money.week.target||0, wD=state.money.week.done||0;
   const mT=state.money.month.target||0, mD=state.money.month.done||0;
-  document.getElementById("week_target").value=wT; document.getElementById("week_done").value=wD; document.getElementById("week_left").textContent=Math.max(0,wT-wD);
-  document.getElementById("month_target").value=mT; document.getElementById("month_done").value=mD; document.getElementById("month_left").textContent=Math.max(0,mT-mD);
+  const wt=document.getElementById("week_target"); if(wt) wt.value=wT;
+  const wd=document.getElementById("week_done"); if(wd) wd.value=wD;
+  const wl=document.getElementById("week_left"); if(wl) wl.textContent=Math.max(0,wT-wD);
+  const mt=document.getElementById("month_target"); if(mt) mt.value=mT;
+  const md=document.getElementById("month_done"); if(md) md.value=mD;
+  const ml=document.getElementById("month_left"); if(ml) ml.textContent=Math.max(0,mT-mD);
 }
-document.getElementById("save_week_target")?.addEventListener("click",()=>{pushHistory(); state.money.week.target=parseInt(document.getElementById("week_target").value)||0; save(); refreshMoneyUI(); toast("Cible semaine enregistrée","success");});
-document.getElementById("save_month_target")?.addEventListener("click",()=>{pushHistory(); state.money.month.target=parseInt(document.getElementById("month_target").value)||0; save(); refreshMoneyUI(); toast("Cible mois enregistrée","success");});
-document.getElementById("save_week_done")?.addEventListener("click",()=>{pushHistory(); state.money.week.done=parseInt(document.getElementById("week_done").value)||0; save(); refreshMoneyUI(); toast("Montant semaine enregistré","success");});
-document.getElementById("save_month_done")?.addEventListener("click",()=>{pushHistory(); state.money.month.done=parseInt(document.getElementById("month_done").value)||0; save(); refreshMoneyUI(); toast("Montant mois enregistré","success");});
+const swt=document.getElementById("save_week_target"); if(swt){swt.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("week_target").value)||0; state.money.week.target=v; save(); refreshMoneyUI(); toast("Cible semaine enregistrée","success");});}
+const smt=document.getElementById("save_month_target"); if(smt){smt.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("month_target").value)||0; state.money.month.target=v; save(); refreshMoneyUI(); toast("Cible mois enregistrée","success");});}
+const swd=document.getElementById("save_week_done"); if(swd){swd.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("week_done").value)||0; state.money.week.done=v; save(); refreshMoneyUI(); toast("Montant semaine enregistré","success");});}
+const smd=document.getElementById("save_month_done"); if(smd){smd.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("month_done").value)||0; state.money.month.done=v; save(); refreshMoneyUI(); toast("Montant mois enregistré","success");});}
 
-function refreshPlayerLabel(){const label=(state.profile.name||"").trim()||"Joueur"; document.getElementById("player_label").textContent=label;}
-document.getElementById("save_name")?.addEventListener("click",()=>{pushHistory(); state.profile.name=document.getElementById("player_name").value.trim(); save(); refreshPlayerLabel(); toast("Pseudo enregistré","success");});
+function refreshPlayerLabel(){const label=(state.profile.name||"").trim()||"Joueur"; const pl=document.getElementById("player_label"); if(pl) pl.textContent=label;}
+const saveName=document.getElementById("save_name"); if(saveName){saveName.addEventListener("click",()=>{pushHistory(); const nm=document.getElementById("player_name"); state.profile.name=(nm?nm.value.trim():""); save(); refreshPlayerLabel(); toast("Pseudo enregistré","success");});}
 
 /* DATE PICKER */
 const dEl=document.getElementById('selected_date');
@@ -927,10 +950,10 @@ if(dEl){ dEl.value=currentDate; dEl.onchange=(e)=>{ currentDate=e.target.value||
 function init(){
   if(!state.profile) state.profile={name:"",level:1,xp:0,streaks:{prayer:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}};
   if(!state.money) state.money={week:{target:0,done:0},month:{target:0,done:0}};
-  if(!state.malus?.rules) state.malus.rules={dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3};
+  if(!state.malus||!state.malus.rules) state.malus={rules:{dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3},pending:[],active:[],penalties:[]};
   save();
 
-  document.getElementById("player_name").value=state.profile.name||"";
+  const pn=document.getElementById("player_name"); if(pn) pn.value=state.profile.name||"";
   refreshPlayerLabel();
 
   if(dEl){ dEl.value=currentDate; loadDay(currentDate); }
