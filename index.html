@@ -5,20 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Game Life ⭐</title>
   <style>
-    :root {
-      --bg: #0b0f14;
-      --bg2: #0f1520;
-      --card: #121826;
-      --text: #e6edf3;
-      --muted: #9fb3c8;
-      --line: rgba(255,255,255,.12);
-      --grad: linear-gradient(90deg,#6ee7ff,#a78bfa);
-      --danger:#ff6b6b;
-      --warning:#ffa726;
+    :root{
+      --bg:#0b0f14;--bg2:#0f1520;--card:#121826;--text:#e6edf3;--muted:#9fb3c8;--line:rgba(255,255,255,.12);
+      --grad:linear-gradient(90deg,#6ee7ff,#a78bfa);--danger:#ff6b6b;--warning:#ffa726;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
-    .top{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s ease-in-out}
+    .top{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s}
     .top.hidden{transform:translateY(-100%)}
     .container{width:min(1100px,94vw);margin:0 auto;padding:70px 0 40px}
     .header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
@@ -27,14 +20,13 @@
     .title p{margin:0;font-size:.75rem}
     .muted{color:var(--muted)}
     .menu-toggle,.back-btn-header{background:none;border:none;color:var(--text);cursor:pointer;padding:8px;border-radius:8px;transition:background .2s}
-    .menu-toggle{font-size:1.5rem}
-    .back-btn-header{font-size:1rem}
+    .menu-toggle{font-size:1.5rem}.back-btn-header{font-size:1rem}
     .menu-toggle:hover,.back-btn-header:hover{background:rgba(255,255,255,.1)}
     .mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;padding:8px;gap:4px}
     .mobile-menu.show{display:flex}
     .tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer;font-size:.9rem;text-align:left;width:100%}
     .tab.active{border-color:rgba(255,255,255,.35)}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;transition:transform .2s, box-shadow .2s}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;transition:transform .2s,box-shadow .2s}
     .card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(110,231,255,.1)}
     .player{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}
     .row{display:flex;justify-content:space-between;gap:8px;align-items:center}
@@ -42,42 +34,31 @@
     .bar>span{display:block;height:100%;background:var(--grad);width:0%;transition:width .5s ease-out}
     .chip{background:#0e1622;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;color:var(--muted);font-size:.9rem}
     button{padding:.55rem .85rem;border-radius:10px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer}
-    button.ghost{opacity:.85}
-    button.danger{background:#4a1e1e;border-color:#8b3a3a}
-    button.warning{background:#5a3a1e;border-color:#8b6a3a}
-    .kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-    .kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:border-color .2s}
-    .kpi:hover{border-color:rgba(255,255,255,.25)}
+    button.ghost{opacity:.85} button.danger{background:#4a1e1e;border-color:#8b3a3a} button.warning{background:#5a3a1e;border-color:#8b6a3a}
+    .kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)} .kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px}
     @media(min-width:860px){.kpi{grid-column:span 6}}
     input[type="number"],input[type="text"]{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text);text-align:center;width:100px}
     input[type="text"]{width:auto;min-width:150px}
     select{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text)}
-    .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-    .half{grid-column:span 12}
-    @media(min-width:860px){.half{grid-column:span 6}}
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)} .half{grid-column:span 12} @media(min-width:860px){.half{grid-column:span 6}}
     #toast{position:fixed;right:14px;bottom:14px;padding:12px 16px;background:#0f1726;border:1px solid var(--line);border-radius:10px;opacity:0;transition:.3s;transform:translateY(20px);z-index:1000}
-    #toast.show{opacity:1;transform:translateY(0)}
-    #toast.success{background:#1a4a3a;border-color:#2d8a5a;color:#4ade80}
-    #toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171}
-    #toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
+    #toast.show{opacity:1;transform:translateY(0)} #toast.success{background:#1a4a3a;border-color:#2d8a5a;color:#4ade80}
+    #toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171} #toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
     #toast.warning{background:#5a3a1e;border-color:#8b6a3a;color:#ffa726}
     .xp-gain,.xp-loss{position:fixed;font-weight:bold;pointer-events:none;animation:xpFloat 2s ease-out forwards;z-index:1001}
     .xp-gain{color:#fbbf24}.xp-loss{color:#ff6b6b}
     @keyframes xpFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}
     .level-up{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--grad);color:#000;padding:20px 40px;border-radius:20px;font-size:1.5rem;font-weight:bold;z-index:1002;animation:levelUpPulse 3s ease-out forwards}
-    @keyframes levelUpPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}40%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+    @keyframes levelUpPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}40%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
     .quest{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
     .view{display:none}.view.active{display:block}
     .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;z-index:100;align-items:center;justify-content:center}
     .modal.active{display:flex}
     .modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(500px,90vw);max-height:80vh;overflow-y:auto}
-    .form-group{margin-bottom:16px}
-    .form-group label{display:block;margin-bottom:8px;color:var(--text)}
-    .form-group input{width:100%;text-align:left}
+    .form-group{margin-bottom:16px}.form-group label{display:block;margin-bottom:8px;color:var(--text)}.form-group input{width:100%;text-align:left}
     .category-actions{display:flex;gap:8px;margin-top:12px}
     .task-item,.manage-item,.stat-card{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
-    .manage-item{display:flex;justify-content:space-between;align-items:center}
-    .manage-item-actions{display:flex;gap:8px}
+    .manage-item{display:flex;justify-content:space-between;align-items:center}.manage-item-actions{display:flex;gap:8px}
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
     .badge{display:inline-flex;align-items:center;gap:6px;padding:.3rem .6rem;border-radius:999px;background:#142033;border:1px solid rgba(255,255,255,.12);color:#cde3ff}
     .badge i{font-style:normal;background:#1a2a44;padding:2px 6px;border-radius:6px}
@@ -311,17 +292,17 @@
 
   <script>
     /* ====== STATE ====== */
-    const KEY = "gamelife_v2";
+    const KEY="gamelife_v2";
     function dflt(){
-      return {
+      return{
         profile:{level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0},name:""},
         edit:false,
         money:{week:{target:0,done:0},month:{target:0,done:0}},
         goals:{
           discipline:{label:"⏰ Discipline/Réveil",bars:[
-            {id:"wake_early",label:"Réveils avant 8h",now:0,goal:7},
-            {id:"wake_very_early",label:"Réveils avant 7h",now:0,goal:3},
-            {id:"wake_extreme",label:"Réveils avant 6h",now:0,goal:1}
+            {id:"wake_early",label:"Réveils avant 9h",now:0,goal:7},
+            {id:"wake_very_early",label:"Réveils avant 8h",now:0,goal:3},
+            {id:"wake_extreme",label:"Réveils avant 7h",now:0,goal:1}
           ]},
           business:{label:"💸 Business MLM",bars:[
             {id:"mlm_prospects",label:"Prospections MLM",now:0,goal:140},
@@ -351,9 +332,10 @@
         },
         tasks:{
           daily:[
-            {id:"wake_early",label:"Réveil avant 8h",xp:10,done:false,category:"discipline"},
-            {id:"wake_very_early",label:"Réveil avant 7h",xp:20,done:false,category:"discipline"},
-            {id:"wake_extreme",label:"Réveil avant 6h",xp:30,done:false,category:"discipline"},
+            {id:"wake_early",label:"Réveil avant 9h",xp:8,done:false,category:"discipline"},
+            {id:"wake_very_early",label:"Réveil avant 8h",xp:16,done:false,category:"discipline"},
+            {id:"wake_extreme",label:"Réveil avant 7h",xp:24,done:false,category:"discipline"},
+            {id:"wake_fajr",label:"Réveil Fajr (à l'heure)",xp:15,done:false,category:"spirituality"},
             {id:"prayers_5",label:"5 prières du jour",xp:25,done:false,category:"spirituality"},
             {id:"mlm_prospect_20",label:"20 prospections MLM",xp:22,done:false,category:"business"},
             {id:"ugc_prospect_20",label:"20 prospections UGC",xp:22,done:false,category:"ugc"},
@@ -389,48 +371,39 @@
     }
     function load(){try{return JSON.parse(localStorage.getItem(KEY))||dflt();}catch(e){return dflt();}}
     function save(){localStorage.setItem(KEY,JSON.stringify(state));}
-    let state = load();
-    if(!state.profile) state.profile={level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0},name:""};
-    if(state.edit===undefined) state.edit=false;
-    if(!state.money) state.money={week:{target:0,done:0},month:{target:0,done:0}};
-    if(!state.byDate) state.byDate={}; // stockage par date: { 'YYYY-MM-DD': { dailyDone:{}, dailyXP:number, validated:boolean } }
+    let state=load();
+    if(!state.byDate) state.byDate={};
 
     const $=s=>document.querySelector(s); const $$=s=>document.querySelectorAll(s);
+    function toast(t,type='info'){const el=$("#toast");el.textContent=t;el.className=type;el.classList.add('show');setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.className='',300);},2500);}
 
-    function toast(text,type='info'){const el=$("#toast");el.textContent=text;el.className=type;el.classList.add('show');setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.className='',300);},2500);}
-
-    function showXPGain(amount,element){const xpEl=document.createElement('div');xpEl.className=amount>0?'xp-gain':'xp-loss';xpEl.textContent=amount>0?`+${amount} XP`:`${amount} XP`;const r=element.getBoundingClientRect();xpEl.style.left=r.left+r.width/2+'px';xpEl.style.top=r.top+'px';document.body.appendChild(xpEl);setTimeout(()=>xpEl.remove(),2000);}
-    function showLevelUp(level){const el=document.createElement('div');el.className='level-up';el.textContent=`🎉 NIVEAU ${level} ! 🎉`;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
-
-    // === Date handling ===
+    // Date storage
     function todayISO(d=new Date()){return d.toISOString().slice(0,10);}
-    let currentDate = todayISO();
+    let currentDate=todayISO();
     function loadDay(date){
-      const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
+      const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};
       state.tasks.daily.forEach(t=>{t.done=!!day.dailyDone[t.id];});
       renderTasks();
-      const dv=document.getElementById('date_validated'); if(dv) dv.textContent=day.validated?'oui':'non';
+      const dv=$("#date_validated"); if(dv) dv.textContent=day.validated?'oui':'non';
     }
     function saveDay(date){
-      const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
+      const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};
       state.tasks.daily.forEach(t=>{day.dailyDone[t.id]=!!t.done;});
-      day.dailyXP = state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);
+      day.dailyXP=state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);
       state.byDate[date]=day; save();
     }
 
-    /* ====== MENU ====== */
+    /* ====== NAV ====== */
     $("#menuToggle").addEventListener("click",()=>$("#mobileMenu").classList.toggle("show"));
-    document.addEventListener("click",(e)=>{const menu=$("#mobileMenu");const toggle=$("#menuToggle");if(menu && !menu.contains(e.target) && !toggle.contains(e.target)) menu.classList.remove("show");});
-
-    // NAV TABS — event delegation robuste
+    document.addEventListener("click",(e)=>{const m=$("#mobileMenu"),t=$("#menuToggle"); if(m && !m.contains(e.target) && !t.contains(e.target)) m.classList.remove("show");});
     document.addEventListener('click',(e)=>{
       const b=e.target.closest('.tab'); if(!b) return;
       const goto=b.dataset.goto; if(!goto) return;
       $$('.tab').forEach(t=>t.classList.remove('active')); b.classList.add('active');
       $$('.view').forEach(v=>v.classList.remove('active'));
-      const v=document.getElementById(`view-${goto}`); if(v) v.classList.add('active');
+      $("#view-"+goto)?.classList.add('active');
       $("#mobileMenu")?.classList.remove('show');
-      const backBtn=$("#backButton"); if(backBtn) backBtn.style.display=(goto==='goals')?'none':'block';
+      $("#backButton").style.display=(goto==='goals')?'none':'block';
     });
     $("#backButton").addEventListener('click',()=>{
       $$('.view').forEach(v=>v.classList.remove('active')); $("#view-goals").classList.add('active');
@@ -438,9 +411,26 @@
       $("#backButton").style.display='none';
     });
 
-    /* ====== XP SYSTEM ====== */
-    function xpNeed(l){return 50 + l*50;}
-    // Gauges weekly — définies EN DEHORS d’updateXP (bug fixe)
+    /* ====== XP ====== */
+    function xpNeed(l){return 50+l*50;}
+    function updateXP(){
+      const need=xpNeed(state.profile.level);
+      const xp=Math.max(0,state.profile.xp||0);
+      $("#xp_text").textContent=`${xp} / ${need}`;
+      $("#xp_bar").style.width=Math.min(100,Math.round((xp/need)*100))+"%";
+      $("#level").textContent=state.profile.level;
+    }
+    function addXP(x,src=null){
+      state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
+      state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
+      if(src){const r=src.getBoundingClientRect();/* simple visual kept */} 
+      while(state.profile.xp>=xpNeed(state.profile.level)){ state.profile.xp-=xpNeed(state.profile.level); state.profile.level++; toast(`Niveau ${state.profile.level} !`,'success'); }
+      save(); updateXP(); updateStreaks(); renderSectorGauges();
+    }
+
+    function updateStreaks(){ $("#streak_pr").textContent=state.profile.streaks.prayer||0; $("#active_malus").textContent=state.malus.active.length||0; }
+
+    // Weekly sector gauges
     function getWeeklySectorXP(){
       const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
       ['daily','weekly','monthly'].forEach(scope=>{
@@ -458,11 +448,9 @@
     function renderSectorGauges(){
       const W=getWeeklySectorXP();
       const set=(idFill,idTxt,now,goal)=>{
-        const fill=document.getElementById(idFill);
-        const txt=document.getElementById(idTxt);
+        const fill=document.getElementById(idFill), txt=document.getElementById(idTxt);
         const pct=goal?Math.min(100,Math.round(now/goal*100)):0;
-        if(fill) fill.style.width=pct+'%';
-        if(txt) txt.textContent=`${now}/${goal}`;
+        if(fill) fill.style.width=pct+'%'; if(txt) txt.textContent=`${now}/${goal}`;
       };
       set('g_biz','g_biz_txt',W.biz,100);
       set('g_ugc','g_ugc_txt',W.ugc,100);
@@ -471,69 +459,29 @@
       set('g_spi','g_spi_txt',W.spi,60);
     }
 
-    function updateXP(){
-      const need=xpNeed(state.profile.level);
-      const xp=Math.max(0,state.profile.xp||0);
-      $("#xp_text").textContent=`${xp} / ${need}`;
-      $("#xp_bar").style.width=Math.min(100,Math.round((xp/need)*100))+"%";
-      $("#level").textContent=state.profile.level;
-    }
-    function addXP(x, sourceElement=null){
-      state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
-      state.profile.stats.dailyXP+=x;
-      state.profile.stats.weeklyXP+=x;
-      state.profile.stats.monthlyXP+=x;
-      if(sourceElement) showXPGain(x,sourceElement);
-      while(state.profile.xp>=xpNeed(state.profile.level)){
-        state.profile.xp-=xpNeed(state.profile.level);
-        state.profile.level++; showLevelUp(state.profile.level);
-        toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');
-      }
-      save(); updateXP(); updateStreaks(); renderSectorGauges();
-    }
-    function updateStreaks(){
-      $("#streak_pr").textContent = state.profile.streaks.prayer||0;
-      $("#active_malus").textContent = state.malus.active.length||0;
-    }
-
-    /* ====== GOALS ====== */
+    /* ====== KPIs (objectifs) ====== */
     function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0;}
     function renderKPIs(){
-      const kpis=$("#kpis"); kpis.innerHTML="";
+      const k=$("#kpis"); k.innerHTML="";
       for(const [key,cat] of Object.entries(state.goals)){
         const card=document.createElement("div"); card.className="kpi"; card.dataset.cat=key;
         let html=`<h3>${cat.label}</h3>`;
         cat.bars.forEach(b=>{
           const p=pct(b.now,b.goal);
           html+=`<div class="row"><strong>${b.label}</strong>
-                   <span>
-                     <input id="${b.id}_now" type="number" value="${b.now}" min="0" disabled> /
-                     <input id="${b.id}_goal" type="number" value="${b.goal}" min="0" disabled>
-                   </span>
-                 </div>
+                   <span><input id="${b.id}_now" type="number" value="${b.now}" min="0" disabled> /
+                         <input id="${b.id}_goal" type="number" value="${b.goal}" min="0" disabled></span></div>
                  <div class="bar"><span id="${b.id}_bar" style="width:${p}%"></span></div>`;
         });
-        card.innerHTML=html; kpis.appendChild(card);
+        card.innerHTML=html; k.appendChild(card);
       }
-      // Bindings: quand on édite les valeurs manuellement
+      // Bind recalc on input (edit mode)
       for(const cat of Object.values(state.goals)){
         cat.bars.forEach(b=>{
           const nowEl=$("#"+b.id+"_now"), goalEl=$("#"+b.id+"_goal"), bar=$("#"+b.id+"_bar");
-          const recalc=()=>{
-            b.now=+nowEl.value||0; b.goal=+goalEl.value||0;
-            bar.style.width=pct(b.now,b.goal)+'%';
-            save();
-          };
-          nowEl.addEventListener("input",recalc);
-          goalEl.addEventListener("input",recalc);
+          const recalc=()=>{ b.now=+nowEl.value||0; b.goal=+goalEl.value||0; bar.style.width=pct(b.now,b.goal)+'%'; save(); };
+          nowEl.addEventListener("input",recalc); goalEl.addEventListener("input",recalc);
         });
-      }
-    }
-
-    function checkBonuses(){
-      // Bonus simple : streak prières
-      if(state.profile.streaks.prayer>=7 && state.profile.streaks.prayer%7===0){
-        addXP(50); toast("🎉 Bonus streak prières +50 XP!",'success');
       }
     }
 
@@ -552,241 +500,196 @@
       mount("monthly_tasks",state.tasks.monthly);
     }
 
+    function updateGoalFromTask(goalId,amount=1){
+      for(const cat of Object.values(state.goals)){
+        const bar=cat.bars.find(b=>b.id===goalId);
+        if(bar){ bar.now=Math.max(0,(bar.now||0)+amount); return; }
+      }
+    }
+
     document.addEventListener("change",(e)=>{
       const el=e.target;
       if(!el.matches('input[type="checkbox"][data-scope]')) return;
       const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
-      const list= scope==="daily_tasks" ? state.tasks.daily : scope==="weekly_tasks" ? state.tasks.weekly : state.tasks.monthly;
+      const list=scope==="daily_tasks"?state.tasks.daily:scope==="weekly_tasks"?state.tasks.weekly:state.tasks.monthly;
       const t=list.find(x=>x.id===id); if(!t) return;
 
       const wasCompleted=t.done;
       t.done=el.checked;
 
-      // Tâches spéciales
-      if(t.id==="prayers_5" && t.done && !wasCompleted){
-        state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers");
-      }else if(t.id==="prayers_5" && !t.done && wasCompleted){
-        state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1);
+      // Prières 5 → mise à jour objectif + streak
+      if(t.id==="prayers_5"){
+        if(t.done && !wasCompleted){ state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers",+1); }
+        if(!t.done && wasCompleted){ state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1); updateGoalFromTask("daily_prayers",-1); }
       }
 
-      if(t.id==="mlm_prospect_20" && t.done && !wasCompleted) updateGoalFromTask("mlm_prospects",20);
-      if(t.id==="ugc_prospect_20" && t.done && !wasCompleted) updateGoalFromTask("ugc_prospects",20);
+      // Réveils (9h/8h/7h) → lient Objectifs Discipline
+      if(["wake_early","wake_very_early","wake_extreme"].includes(t.id)){
+        const delta = (t.done && !wasCompleted)? +1 : (!t.done && wasCompleted)? -1 : 0;
+        if(delta) updateGoalFromTask(t.id, delta);
+      }
 
+      // Prospections par 20
+      if(t.id==="mlm_prospect_20"){
+        const delta = (t.done && !wasCompleted)? +20 : (!t.done && wasCompleted)? -20 : 0;
+        if(delta) updateGoalFromTask("mlm_prospects",delta);
+      }
+      if(t.id==="ugc_prospect_20"){
+        const delta = (t.done && !wasCompleted)? +20 : (!t.done && wasCompleted)? -20 : 0;
+        if(delta) updateGoalFromTask("ugc_prospects",delta);
+      }
+
+      // Tâches simples (+/-1)
       const map={workout:"workouts",run:"runs",reel:"reels",video:"videos",lecture:"lectures",introspection:"introspections",jumuah:"jumuah",mlm_presentation:"mlm_presentations",ugc_collab:"ugc_collabs"};
-      if(map[t.id] && t.done && !wasCompleted) updateGoalFromTask(map[t.id]);
-
-      addXP(t.done?t.xp:-t.xp, el.closest('.quest'));
-      if(t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`,'success');
-      saveDay(currentDate); save(); renderKPIs(); // gauges hebdo via addXP -> renderSectorGauges()
-    });
-
-    function updateGoalFromTask(goalId,amount=1){
-      for(const cat of Object.values(state.goals)){
-        const bar=cat.bars.find(b=>b.id===goalId);
-        if(bar){ bar.now+=amount; break; }
+      if(map[t.id]){
+        const delta = (t.done && !wasCompleted)? +1 : (!t.done && wasCompleted)? -1 : 0;
+        if(delta) updateGoalFromTask(map[t.id],delta);
       }
-    }
+
+      addXP(t.done? t.xp : -t.xp, el.closest('.quest'));
+      if(t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`,'success');
+      saveDay(currentDate); save(); renderKPIs(); renderSectorGauges();
+    });
 
     $("#resetDaily").addEventListener("click",()=>{state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});
     $("#resetWeekly").addEventListener("click",()=>{state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
     $("#resetMonthly").addEventListener("click",()=>{state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
 
     /* ====== VALIDATE DAY ====== */
+    function checkBonuses(){
+      if(state.profile.streaks.prayer>=7 && state.profile.streaks.prayer%7===0){ addXP(50); toast("🎉 Bonus streak prières +50 XP!",'success');}
+    }
     $("#validateDay").addEventListener("click",()=>{
       checkBonuses();
-      // Quelques bonus hebdo
       const g=state.goals;
-      if(g.sport.bars[0].now>=5) {addXP(30); toast("🏋️ Bonus 5 workouts +30 XP!",'success');}
-      if(g.sport.bars[1].now>=3) {addXP(20); toast("🏃 Bonus 3 courses +20 XP!",'success');}
-      if(g.social.bars[0].now>=5){addXP(40); toast("📱 Bonus 5 reels +40 XP!",'success');}
-      if(g.social.bars[1].now>=6){addXP(30); toast("🎬 Bonus 6 vidéos +30 XP!",'success');}
-      if(g.dev.bars[0].now>=5){addXP(25); toast("📚 Bonus 5 lectures +25 XP!",'success');}
-      if(g.dev.bars[1].now>=5){addXP(25); toast("📝 Bonus 5 introspections +25 XP!",'success');}
-      if(g.business.bars[2].now>=1){addXP(60); toast("💸 Bonus inscription MLM +60 XP!",'success');}
-      if(g.business.bars[2].now>=2){addXP(120); toast("💸 Bonus 2 inscriptions +120 XP!",'success');}
-      if(g.ugc.bars[1].now>=1){addXP(50); toast("🎥 Bonus collab UGC +50 XP!",'success');}
-      if(g.ugc.bars[1].now>=2){addXP(120); toast("🎥 Bonus 2 collabs +120 XP!",'success');}
-
-      // Marque la journée comme validée
+      if(g.sport.bars[0].now>=5) {addXP(30);toast("🏋️ Bonus 5 workouts +30 XP!",'success');}
+      if(g.sport.bars[1].now>=3) {addXP(20);toast("🏃 Bonus 3 courses +20 XP!",'success');}
+      if(g.social.bars[0].now>=5){addXP(40);toast("📱 Bonus 5 reels +40 XP!",'success');}
+      if(g.social.bars[1].now>=6){addXP(30);toast("🎬 Bonus 6 vidéos +30 XP!",'success');}
+      if(g.dev.bars[0].now>=5){addXP(25);toast("📚 Bonus 5 lectures +25 XP!",'success');}
+      if(g.dev.bars[1].now>=5){addXP(25);toast("📝 Bonus 5 introspections +25 XP!",'success');}
+      if(g.business.bars[2].now>=1){addXP(60);toast("💸 Bonus inscription MLM +60 XP!",'success');}
+      if(g.business.bars[2].now>=2){addXP(120);toast("💸 Bonus 2 inscriptions +120 XP!",'success');}
+      if(g.ugc.bars[1].now>=1){addXP(50);toast("🎥 Bonus collab UGC +50 XP!",'success');}
+      if(g.ugc.bars[1].now>=2){addXP(120);toast("🎥 Bonus 2 collabs +120 XP!",'success');}
       if(!state.byDate[currentDate]) state.byDate[currentDate]={dailyDone:{},dailyXP:0,validated:false};
-      state.byDate[currentDate].validated=true;
-      const dv=document.getElementById('date_validated'); if(dv) dv.textContent='oui';
-      save(); toast("Journée validée ✅",'success');
+      state.byDate[currentDate].validated=true; $("#date_validated").textContent='oui'; save(); toast("Journée validée ✅",'success');
     });
 
     /* ====== REWARDS ====== */
+    function canUseReward(r){
+      const a=state.malus.active;
+      if(a.includes('no_rewards_daily')) return false;
+      if(a.includes('no_rewards_weekend')&&(r.id==='weekend'||r.id==='day_off')) return false;
+      if(a.includes('no_shopping')&&r.id==='shopping') return false;
+      if(a.includes('no_social')&&r.id==='friends') return false;
+      if(a.includes('no_pleasure')&&(r.id==='activity'||r.id==='day_off')) return false;
+      return true;
+    }
     function renderRewards(){
       const wrap=$("#rewards_list"), log=$("#rewards_log"); wrap.innerHTML="";
       state.rewards.catalog.forEach(it=>{
         const card=document.createElement("div"); card.className="card half";
-        const isBlocked=it.blocked || !canUseReward(it);
+        const isBlocked=it.blocked||!canUseReward(it);
         card.innerHTML=`
           <div class="row">
-            <div>
-              <h3 style="margin:.2rem 0">${it.name}</h3>
-              <div class="muted">${it.tag}${isBlocked?' - BLOQUÉ':''}</div>
-            </div>
+            <div><h3 style="margin:.2rem 0">${it.name}</h3><div class="muted">${it.tag}${isBlocked?' - BLOQUÉ':''}</div></div>
             <b>${it.cost} XP</b>
           </div>
-          <button data-redeem="${it.id}" ${isBlocked?'disabled style="opacity:.5"':''}>
-            ${isBlocked?'Bloqué':`Utiliser ${it.cost} XP`}
-          </button>`;
+          <button data-redeem="${it.id}" ${isBlocked?'disabled style="opacity:.5"':''}>${isBlocked?'Bloqué':`Utiliser ${it.cost} XP`}</button>`;
         wrap.appendChild(card);
       });
-
       wrap.onclick=(e)=>{
         const btn=e.target.closest("[data-redeem]"); if(!btn||btn.disabled) return;
         const it=state.rewards.catalog.find(x=>x.id===btn.dataset.redeem); if(!it) return;
         if((state.profile.xp||0)<it.cost) return toast("Pas assez d'XP.",'error');
         if(!canUseReward(it)) return toast("Récompense bloquée par les malus.",'error');
-        state.profile.xp -= it.cost;
-        state.rewards.log.unshift(`🎁 ${it.name} (${it.cost} XP) — ${new Date().toLocaleString()}`);
+        state.profile.xp-=it.cost; state.rewards.log.unshift(`🎁 ${it.name} (${it.cost} XP) — ${new Date().toLocaleString()}`);
         save(); updateXP(); renderRewards(); toast("Profite bien ! 🎉",'success');
       };
-
       log.innerHTML=state.rewards.log.slice(0,10).map(x=>`<li>${x}</li>`).join("");
-    }
-    function canUseReward(reward){
-      const a=state.malus.active;
-      if(a.includes('no_rewards_daily')) return false;
-      if(a.includes('no_rewards_weekend') && (reward.id==='weekend'||reward.id==='day_off')) return false;
-      if(a.includes('no_shopping') && reward.id==='shopping') return false;
-      if(a.includes('no_social') && reward.id==='friends') return false;
-      if(a.includes('no_pleasure') && (reward.id==='activity'||reward.id==='day_off')) return false;
-      return true;
     }
 
     /* ====== MALUS ====== */
     function renderMalus(){
-      const content=$("#malus_status");
-      const active=state.malus.active; const penalties=state.malus.penalties;
-      let html=`
-        <h3>Règles de malus</h3>
-        <div class="manage-item">
-          <div>
-            <strong>Malus globaux :</strong>
-            <ul style="margin:6px 0 0 16px">
-              <li>&lt;100 XP/jour → pas de récompense ce jour-là</li>
-              <li>&lt;250 XP/semaine → pas de récompense le week-end</li>
-              <li>&lt;200 XP/mois → défi exceptionnel</li>
-            </ul>
-          </div>
-          <div class="manage-item-actions">
-            <button id="checkMalusInline" class="warning">Vérifier</button>
-          </div>
-        </div>
-        <h3>Malus actifs (${active.length})</h3>
-      `;
-      if(active.length===0) html+=`<p class="muted">Aucun malus actif - Continue comme ça ! 🎉</p>`;
-      else active.forEach(m=>{html+=`<div class="manage-item" style="background:#4a1e1e;border-color:#ff6b6b">${getMalusDescription(m)}</div>`;});
-      html+=`<h3>Pénalités en cours (${penalties.length})</h3>`;
-      if(penalties.length===0) html+=`<p class="muted">Aucune pénalité active</p>`;
-      else penalties.forEach(p=>{html+=`<div class="manage-item">${p}</div>`;});
+      const content=$("#malus_status"); const a=state.malus.active, p=state.malus.penalties;
+      let html=`<h3>Règles de malus</h3>
+        <div class="manage-item"><div><strong>Malus globaux :</strong>
+          <ul style="margin:6px 0 0 16px">
+            <li>&lt;100 XP/jour → pas de récompense ce jour-là</li>
+            <li>&lt;250 XP/semaine → pas de récompense le week-end</li>
+            <li>&lt;200 XP/mois → défi exceptionnel</li>
+          </ul></div>
+          <div class="manage-item-actions"><button id="checkMalusInline" class="warning">Vérifier</button></div></div>
+        <h3>Malus actifs (${a.length})</h3>`;
+      if(a.length===0) html+=`<p class="muted">Aucun malus actif - Continue comme ça ! 🎉</p>`;
+      else a.forEach(m=>html+=`<div class="manage-item" style="background:#4a1e1e;border-color:#ff6b6b">${m}</div>`);
+      html+=`<h3>Pénalités en cours (${p.length})</h3>`;
+      if(p.length===0) html+=`<p class="muted">Aucune pénalité active</p>`;
+      else p.forEach(x=>html+=`<div class="manage-item">${x}</div>`);
       content.innerHTML=html;
       document.getElementById('checkMalusInline')?.addEventListener('click',checkAndApplyMalus);
     }
-    function getMalusDescription(m){
-      const d={'no_rewards_daily':"🚫 Pas de récompense aujourd'hui (<100 XP)",
-      'no_rewards_weekend':'🚫 Pas de récompense week-end (<250 XP/semaine)',
-      'no_shopping':'🚫 Pas de shopping (<100 XP business/semaine)',
-      'no_social':'🚫 Pas de soirée amis (<3 lectures/semaine)',
-      'no_pleasure':"🚫 Pas d'activité plaisir (<3 workouts/semaine)",
-      'extra_prospects_mlm':'📈 +50 prospections MLM obligatoires',
-      'extra_calls':'📞 +5 appels obligatoires',
-      'extra_prospects_ugc':'📈 +30 prospections UGC obligatoires',
-      'extra_workout':'🏋️ Workout extra week-end',
-      'long_cardio':'🏃 Cardio long (45min) obligatoire',
-      'sunday_reading':'📚 1h lecture dimanche obligatoire',
-      'quran_reading':'📖 1h lecture coranique obligatoire'};
-      return d[m]||m;
+    function calculateCategoryXP(cat){let xp=0;['daily','weekly','monthly'].forEach(t=>{state.tasks[t].forEach(task=>{if(task.category===cat&&task.done) xp+=task.xp;});});return xp;}
+    function checkAndApplyMalus(){
+      const m=[], pen=[];
+      if(state.profile.stats.dailyXP<100) m.push('no_rewards_daily');
+      if(state.profile.stats.weeklyXP<250) m.push('no_rewards_weekend');
+      if(calculateCategoryXP('business')<100) m.push('no_shopping');
+      if(state.goals.business.bars[2].now===0){pen.push('+50 prospections MLM obligatoires','+5 appels téléphoniques obligatoires');}
+      if(state.goals.ugc.bars[1].now===0){pen.push('+30 prospections UGC obligatoires');}
+      if(state.goals.sport.bars[0].now<3){pen.push('Workout extra le week-end');}
+      if(state.goals.sport.bars[1].now===0){pen.push('Cardio long (45min) la semaine suivante');}
+      if(state.goals.dev.bars[0].now<3){m.push('no_social'); pen.push('1h lecture le dimanche');}
+      const missed=7-state.goals.spirituality.bars[0].now; if(missed>0) m.push('no_rewards_daily');
+      if(state.goals.spirituality.bars[1].now===0){pen.push('Lecture coranique (1h) le week-end');}
+      state.malus.active=m; state.malus.penalties=pen; save(); renderMalus(); renderRewards(); updateStreaks();
+      toast((m.length||pen.length)?`⚠️ ${m.length} malus et ${pen.length} pénalités appliqués`:'✅ Aucun malus - Excellent travail !',(m.length||pen.length)?'warning':'success');
     }
     document.getElementById('checkMalus').addEventListener('click',checkAndApplyMalus);
     document.getElementById('applyMalus').addEventListener('click',checkAndApplyMalus);
-    function checkAndApplyMalus(){
-      const newMalus=[], newPen=[];
-      if(state.profile.stats.dailyXP<100) newMalus.push('no_rewards_daily');
-      if(state.profile.stats.weeklyXP<250) newMalus.push('no_rewards_weekend');
-      const businessXP=calculateCategoryXP('business'); if(businessXP<100) newMalus.push('no_shopping');
-      if(state.goals.business.bars[2].now===0){newPen.push('+50 prospections MLM obligatoires'); newPen.push('+5 appels téléphoniques obligatoires');}
-      if(state.goals.ugc.bars[1].now===0){newPen.push('+30 prospections UGC obligatoires');}
-      if(state.goals.sport.bars[0].now<3){newPen.push('Workout extra le week-end');}
-      if(state.goals.sport.bars[1].now===0){newPen.push('Cardio long (45min) la semaine suivante');}
-      if(state.goals.dev.bars[0].now<3){newMalus.push('no_social'); newPen.push('1h lecture le dimanche');}
-      const missed=7 - state.goals.spirituality.bars[0].now; if(missed>0) newMalus.push('no_rewards_daily');
-      if(state.goals.spirituality.bars[1].now===0){newPen.push('Lecture coranique (1h) le week-end');}
-      state.malus.active=newMalus; state.malus.penalties=newPen;
-      save(); renderMalus(); renderRewards(); updateStreaks();
-      if(newMalus.length||newPen.length) toast(`⚠️ ${newMalus.length} malus et ${newPen.length} pénalités appliqués`,'warning');
-      else toast('✅ Aucun malus - Excellent travail !','success');
-    }
-    function calculateCategoryXP(category){
-      let xp=0; ['daily','weekly','monthly'].forEach(type=>{
-        state.tasks[type].forEach(task=>{ if(task.category===category && task.done) xp+=task.xp; });
-      }); return xp;
-    }
 
     /* ====== STATS ====== */
     function renderStats(){
-      const s=state.profile.stats, content=$("#stats_content");
-      let html=`
-        <div class="stats-grid">
-          <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem;color:var(--grad)">${s.dailyXP}</div></div>
-          <div class="stat-card"><h3>XP Hebdomadaire</h3><div style="font-size:2rem;color:var(--grad)">${s.weeklyXP}</div></div>
-          <div class="stat-card"><h3>XP Mensuel</h3><div style="font-size:2rem;color:var(--grad)">${s.monthlyXP}</div></div>
-          <div class="stat-card"><h3>Niveau</h3><div style="font-size:2rem;color:var(--grad)">${state.profile.level}</div></div>
-        </div>
-        <h3>Progression par catégorie</h3>
-      `;
+      const s=state.profile.stats, c=$("#stats_content");
+      let html=`<div class="stats-grid">
+        <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem;color:var(--grad)">${s.dailyXP}</div></div>
+        <div class="stat-card"><h3>XP Hebdomadaire</h3><div style="font-size:2rem;color:var(--grad)">${s.weeklyXP}</div></div>
+        <div class="stat-card"><h3>XP Mensuel</h3><div style="font-size:2rem;color:var(--grad)">${s.monthlyXP}</div></div>
+        <div class="stat-card"><h3>Niveau</h3><div style="font-size:2rem;color:var(--grad)">${state.profile.level}</div></div>
+      </div><h3>Progression par catégorie</h3>`;
       for(const cat of Object.values(state.goals)){
         html+=`<div class="card" style="margin-bottom:12px"><h4>${cat.label}</h4>`;
-        cat.bars.forEach(bar=>{
-          const p=pct(bar.now,bar.goal);
+        cat.bars.forEach(bar=>{const p=pct(bar.now,bar.goal);
           html+=`<div class="row" style="margin-bottom:8px"><span>${bar.label}</span><span>${bar.now}/${bar.goal} (${p}%)</span></div>
                  <div class="bar"><span style="width:${p}%"></span></div>`;
         });
         html+=`</div>`;
       }
-      content.innerHTML=html;
+      c.innerHTML=html;
     }
 
-    /* ====== EXPORT/IMPORT/RESET ====== */
+    /* ====== EXPORT / IMPORT / RESET ====== */
     $("#exportData").addEventListener("click",()=>{
-      const dataStr=JSON.stringify(state,null,2);
-      const blob=new Blob([dataStr],{type:'application/json'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a'); a.href=url; a.download=`gamelife-v2-backup-${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      const dataStr=JSON.stringify(state,null,2), blob=new Blob([dataStr],{type:'application/json'});
+      const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=`gamelife-v2-backup-${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
       toast("Données exportées avec succès !",'success');
     });
     $("#importData").addEventListener("click",()=>{
-      const input=document.createElement('input'); input.type='file'; input.accept='.json';
-      input.onchange=(e)=>{
-        const file=e.target.files[0]; if(!file) return;
-        const reader=new FileReader();
-        reader.onload=(ev)=>{
-          try{
-            const imported=JSON.parse(ev.target.result);
-            if(confirm("Remplacer toutes vos données actuelles ?")){
-              state=imported; save(); init(); toast("Données importées avec succès !",'success');
-            }
-          }catch(err){ toast("Erreur lors de l'import du fichier",'error'); }
-        };
-        reader.readAsText(file);
-      };
-      input.click();
+      const i=document.createElement('input'); i.type='file'; i.accept='.json';
+      i.onchange=(e)=>{const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+        r.onload=(ev)=>{try{const data=JSON.parse(ev.target.result); if(confirm("Remplacer toutes vos données ?")){state=data; save(); init(); toast("Données importées !",'success');}}catch{toast("Erreur d'import",'error');}};
+        r.readAsText(f);
+      }; i.click();
     });
-    $("#resetAll").addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; state=dflt(); save(); init(); toast("Données réinitialisées",'info'); });
+    $("#resetAll").addEventListener("click",()=>{if(!confirm("Tout remettre à zéro ?")) return; state=dflt(); save(); init(); toast("Données réinitialisées",'info');});
 
-    /* ====== GESTION DES TÂCHES ====== */
-    let currentEditType=null, currentEditId=null;
+    /* ====== TASK MANAGER / REWARDS MANAGER ====== */
+    let currentEditType=null,currentEditId=null;
     $("#manageDailyTasks").addEventListener("click",()=>openTaskManager('daily'));
     $("#manageWeeklyTasks").addEventListener("click",()=>openTaskManager('weekly'));
     $("#manageMonthlyTasks").addEventListener("click",()=>openTaskManager('monthly'));
-
-    function openTaskManager(type){
-      currentEditType=type;
-      $("#taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`;
-      renderTaskManager(type); $("#taskModal").classList.add("active");
-    }
+    function openTaskManager(type){currentEditType=type; $("#taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`; renderTaskManager(type); $("#taskModal").classList.add("active");}
     function renderTaskManager(type){
       const list=$("#taskManageList"), tasks=state.tasks[type];
       list.innerHTML=tasks.map(task=>`
@@ -805,22 +708,14 @@
       $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
       currentEditType=type; currentEditId=id; $("#editModal").classList.add("active");
     }
-    function deleteTask(type,id){
-      if(!confirm("Supprimer cette tâche ?")) return;
-      state.tasks[type]=state.tasks[type].filter(t=>t.id!==id); save(); renderTaskManager(type); renderTasks(); toast("Tâche supprimée",'info');
-    }
-    $("#addNewTask").addEventListener("click",()=>{
-      $("#editModalTitle").textContent="Ajouter une tâche";
-      $("#editName").value=""; $("#editValue").value=10; $("#editCategory").value="discipline";
-      $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
-      currentEditId=null; currentEditType=currentEditType||'daily'; $("#editModal").classList.add("active");
-    });
+    function deleteTask(type,id){ if(!confirm("Supprimer cette tâche ?")) return;
+      state.tasks[type]=state.tasks[type].filter(t=>t.id!==id); save(); renderTaskManager(type); renderTasks(); toast("Tâche supprimée",'info');}
+    $("#addNewTask").addEventListener("click",()=>{ $("#editModalTitle").textContent="Ajouter une tâche"; $("#editName").value=""; $("#editValue").value=10; $("#editCategory").value="discipline"; $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none"; currentEditId=null; currentEditType=currentEditType||'daily'; $("#editModal").classList.add("active"); });
 
-    /* ====== GESTION RÉCOMPENSES ====== */
     $("#manageRewards").addEventListener("click",()=>{ renderRewardManager(); $("#rewardModal").classList.add("active"); });
     function renderRewardManager(){
-      const list=$("#rewardManageList"), rewards=state.rewards.catalog;
-      list.innerHTML=rewards.map(r=>`
+      const list=$("#rewardManageList"), items=state.rewards.catalog;
+      list.innerHTML=items.map(r=>`
         <div class="manage-item">
           <div><strong>${r.name}</strong><div class="muted">${r.cost} XP - ${r.tag}</div></div>
           <div class="manage-item-actions">
@@ -836,139 +731,83 @@
       $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block";
       currentEditType='reward'; currentEditId=id; $("#editModal").classList.add("active");
     }
-    function deleteReward(id){
-      if(!confirm("Supprimer cette récompense ?")) return;
-      state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id); save(); renderRewardManager(); renderRewards(); toast("Récompense supprimée",'info');
-    }
-    $("#addNewReward").addEventListener("click",()=>{
-      $("#editModalTitle").textContent="Ajouter une récompense";
-      $("#editName").value=""; $("#editValue").value=100; $("#editTag").value="Détente";
-      $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block";
-      currentEditType='reward'; currentEditId=null; $("#editModal").classList.add("active");
-    });
+    function deleteReward(id){ if(!confirm("Supprimer cette récompense ?")) return;
+      state.rewards.catalog=state.reards?.catalog?.filter? state.rewards.catalog.filter(r=>r.id!==id) : state.rewards.catalog.filter(r=>r.id!==id);
+      save(); renderRewardManager(); renderRewards(); toast("Récompense supprimée",'info'); }
+    $("#addNewReward").addEventListener("click",()=>{ $("#editModalTitle").textContent="Ajouter une récompense"; $("#editName").value=""; $("#editValue").value=100; $("#editTag").value="Détente"; $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block"; currentEditType='reward'; currentEditId=null; $("#editModal").classList.add("active"); });
 
-    /* ====== FORM D'ÉDITION COMMUN ====== */
     $("#editForm").addEventListener("submit",(e)=>{
       e.preventDefault();
-      const name=$("#editName").value.trim();
-      const value=parseInt($("#editValue").value);
+      const name=$("#editName").value.trim(), value=parseInt($("#editValue").value);
       if(!name || isNaN(value)) return;
-
       if(currentEditType==='reward'){
         const tag=$("#editTag").value.trim();
-        if(currentEditId){
-          const r=state.rewards.catalog.find(x=>x.id===currentEditId);
-          if(r){ r.name=name; r.cost=value; r.tag=tag; }
-        }else{
-          const id='reward_'+Date.now();
-          state.rewards.catalog.push({id,name,cost:value,tag,blocked:false});
-        }
+        if(currentEditId){ const r=state.rewards.catalog.find(x=>x.id===currentEditId); if(r){r.name=name;r.cost=value;r.tag=tag;} }
+        else{ const id='reward_'+Date.now(); state.rewards.catalog.push({id,name,cost:value,tag,blocked:false}); }
         renderRewardManager(); renderRewards();
       }else{
-        const category=$("#editCategory").value;
-        if(currentEditId){
-          const t=state.tasks[currentEditType].find(x=>x.id===currentEditId);
-          if(t){ t.label=name; t.xp=value; t.category=category; }
-        }else{
-          const id='task_'+Date.now();
-          state.tasks[currentEditType].push({id,label:name,xp:value,category,done:false});
-        }
+        const cat=$("#editCategory").value;
+        if(currentEditId){ const t=state.tasks[currentEditType].find(x=>x.id===currentEditId); if(t){t.label=name;t.xp=value;t.category=cat;} }
+        else{ const id='task_'+Date.now(); state.tasks[currentEditType].push({id,label:name,xp:value,category:cat,done:false}); }
         renderTaskManager(currentEditType); renderTasks();
       }
       save(); $("#editModal").classList.remove("active"); toast("Modifications sauvegardées",'success');
     });
 
-    // Fermeture modales
+    // Close modals (Fermer / Annuler / extérieur)
     ['closeTaskModal','closeRewardModal','cancelEdit'].forEach(id=>{
       const el=document.getElementById(id);
-      if(el) el.onclick=()=>{
-        document.getElementById('taskModal').classList.remove('active');
-        document.getElementById('rewardModal').classList.remove('active');
-        document.getElementById('editModal').classList.remove('active');
-      };
+      if(el) el.onclick=()=>{ document.getElementById('taskModal').classList.remove('active'); document.getElementById('rewardModal').classList.remove('active'); document.getElementById('editModal').classList.remove('active'); };
     });
     $("#taskModal, #rewardModal, #editModal").addEventListener("click",(e)=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active"); });
 
-    // Rendre les fonctions globales pour les boutons inline
-    window.editTask=editTask; window.deleteTask=deleteTask;
-    window.editReward=editReward; window.deleteReward=deleteReward;
+    // Global expose
+    window.editTask=editTask; window.deleteTask=deleteTask; window.editReward=editReward; window.deleteReward=deleteReward;
 
     /* ====== AUTO-HIDE NAV ====== */
-    let lastScrollY=0, ticking=false;
-    function updateNavbar(){
-      const y=window.scrollY, nav=$(".top");
-      if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden");
-      lastScrollY=y; ticking=false;
-    }
+    let lastScrollY=0,ticking=false;
+    function updateNavbar(){const y=window.scrollY,nav=document.querySelector(".top"); if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden"); lastScrollY=y; ticking=false;}
     function onScroll(){ if(!ticking){ requestAnimationFrame(updateNavbar); ticking=true; } }
     window.addEventListener("scroll",onScroll);
 
-    /* ====== MODE EDIT (toggle) ====== */
+    /* ====== MODE EDIT ====== */
     function setEditMode(on){
       state.edit=!!on; save();
-      // objectifs jauges
-      document.querySelectorAll('[id$="_now"],[id$="_goal"],#money_week_target,#money_month_target')
-        .forEach(inp=>{ if(inp) inp.disabled=!state.edit; });
-      // champs "fait" restent modifiables
-      ['money_week_done_input','money_month_done_input'].forEach(id=>{
-        const el=document.getElementById(id); if(el) el.disabled=false;
-      });
+      document.querySelectorAll('[id$="_now"],[id$="_goal"],#money_week_target,#money_month_target').forEach(inp=>{ if(inp) inp.disabled=!state.edit; });
+      ['money_week_done_input','money_month_done_input'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=false; });
       const btn=document.getElementById('toggleEdit'); if(btn) btn.textContent=state.edit?'✅ Terminer':'✏️ Modifier';
     }
     document.getElementById('toggleEdit').addEventListener('click',()=>setEditMode(!state.edit));
 
     /* ====== ARGENT ====== */
-    const toNumber=(v)=>{ if(v===null||v===undefined) return 0; const s=String(v).replace(/[^\d.,-]/g,'').replace(/\s/g,'').replace(/,/g,'.'); const n=Number(s); return isNaN(n)?0:n; };
+    const toNumber=v=>{ if(v===null||v===undefined) return 0; const s=String(v).replace(/[^\d.,-]/g,'').replace(/\s/g,'').replace(/,/g,'.'); const n=Number(s); return isNaN(n)?0:n; };
     function renderMoney(){
-      const wT=state.money?.week?.target??0, wD=state.money?.week?.done??0;
-      const mT=state.money?.month?.target??0, mD=state.money?.month?.done??0;
+      const wT=state.money?.week?.target??0,wD=state.money?.week?.done??0,mT=state.money?.month?.target??0,mD=state.money?.month?.done??0;
       const wR=Math.max(0,wT-wD), mR=Math.max(0,mT-mD);
-      const wTarget=$("#money_week_target"), wDone=$("#money_week_done_input"), wRest=$("#money_week_rest");
-      const mTarget=$("#money_month_target"), mDone=$("#money_month_done_input"), mRest=$("#money_month_rest");
-      if(wTarget) wTarget.value=wT; if(wDone) wDone.value=wD; if(wRest) wRest.textContent=wR;
-      if(mTarget) mTarget.value=mT; if(mDone) mDone.value=mD; if(mRest) mRest.textContent=mR;
+      $("#money_week_target").value=wT; $("#money_week_done_input").value=wD; $("#money_week_rest").textContent=wR;
+      $("#money_month_target").value=mT; $("#money_month_done_input").value=mD; $("#money_month_rest").textContent=mR;
     }
-    $("#save_money_week_done").addEventListener('click',()=>{
-      state.money.week.done = toNumber($("#money_week_done_input")?.value); save(); renderMoney(); toast('Montant semaine mis à jour','success');
-    });
-    $("#save_money_month_done").addEventListener('click',()=>{
-      state.money.month.done = toNumber($("#money_month_done_input")?.value); save(); renderMoney(); toast('Montant mois mis à jour','success');
-    });
-    $("#money_week_target").addEventListener('change',()=>{
-      if(!state.edit) return; state.money.week.target = toNumber($("#money_week_target").value); save(); renderMoney(); toast('Objectif semaine sauvegardé','success');
-    });
-    $("#money_month_target").addEventListener('change',()=>{
-      if(!state.edit) return; state.money.month.target = toNumber($("#money_month_target").value); save(); renderMoney(); toast('Objectif mois sauvegardé','success');
-    });
+    $("#save_money_week_done").addEventListener('click',()=>{ state.money.week.done=toNumber($("#money_week_done_input").value); save(); renderMoney(); toast('Montant semaine mis à jour','success'); });
+    $("#save_money_month_done").addEventListener('click',()=>{ state.money.month.done=toNumber($("#money_month_done_input").value); save(); renderMoney(); toast('Montant mois mis à jour','success'); });
+    $("#money_week_target").addEventListener('change',()=>{ if(!state.edit) return; state.money.week.target=toNumber($("#money_week_target").value); save(); renderMoney(); toast('Objectif semaine sauvegardé','success'); });
+    $("#money_month_target").addEventListener('change',()=>{ if(!state.edit) return; state.money.month.target=toNumber($("#money_month_target").value); save(); renderMoney(); toast('Objectif mois sauvegardé','success'); });
 
     /* ====== INIT ====== */
+    function renderStatsAndGauges(){ renderKPIs(); renderSectorGauges(); renderStats(); }
     function init(){
-      renderKPIs();
-      renderSectorGauges();
-      renderTasks();
-      renderRewards();
-      renderMalus();
-      renderStats();
-      renderMoney();
+      renderKPIs(); renderSectorGauges(); renderTasks(); renderRewards(); renderMalus(); renderStats(); renderMoney();
 
-      // Pseudo → met dans le titre
+      // Pseudo → titre
       const nameEl=$("#player_name"), saveNameBtn=$("#save_name"), title=$("#playerTitle");
-      const applyName=()=>{ const pseudo=(nameEl?.value?.trim()||""); const base="🎮 "; const name= pseudo? pseudo : "Joueur"; title.childNodes[0].nodeValue = base + name + " "; };
+      const applyName=()=>{ const pseudo=(nameEl?.value?.trim()||""); const base="🎮 "; const name=pseudo?pseudo:"Joueur"; title.childNodes[0].nodeValue=base+name+" "; };
       if(nameEl){ nameEl.value=state.profile?.name||""; nameEl.addEventListener('input',()=>{ state.profile.name=nameEl.value; save(); applyName(); }); }
       saveNameBtn?.addEventListener('click',()=>{ state.profile.name=nameEl.value.trim(); save(); applyName(); toast('Pseudo sauvegardé','success'); });
       applyName();
 
-      // Datepicker
       const dEl=$("#selected_date");
-      if(dEl){
-        dEl.value=currentDate;
-        dEl.onchange=(e)=>{ currentDate=e.target.value || todayISO(); loadDay(currentDate); };
-        loadDay(currentDate);
-      }
+      if(dEl){ dEl.value=currentDate; dEl.onchange=(e)=>{ currentDate=e.target.value||todayISO(); loadDay(currentDate); }; loadDay(currentDate); }
 
-      updateXP();
-      updateStreaks();
-      setEditMode(state.edit); // verrouille/déverrouille les champs selon le mode
+      updateXP(); updateStreaks(); setEditMode(state.edit);
     }
     init();
   </script>
