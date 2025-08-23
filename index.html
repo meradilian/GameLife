@@ -1,871 +1,976 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Game Life ⭐</title>
-<style>
-:root{
-  --bg:#0b0f14;--bg2:#0f1520;--card:#121826;--text:#e6edf3;--muted:#9fb3c8;
-  --line:rgba(255,255,255,.12);--grad:linear-gradient(90deg,#6ee7ff,#a78bfa);
-  --danger:#ff6b6b;--warning:#ffa726;--ok:#4ade80
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
-.top{position:fixed;inset:0 0 auto 0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s}
-.top.hidden{transform:translateY(-100%)}
-.container{width:min(1100px,94vw);margin:0 auto;padding:70px 0 40px}
-.header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
-.title{flex:1;text-align:center}
-.title h1{margin:0;font-size:1.2rem}
-.title p{margin:0;font-size:.75rem}
-.muted{color:var(--muted)}
-.menu-toggle,.back-btn-header,button{border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer}
-.menu-toggle,.back-btn-header{border:none;font-size:1rem;padding:8px;border-radius:8px}
-.menu-toggle{font-size:1.5rem}
-.menu-toggle:hover,.back-btn-header:hover{background:rgba(255,255,255,.1)}
-.mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;gap:4px;padding:8px}
-.mobile-menu.show{display:flex}
-.tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);background:#0d1520;color:var(--text);font-size:.9rem;text-align:left;width:100%}
-.tab.active{border-color:rgba(255,255,255,.35)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;transition:transform .2s,box-shadow .2s}
-.card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(110,231,255,.1)}
-.player{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}
-.row{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-.half{grid-column:span 12}
-@media(min-width:860px){.half{grid-column:span 6}}
-.kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-.kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px}
-@media(min-width:860px){.kpi{grid-column:span 6}}
-.kpi:hover{border-color:rgba(255,255,255,.25)}
-.kpi.malus{background:#2a1a1a;border-color:#8b3a3a}
-input[type="number"],input[type="text"],input[type="date"]{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text);text-align:center;min-width:90px}
-input[disabled],select[disabled],button[disabled]{opacity:.55;cursor:not-allowed}
-select{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text)}
-.bar,.gbar{height:12px;border-radius:999px;background:#0e1622;border:1px solid var(--line);overflow:hidden}
-.bar>span,.gfill{display:block;height:100%;background:var(--grad);width:0%}
-.chip{background:#0e1622;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;color:var(--muted);font-size:.9rem}
-button{padding:.55rem .85rem;border-radius:10px}
-button.ghost{opacity:.85}
-button.danger{background:#4a1e1e;border-color:#8b3a3a}
-button.warning{background:#5a3a1e;border-color:#8b6a3a}
-button.ok{background:#153a2a;border-color:#2d8a5a}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:.3rem .6rem;border-radius:999px;background:#142033;border:1px solid var(--line);color:#cde3ff}
-.badge i{font-style:normal;background:#1a2a44;padding:2px 6px;border-radius:6px}
-.view{display:none}
-.view.active{display:block}
-.hidden{display:none!important}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;z-index:100;align-items:center;justify-content:center}
-.modal.active{display:flex}
-.modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(520px,92vw);max-height:80vh;overflow:auto}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;margin-bottom:6px}
-.manage-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;align-items:center}
-.manage-item-actions{display:flex;gap:8px}
-.malus-item{background:#2a1a1a;border:1px solid #8b3a3a;border-radius:8px;padding:12px;margin-bottom:8px}
-.malus-active{background:#4a1e1e;border-color:#ff6b6b}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
-.stat-card{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
-#toast{position:fixed;right:14px;bottom:14px;padding:12px 16px;background:#0f1726;border:1px solid var(--line);border-radius:10px;opacity:0;transform:translateY(20px);transition:.3s;z-index:1000}
-#toast.show{opacity:1;transform:translateY(0)}
-#toast.success{background:#1a4a3a;border-color:#2d8a5a;color:var(--ok)}
-#toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171}
-#toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
-#toast.warning{background:#5a3a1e;border-color:#8b6a3a;color:#ffa726}
-.xp-gain,.xp-loss{position:fixed;font-weight:bold;pointer-events:none;animation:xpFloat 2s ease-out forwards;z-index:1001}
-.xp-gain{color:#fbbf24}.xp-loss{color:#ff6b6b}
-@keyframes xpFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}
-.level-up{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--grad);color:#000;padding:20px 40px;border-radius:20px;font-size:1.5rem;font-weight:bold;z-index:1002;animation:levelUpPulse 3s ease-out forwards}
-@keyframes levelUpPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}40%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0}}
-.two-col{display:grid;gap:12px;grid-template-columns:1fr}
-@media(min-width:920px){.two-col{grid-template-columns:1fr 1fr}}
-.goal-list li{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0}
-.small{font-size:.85rem}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Game Life ⭐</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg2: #0f1520;
+      --card: #121826;
+      --text: #e6edf3;
+      --muted: #9fb3c8;
+      --line: rgba(255,255,255,.12);
+      --grad: linear-gradient(90deg,#6ee7ff,#a78bfa);
+      --danger:#ff6b6b;
+      --warning:#ffa726;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
+    .top{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s ease-in-out}
+    .top.hidden{transform:translateY(-100%)}
+    .container{width:min(1100px,94vw);margin:0 auto;padding:70px 0 40px}
+    .header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
+    .title{flex:1;text-align:center}
+    .title h1{margin:0;font-size:1.2rem}
+    .title p{margin:0;font-size:.75rem}
+    .muted{color:var(--muted)}
+    .menu-toggle,.back-btn-header{background:none;border:none;color:var(--text);cursor:pointer;padding:8px;border-radius:8px;transition:background .2s}
+    .menu-toggle{font-size:1.5rem}
+    .back-btn-header{font-size:1rem}
+    .menu-toggle:hover,.back-btn-header:hover{background:rgba(255,255,255,.1)}
+    .mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;padding:8px;gap:4px}
+    .mobile-menu.show{display:flex}
+    .tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer;font-size:.9rem;text-align:left;width:100%}
+    .tab.active{border-color:rgba(255,255,255,.35)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;transition:transform .2s, box-shadow .2s}
+    .card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(110,231,255,.1)}
+    .player{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}
+    .row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+    .bar{height:12px;border-radius:999px;background:#0e1622;border:1px solid var(--line);overflow:hidden}
+    .bar>span{display:block;height:100%;background:var(--grad);width:0%;transition:width .5s ease-out}
+    .chip{background:#0e1622;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;color:var(--muted);font-size:.9rem}
+    button{padding:.55rem .85rem;border-radius:10px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer}
+    button.ghost{opacity:.85}
+    button.danger{background:#4a1e1e;border-color:#8b3a3a}
+    button.warning{background:#5a3a1e;border-color:#8b6a3a}
+    .kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+    .kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:border-color .2s}
+    .kpi:hover{border-color:rgba(255,255,255,.25)}
+    @media(min-width:860px){.kpi{grid-column:span 6}}
+    input[type="number"],input[type="text"]{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text);text-align:center;width:100px}
+    input[type="text"]{width:auto;min-width:150px}
+    select{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text)}
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+    .half{grid-column:span 12}
+    @media(min-width:860px){.half{grid-column:span 6}}
+    #toast{position:fixed;right:14px;bottom:14px;padding:12px 16px;background:#0f1726;border:1px solid var(--line);border-radius:10px;opacity:0;transition:.3s;transform:translateY(20px);z-index:1000}
+    #toast.show{opacity:1;transform:translateY(0)}
+    #toast.success{background:#1a4a3a;border-color:#2d8a5a;color:#4ade80}
+    #toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171}
+    #toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
+    #toast.warning{background:#5a3a1e;border-color:#8b6a3a;color:#ffa726}
+    .xp-gain,.xp-loss{position:fixed;font-weight:bold;pointer-events:none;animation:xpFloat 2s ease-out forwards;z-index:1001}
+    .xp-gain{color:#fbbf24}.xp-loss{color:#ff6b6b}
+    @keyframes xpFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}
+    .level-up{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--grad);color:#000;padding:20px 40px;border-radius:20px;font-size:1.5rem;font-weight:bold;z-index:1002;animation:levelUpPulse 3s ease-out forwards}
+    @keyframes levelUpPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}40%{transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+    .quest{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+    .view{display:none}.view.active{display:block}
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;z-index:100;align-items:center;justify-content:center}
+    .modal.active{display:flex}
+    .modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(500px,90vw);max-height:80vh;overflow-y:auto}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;margin-bottom:8px;color:var(--text)}
+    .form-group input{width:100%;text-align:left}
+    .category-actions{display:flex;gap:8px;margin-top:12px}
+    .task-item,.manage-item,.stat-card{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
+    .manage-item{display:flex;justify-content:space-between;align-items:center}
+    .manage-item-actions{display:flex;gap:8px}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:.3rem .6rem;border-radius:999px;background:#142033;border:1px solid rgba(255,255,255,.12);color:#cde3ff}
+    .badge i{font-style:normal;background:#1a2a44;padding:2px 6px;border-radius:6px}
+    .gbar{height:12px;border-radius:999px;background:#0e1622;border:1px solid var(--line);overflow:hidden;position:relative}
+    .gfill{height:100%;background:var(--grad);width:0%;transition:width .5s}
+  </style>
 </head>
 <body>
-<header class="top">
-  <div class="header-content">
-    <button id="backButton" class="back-btn-header" style="display:none">← Retour</button>
-    <div class="title">
-      <h1>⭐ Game Life</h1>
-      <p class="muted">c'est toi qui choisis de stagner ou d'évoluer</p>
-    </div>
-    <div class="row">
-      <button id="toggleEdit" class="ghost">✏️ Modifier (OFF)</button>
-      <button id="undoBtn" class="ghost" title="Annuler dernière action">↩︎ Annuler</button>
-      <button id="menuToggle" class="menu-toggle">☰</button>
-    </div>
-  </div>
-  <nav id="mobileMenu" class="mobile-menu">
-    <button class="tab active" data-goto="goals">🎯 Objectifs</button>
-    <button class="tab" data-goto="tasks">✅ Tâches</button>
-    <button class="tab" data-goto="rewards">🎁 Récompenses</button>
-    <button class="tab" data-goto="malus">⚠️ Malus</button>
-    <button class="tab" data-goto="bonus">✨ Bonus</button>
-    <button class="tab" data-goto="stats">📊 Statistiques</button>
-    <button id="exportData" class="ghost">📤 Exporter</button>
-  </nav>
-</header>
-
-<main class="container">
-  <!-- PLAYER -->
-  <section class="card">
-    <div class="player">
-      <div style="min-width:280px">
-        <h2>
-          <span>🎮 </span><span id="player_title_name">Joueur</span>
-          <span class="badge"><i>Lvl</i><b id="level">1</b></span>
-        </h2>
-
-        <div class="row small" style="gap:6px;margin:6px 0 4px">
-          <label class="muted">Pseudo :</label>
-          <input id="player_name" type="text" placeholder="Ton nom" style="width:180px">
-          <button id="save_name" class="ok">Valider</button>
-        </div>
-
-        <div class="row small" style="gap:8px;flex-wrap:wrap;margin:6px 0">
-          <label class="muted">Jour :</label>
-          <input id="selected_date" type="date"/>
-          <span class="chip">Validé : <b id="date_validated">non</b></span>
-        </div>
-
-        <div class="row"><strong>XP</strong><span id="xp_text">0 / 100</span></div>
-        <div class="gbar"><span id="xp_bar" class="gfill" style="width:0%"></span></div>
-
-        <div style="margin-top:8px">
-          <span class="chip">🕌 Streak prières: <b id="streak_pr">0</b> j</span>
-          <span class="chip">🚫 Malus actifs: <b id="active_malus">0</b></span>
-        </div>
+  <header class="top">
+    <div class="header-content">
+      <button id="backButton" class="back-btn-header" style="display:none;">← Retour</button>
+      <div class="title">
+        <h1>⭐ Game Life</h1>
+        <p class="muted">c'est toi qui choisis de stagner ou d'évoluer</p>
       </div>
-
-      <div class="row" style="gap:8px">
-        <button id="validateDay">Valider la journée</button>
-        <button id="checkMalus" class="warning">Aperçu malus</button>
-        <button id="applyMalus" class="danger">Appliquer malus</button>
-        <button id="importData" class="ghost">📥 Importer</button>
-        <button id="resetAll" class="ghost">🔄 Reset</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="toggleEdit" class="ghost">✏️ Modifier</button>
+        <button id="menuToggle" class="menu-toggle">☰</button>
       </div>
     </div>
-  </section>
+    <nav id="mobileMenu" class="mobile-menu">
+      <button class="tab active" data-goto="goals">🎯 Objectifs</button>
+      <button class="tab" data-goto="tasks">✅ Tâches</button>
+      <button class="tab" data-goto="rewards">🎁 Récompenses</button>
+      <button class="tab" data-goto="malus">⚠️ Malus</button>
+      <button class="tab" data-goto="stats">📊 Statistiques</button>
+      <button id="exportData" class="ghost">📤 Exporter</button>
+    </nav>
+  </header>
 
-  <!-- ARGENT SEMAINE / MOIS -->
-  <section class="card">
-    <h2>💰 Objectifs argent</h2>
-    <div class="grid">
-      <div class="half card">
-        <div class="row"><b>Semaine</b>
-          <span class="small">
-            Fait :
-            <input id="money_week_done_input" type="number" min="0" step="1" style="width:120px">
-            <button id="save_money_week_done" class="ok">Valider</button>
-            &nbsp; / Objectif :
-            <input id="money_week_target" type="number" min="0" step="1" data-editable>
-          </span>
-        </div>
-        <div class="row small"><span>Reste</span><b id="money_week_left">0</b></div>
-      </div>
-
-      <div class="half card">
-        <div class="row"><b>Mois</b>
-          <span class="small">
-            Fait :
-            <input id="money_month_done_input" type="number" min="0" step="1" style="width:120px">
-            <button id="save_money_month_done" class="ok">Valider</button>
-            &nbsp; / Objectif :
-            <input id="money_month_target" type="number" min="0" step="1" data-editable>
-          </span>
-        </div>
-        <div class="row small"><span>Reste</span><b id="money_month_left">0</b></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTEURS -->
-  <section class="card">
-    <h2>📈 Progression hebdo par secteur</h2>
-    <div id="sector_gauges" class="grid" style="margin-top:8px">
-      <div class="half card"><div class="row"><b>💸 Business</b><span id="g_biz_txt">0/100</span></div><div class="gbar"><span id="g_biz" class="gfill"></span></div></div>
-      <div class="half card"><div class="row"><b>🎥 UGC</b><span id="g_ugc_txt">0/100</span></div><div class="gbar"><span id="g_ugc" class="gfill"></span></div></div>
-      <div class="half card"><div class="row"><b>🏋️ Sport</b><span id="g_sport_txt">0/60</span></div><div class="gbar"><span id="g_sport" class="gfill"></span></div></div>
-      <div class="half card"><div class="row"><b>📚 Dév perso</b><span id="g_dev_txt">0/50</span></div><div class="gbar"><span id="g_dev" class="gfill"></span></div></div>
-      <div class="half card"><div class="row"><b>🕌 Spiritualité</b><span id="g_spi_txt">0/60</span></div><div class="gbar"><span id="g_spi" class="gfill"></span></div></div>
-    </div>
-  </section>
-
-  <!-- PRIORITÉS -->
-  <section class="card">
-    <h2>🧭 Priorités</h2>
-    <div class="two-col">
-      <div class="card">
-        <h3>🟩 5 objectifs les plus proches</h3>
-        <ul id="goals_closest" class="goal-list"></ul>
-      </div>
-      <div class="card">
-        <h3>🟥 5 objectifs les plus loin</h3>
-        <ul id="goals_farthest" class="goal-list"></ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- GOALS -->
-  <section id="view-goals" class="view active">
+  <main class="container">
+    <!-- PLAYER -->
     <section class="card">
-      <h2>🎯 Objectifs (hebdo) <span class="small muted">(modifiables en mode édition)</span></h2>
-      <div id="kpis" class="kpis"></div>
-    </section>
-  </section>
-
-  <!-- TASKS -->
-  <section id="view-tasks" class="view">
-    <section class="card">
-      <h2>✅ Tâches (par catégorie)</h2>
-      <div id="tasks_by_cat" class="grid"></div>
-      <div class="category-actions">
-        <button id="manageDailyTasks" class="ghost hidden">✏️ Gérer Quotidiennes</button>
-        <button id="manageWeeklyTasks" class="ghost hidden">✏️ Gérer Hebdo</button>
-        <button id="manageMonthlyTasks" class="ghost hidden">✏️ Gérer Mensuelles</button>
-        <button id="resetDaily" class="ghost">Réinitialiser la journée</button>
-        <button id="resetWeekly" class="ghost">Réinitialiser la semaine</button>
-        <button id="resetMonthly" class="ghost">Réinitialiser le mois</button>
-      </div>
-    </section>
-  </section>
-
-  <!-- REWARDS -->
-  <section id="view-rewards" class="view">
-    <section class="card">
-      <h2>🎁 Récompenses</h2>
-      <div id="rewards_list" class="grid"></div>
-      <div class="category-actions">
-        <button id="manageRewards" class="ghost hidden">✏️ Gérer les récompenses</button>
-      </div>
-    </section>
-    <section class="card">
-      <h2>Historique</h2>
-      <ul id="rewards_log" class="muted"></ul>
-    </section>
-  </section>
-
-  <!-- MALUS -->
-  <section id="view-malus" class="view">
-    <section class="card">
-      <h2>⚠️ Malus & Règles</h2>
-      <div class="grid">
-        <div class="half card">
-          <h3>Règles (éditer en mode édition)</h3>
-          <div class="form-group small"><label>XP min / jour</label><input id="rule_day_min" type="number" step="1" min="0" data-editable></div>
-          <div class="form-group small"><label>XP min / semaine</label><input id="rule_week_min" type="number" step="1" min="0" data-editable></div>
-          <div class="form-group small"><label>XP Business min / semaine</label><input id="rule_biz_min" type="number" step="1" min="0" data-editable></div>
-          <div class="form-group small"><label>Lectures min / semaine</label><input id="rule_read_min" type="number" step="1" min="0" data-editable></div>
-        </div>
-        <div class="half card">
-          <h3>Aperçu</h3>
-          <div id="malus_preview"></div>
-          <div class="row" style="gap:8px;margin-top:8px">
-            <button id="btnPreviewMalus" class="ghost">🔍 Calculer aperçu</button>
-            <button id="applyMalus" class="danger">🚨 Appliquer maintenant</button>
+      <div class="player">
+        <div>
+          <h2 id="playerTitle">🎮 Joueur <span class="badge"><i>Lvl</i><b id="level">1</b></span></h2>
+          <div class="row" style="margin:6px 0 4px">
+            <label class="muted">Pseudo :</label>
+            <input id="player_name" type="text" placeholder="Ton nom" style="width:180px">
+            <button id="save_name" class="ghost">Valider</button>
+          </div>
+          <div class="row" style="gap:8px;flex-wrap:wrap;margin:6px 0">
+            <label class="muted">Jour :</label>
+            <input id="selected_date" type="date" />
+            <span class="chip">Validé : <b id="date_validated">non</b></span>
+          </div>
+          <div class="row"><strong>XP</strong><span id="xp_text">0 / 100</span></div>
+          <div class="gbar"><span id="xp_bar" class="gfill" style="width:0%"></span></div>
+          <div style="margin-top:8px">
+            <span class="chip">🕌 Streak prières: <b id="streak_pr">0</b> j</span>
+            <span class="chip">🚫 Malus actifs: <b id="active_malus">0</b></span>
           </div>
         </div>
+        <div class="row" style="gap:8px">
+          <button id="validateDay">Valider la journée</button>
+          <button id="checkMalus" class="warning">Vérifier malus</button>
+          <button id="importData" class="ghost">📥 Importer</button>
+          <button id="resetAll" class="ghost">🔄 Reset</button>
+        </div>
       </div>
-      <div class="card">
-        <h3>Malus/Pénalités actifs</h3>
+    </section>
+
+    <!-- GOALS -->
+    <section id="view-goals" class="view active">
+      <section class="card">
+        <h2>Objectifs hebdomadaires</h2>
+
+        <!-- Mini jauges secteur (hebdo) -->
+        <div id="sector_gauges" class="grid" style="margin-top:8px">
+          <div class="half card"><div class="row"><b>💸 Business</b><span id="g_biz_txt">0/100</span></div><div class="gbar"><span id="g_biz" class="gfill"></span></div></div>
+          <div class="half card"><div class="row"><b>🎥 UGC</b><span id="g_ugc_txt">0/100</span></div><div class="gbar"><span id="g_ugc" class="gfill"></span></div></div>
+          <div class="half card"><div class="row"><b>🏋️ Sport</b><span id="g_sport_txt">0/60</span></div><div class="gbar"><span id="g_sport" class="gfill"></span></div></div>
+          <div class="half card"><div class="row"><b>📚 Dév perso</b><span id="g_dev_txt">0/50</span></div><div class="gbar"><span id="g_dev" class="gfill"></span></div></div>
+          <div class="half card"><div class="row"><b>🕌 Spiritualité</b><span id="g_spi_txt">0/60</span></div><div class="gbar"><span id="g_spi" class="gfill"></span></div></div>
+        </div>
+
+        <!-- ARGENT SEMAINE/MOIS -->
+        <div class="grid" style="margin-top:12px">
+          <div class="half card">
+            <h3>💰 Semaine</h3>
+            <div class="row">
+              <label class="muted">Objectif :</label>
+              <input id="money_week_target" type="number" min="0" step="1" disabled>
+            </div>
+            <div class="row">
+              <label class="muted">Fait :</label>
+              <input id="money_week_done_input" type="number" min="0" step="1">
+              <button id="save_money_week_done">Valider</button>
+            </div>
+            <div class="row"><strong>Reste :</strong> <span id="money_week_rest">0</span></div>
+          </div>
+
+          <div class="half card">
+            <h3>💵 Mois</h3>
+            <div class="row">
+              <label class="muted">Objectif :</label>
+              <input id="money_month_target" type="number" min="0" step="1" disabled>
+            </div>
+            <div class="row">
+              <label class="muted">Fait :</label>
+              <input id="money_month_done_input" type="number" min="0" step="1">
+              <button id="save_money_month_done">Valider</button>
+            </div>
+            <div class="row"><strong>Reste :</strong> <span id="money_month_rest">0</span></div>
+          </div>
+        </div>
+
+        <div id="kpis" class="kpis"></div>
+      </section>
+    </section>
+
+    <!-- TASKS -->
+    <section id="view-tasks" class="view">
+      <section class="card">
+        <h2>Tâches quotidiennes</h2>
+        <div class="category-actions">
+          <button id="manageDailyTasks" class="ghost">✏️ Gérer les tâches</button>
+          <button id="resetDaily" class="ghost">Réinitialiser la journée</button>
+        </div>
+        <div id="daily_tasks"></div>
+      </section>
+      <section class="card">
+        <h2>Tâches hebdomadaires</h2>
+        <div class="category-actions">
+          <button id="manageWeeklyTasks" class="ghost">✏️ Gérer les tâches</button>
+          <button id="resetWeekly" class="ghost">Réinitialiser la semaine</button>
+        </div>
+        <div id="weekly_tasks"></div>
+      </section>
+      <section class="card">
+        <h2>Tâches mensuelles</h2>
+        <div class="category-actions">
+          <button id="manageMonthlyTasks" class="ghost">✏️ Gérer les tâches</button>
+          <button id="resetMonthly" class="ghost">Réinitialiser le mois</button>
+        </div>
+        <div id="monthly_tasks"></div>
+      </section>
+    </section>
+
+    <!-- REWARDS -->
+    <section id="view-rewards" class="view">
+      <section class="card">
+        <h2>Récompenses disponibles</h2>
+        <div class="category-actions">
+          <button id="manageRewards" class="ghost">✏️ Gérer les récompenses</button>
+        </div>
+        <div id="rewards_list" class="grid"></div>
+      </section>
+      <section class="card">
+        <h2>Historique des récompenses</h2>
+        <ul id="rewards_log" class="muted"></ul>
+      </section>
+    </section>
+
+    <!-- MALUS -->
+    <section id="view-malus" class="view">
+      <section class="card">
+        <h2>⚠️ Système de malus</h2>
         <div id="malus_status"></div>
-      </div>
+        <div class="category-actions">
+          <button id="applyMalus" class="danger">Appliquer les malus</button>
+        </div>
+      </section>
     </section>
-  </section>
 
-  <!-- BONUS -->
-  <section id="view-bonus" class="view">
-    <section class="card">
-      <h2>✨ Bonus (exploits)</h2>
-      <div id="bonus_list"></div>
-      <div class="category-actions">
-        <button id="addBonus" class="ghost hidden">+ Ajouter un bonus</button>
-      </div>
+    <!-- STATS -->
+    <section id="view-stats" class="view">
+      <section class="card">
+        <h2>📊 Statistiques</h2>
+        <div id="stats_content"></div>
+      </section>
     </section>
-  </section>
+  </main>
 
-  <!-- STATS -->
-  <section id="view-stats" class="view">
-    <section class="card">
-      <h2>📊 Statistiques</h2>
-      <div id="stats_content"></div>
-    </section>
-  </section>
-</main>
+  <div id="toast"></div>
 
-<!-- MODALES -->
-<div id="taskModal" class="modal"><div class="modal-content">
-  <h2 id="taskModalTitle">Gérer les tâches</h2>
-  <div id="taskManageList"></div>
-  <div class="category-actions">
-    <button id="addNewTask" class="ghost">+ Ajouter</button>
-    <button id="closeTaskModal">Fermer</button>
+  <!-- MODALES -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <h2 id="taskModalTitle">Gérer les tâches</h2>
+      <div id="taskManageList"></div>
+      <button id="addNewTask">+ Ajouter une tâche</button>
+      <div class="category-actions"><button id="closeTaskModal">Fermer</button></div>
+    </div>
   </div>
-</div></div>
 
-<div id="rewardModal" class="modal"><div class="modal-content">
-  <h2>Gérer les récompenses</h2>
-  <div id="rewardManageList"></div>
-  <div class="category-actions">
-    <button id="addNewReward" class="ghost">+ Ajouter</button>
-    <button id="closeRewardModal">Fermer</button>
+  <div id="rewardModal" class="modal">
+    <div class="modal-content">
+      <h2>Gérer les récompenses</h2>
+      <div id="rewardManageList"></div>
+      <button id="addNewReward">+ Ajouter une récompense</button>
+      <div class="category-actions"><button id="closeRewardModal">Fermer</button></div>
+    </div>
   </div>
-</div></div>
 
-<div id="editModal" class="modal"><div class="modal-content">
-  <h2 id="editModalTitle">Modifier</h2>
-  <form id="editForm">
-    <div class="form-group"><label for="editName">Nom :</label><input type="text" id="editName" required></div>
-    <div class="form-group"><label for="editValue">Valeur :</label><input type="number" id="editValue" required></div>
-    <div class="form-group" id="editCategoryGroup">
-      <label for="editCategory">Catégorie :</label>
-      <select id="editCategory">
-        <option value="discipline">Discipline</option>
-        <option value="business">Business</option>
-        <option value="ugc">UGC</option>
-        <option value="sport">Sport</option>
-        <option value="social">Social</option>
-        <option value="dev">Développement</option>
-        <option value="spiritualité">Spiritualité</option>
-      </select>
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h2 id="editModalTitle">Modifier</h2>
+      <form id="editForm">
+        <div class="form-group">
+          <label for="editName">Nom :</label>
+          <input type="text" id="editName" required>
+        </div>
+        <div class="form-group">
+          <label for="editValue">Valeur :</label>
+          <input type="number" id="editValue" required>
+        </div>
+        <div class="form-group" id="editCategoryGroup">
+          <label for="editCategory">Catégorie :</label>
+          <select id="editCategory">
+            <option value="discipline">Discipline</option>
+            <option value="business">Business</option>
+            <option value="ugc">UGC</option>
+            <option value="sport">Sport</option>
+            <option value="social">Social</option>
+            <option value="dev">Développement</option>
+            <option value="spirituality">Spiritualité</option>
+          </select>
+        </div>
+        <div class="form-group" id="editTagGroup">
+          <label for="editTag">Tag :</label>
+          <input type="text" id="editTag">
+        </div>
+        <div class="category-actions">
+          <button type="submit">Sauvegarder</button>
+          <button type="button" id="cancelEdit">Annuler</button>
+        </div>
+      </form>
     </div>
-    <div class="form-group" id="editTagGroup">
-      <label for="editTag">Tag :</label><input type="text" id="editTag">
-    </div>
-    <div class="category-actions">
-      <button type="submit">Sauvegarder</button>
-      <button type="button" id="cancelEdit">Annuler</button>
-    </div>
-  </form>
-</div></div>
+  </div>
 
-<div id="toast"></div>
+  <script>
+    /* ====== STATE ====== */
+    const KEY = "gamelife_v2";
+    function dflt(){
+      return {
+        profile:{level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0},name:""},
+        edit:false,
+        money:{week:{target:0,done:0},month:{target:0,done:0}},
+        goals:{
+          discipline:{label:"⏰ Discipline/Réveil",bars:[
+            {id:"wake_early",label:"Réveils avant 8h",now:0,goal:7},
+            {id:"wake_very_early",label:"Réveils avant 7h",now:0,goal:3},
+            {id:"wake_extreme",label:"Réveils avant 6h",now:0,goal:1}
+          ]},
+          business:{label:"💸 Business MLM",bars:[
+            {id:"mlm_prospects",label:"Prospections MLM",now:0,goal:140},
+            {id:"mlm_presentations",label:"Présentations",now:0,goal:7},
+            {id:"mlm_inscriptions",label:"Inscriptions",now:0,goal:1}
+          ]},
+          ugc:{label:"🎥 UGC",bars:[
+            {id:"ugc_prospects",label:"Prospections marques",now:0,goal:140},
+            {id:"ugc_collabs",label:"Collabs signées",now:0,goal:1}
+          ]},
+          sport:{label:"🏋️ Sport",bars:[
+            {id:"workouts",label:"Workouts",now:0,goal:5},
+            {id:"runs",label:"Courses",now:0,goal:3}
+          ]},
+          social:{label:"📱 Réseaux sociaux",bars:[
+            {id:"reels",label:"Reels postés",now:0,goal:5},
+            {id:"videos",label:"Vidéos produites",now:0,goal:6}
+          ]},
+          dev:{label:"📚 Développement perso",bars:[
+            {id:"lectures",label:"Lectures (20min)",now:0,goal:5},
+            {id:"introspections",label:"Introspections",now:0,goal:5}
+          ]},
+          spirituality:{label:"🕌 Spiritualité",bars:[
+            {id:"daily_prayers",label:"Journées 5 prières",now:0,goal:7},
+            {id:"jumuah",label:"Jumu'ah",now:0,goal:1}
+          ]}
+        },
+        tasks:{
+          daily:[
+            {id:"wake_early",label:"Réveil avant 8h",xp:10,done:false,category:"discipline"},
+            {id:"wake_very_early",label:"Réveil avant 7h",xp:20,done:false,category:"discipline"},
+            {id:"wake_extreme",label:"Réveil avant 6h",xp:30,done:false,category:"discipline"},
+            {id:"prayers_5",label:"5 prières du jour",xp:25,done:false,category:"spirituality"},
+            {id:"mlm_prospect_20",label:"20 prospections MLM",xp:22,done:false,category:"business"},
+            {id:"ugc_prospect_20",label:"20 prospections UGC",xp:22,done:false,category:"ugc"},
+            {id:"workout",label:"1 workout",xp:10,done:false,category:"sport"},
+            {id:"run",label:"1 course",xp:12,done:false,category:"sport"},
+            {id:"reel",label:"1 reel posté",xp:8,done:false,category:"social"},
+            {id:"video",label:"1 vidéo produite",xp:5,done:false,category:"social"},
+            {id:"lecture",label:"Lecture 20min",xp:8,done:false,category:"dev"},
+            {id:"introspection",label:"Introspection courte",xp:8,done:false,category:"dev"}
+          ],
+          weekly:[
+            {id:"jumuah",label:"Jumu'ah",xp:30,done:false,category:"spirituality"},
+            {id:"big_introspection",label:"Grosse introspection",xp:30,done:false,category:"dev"},
+            {id:"mlm_presentation",label:"Présentation MLM",xp:5,done:false,category:"business"},
+            {id:"ugc_collab",label:"Collab UGC signée",xp:50,done:false,category:"ugc"}
+          ],
+          monthly:[]
+        },
+        rewards:{
+          catalog:[
+            {id:"film",name:"Film/épisode (1h30)",cost:100,tag:"Détente",blocked:false},
+            {id:"activity",name:"Activité plaisir (1-2h)",cost:150,tag:"Plaisir",blocked:false},
+            {id:"friends",name:"Soirée amis/famille",cost:200,tag:"Social",blocked:false},
+            {id:"spa",name:"Spa/détente (2h)",cost:250,tag:"Bien-être",blocked:false},
+            {id:"shopping",name:"Shopping ≤50 CHF",cost:300,tag:"Shopping",blocked:false},
+            {id:"day_off",name:"Day off complet",cost:300,tag:"Repos",blocked:false},
+            {id:"weekend",name:"Weekend détente",cost:800,tag:"Voyage",blocked:false}
+          ],
+          log:[]
+        },
+        malus:{active:[],penalties:[]}
+      }
+    }
+    function load(){try{return JSON.parse(localStorage.getItem(KEY))||dflt();}catch(e){return dflt();}}
+    function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+    let state = load();
+    if(!state.profile) state.profile={level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0},name:""};
+    if(state.edit===undefined) state.edit=false;
+    if(!state.money) state.money={week:{target:0,done:0},month:{target:0,done:0}};
+    if(!state.byDate) state.byDate={}; // stockage par date: { 'YYYY-MM-DD': { dailyDone:{}, dailyXP:number, validated:boolean } }
 
-<script>
-/* ========== STATE / STORAGE ========== */
-const KEY="gamelife_v3";
-function dflt(){
-  return {
-    edit:false,
-    profile:{name:"",level:1,xp:0,streaks:{prayer:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}},
-    money:{week:{target:0,done:0},month:{target:0,done:0}},
-    goals:{
-      discipline:{label:"⏰ Discipline/Réveil",bars:[
-        {id:"wake_early",label:"Réveils avant 8h",now:0,goal:7},
-        {id:"wake_very_early",label:"Réveils avant 7h",now:0,goal:3},
-        {id:"wake_extreme",label:"Réveils avant 6h",now:0,goal:1}
-      ]},
-      business:{label:"💸 Business MLM",bars:[
-        {id:"mlm_prospects",label:"Prospections MLM",now:0,goal:140},
-        {id:"mlm_presentations",label:"Présentations",now:0,goal:7},
-        {id:"mlm_inscriptions",label:"Inscriptions",now:0,goal:1}
-      ]},
-      ugc:{label:"🎥 UGC",bars:[
-        {id:"ugc_prospects",label:"Prospections marques",now:0,goal:140},
-        {id:"ugc_collabs",label:"Collabs signées",now:0,goal:1}
-      ]},
-      sport:{label:"🏋️ Sport",bars:[
-        {id:"workouts",label:"Workouts",now:0,goal:5},
-        {id:"runs",label:"Courses",now:0,goal:3}
-      ]},
-      social:{label:"📱 Réseaux sociaux",bars:[
-        {id:"reels",label:"Reels postés",now:0,goal:5},
-        {id:"videos",label:"Vidéos produites",now:0,goal:6}
-      ]},
-      dev:{label:"📚 Développement perso",bars:[
-        {id:"lectures",label:"Lectures (20min)",now:0,goal:5},
-        {id:"introspections",label:"Introspections",now:0,goal:5}
-      ]},
-      spirituality:{label:"🕌 Spiritualité",bars:[
-        {id:"daily_prayers",label:"Journées 5 prières",now:0,goal:7},
-        {id:"jumuah",label:"Jumu'ah",now:0,goal:1}
-      ]}
-    },
-    tasks:{
-      daily:[
-        {id:"wake_early",label:"Réveil avant 8h",xp:10,done:false,category:"discipline"},
-        {id:"wake_very_early",label:"Réveil avant 7h",xp:20,done:false,category:"discipline"},
-        {id:"wake_extreme",label:"Réveil avant 6h",xp:30,done:false,category:"discipline"},
-        {id:"prayers_5",label:"5 prières du jour",xp:25,done:false,category:"spirituality"},
-        {id:"mlm_prospect_20",label:"20 prospections MLM",xp:22,done:false,category:"business"},
-        {id:"ugc_prospect_20",label:"20 prospections UGC",xp:22,done:false,category:"ugc"},
-        {id:"workout",label:"1 workout",xp:10,done:false,category:"sport"},
-        {id:"run",label:"1 course",xp:12,done:false,category:"sport"},
-        {id:"reel",label:"1 reel posté",xp:8,done:false,category:"social"},
-        {id:"video",label:"1 vidéo produite",xp:5,done:false,category:"social"},
-        {id:"lecture",label:"Lecture 20min",xp:8,done:false,category:"dev"},
-        {id:"introspection",label:"Introspection courte",xp:8,done:false,category:"dev"}
-      ],
-      weekly:[
-        {id:"jumuah",label:"Jumu'ah",xp:30,done:false,category:"spirituality"},
-        {id:"big_introspection",label:"Grosse introspection",xp:30,done:false,category:"dev"},
-        {id:"mlm_presentation",label:"Présentation MLM",xp:5,done:false,category:"business"},
-        {id:"ugc_collab",label:"Collab UGC signée",xp:50,done:false,category:"ugc"}
-      ],
-      monthly:[]
-    },
-    rewards:{
-      catalog:[
-        {id:"film",name:"Film/épisode (1h30)",cost:100,tag:"Détente"},
-        {id:"activity",name:"Activité plaisir (1-2h)",cost:150,tag:"Plaisir"},
-        {id:"friends",name:"Soirée amis/famille",cost:200,tag:"Social"},
-        {id:"spa",name:"Spa/détente (2h)",cost:250,tag:"Bien-être"},
-        {id:"shopping",name:"Shopping ≤50 CHF",cost:300,tag:"Shopping"},
-        {id:"day_off",name:"Day off complet",cost:300,tag:"Repos"},
-        {id:"weekend",name:"Weekend détente",cost:800,tag:"Voyage"}
-      ],
-      inventory:{},
-      log:[]
-    },
-    malus:{rules:{dayMin:100,weekMin:250,bizMin:100,readMin:3},active:[],penalties:[]},
-    bonus:[],
-    byDate:{},
-    _history:[]
-  }
-}
-let state=load();
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||dflt()}catch(e){return dflt()}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-function pushHistory(){state._history=state._history||[];state._history.push(JSON.stringify(state))}
-function undo(){if(!state._history||!state._history.length){toast("Rien à annuler","info");return}
-  const snap=state._history.pop();try{state=JSON.parse(snap)}catch(e){return} save(); init(); toast("Action annulée","info")}
-const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+    const $=s=>document.querySelector(s); const $$=s=>document.querySelectorAll(s);
 
-/* ========== HELPERS UI ========== */
-function toast(t,typ="info"){const el=$("#toast");el.textContent=t;el.className=typ;el.classList.add("show");
-  setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.className="",300)},2200)}
-function xpNeed(l){return 50+l*50}
-function todayISO(d=new Date()){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+    function toast(text,type='info'){const el=$("#toast");el.textContent=text;el.className=type;el.classList.add('show');setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.className='',300);},2500);}
 
-/* ========== NAV ========== */
-$("#menuToggle").onclick=()=>$("#mobileMenu").classList.toggle("show");
-document.addEventListener("click",(e)=>{const m=$("#mobileMenu"),t=$("#menuToggle");if(!m.contains(e.target)&&!t.contains(e.target))m.classList.remove("show")});
-$$(".tab").forEach(b=>b.addEventListener("click",()=>{$$(".tab").forEach(t=>t.classList.remove("active"));b.classList.add("active");$$(".view").forEach(v=>v.classList.remove("active"));$("#view-"+b.dataset.goto).classList.add("active");$("#mobileMenu").classList.remove("show");$("#backButton").style.display=b.dataset.goto==="goals"?"none":"block"}));
-$("#backButton").onclick=()=>{$$(".view").forEach(v=>v.classList.remove("active"));$("#view-goals").classList.add("active");$$(".tab").forEach(t=>t.classList.remove("active"));$('.tab[data-goto="goals"]').classList.add("active");$("#backButton").style.display="none"};
+    function showXPGain(amount,element){const xpEl=document.createElement('div');xpEl.className=amount>0?'xp-gain':'xp-loss';xpEl.textContent=amount>0?`+${amount} XP`:`${amount} XP`;const r=element.getBoundingClientRect();xpEl.style.left=r.left+r.width/2+'px';xpEl.style.top=r.top+'px';document.body.appendChild(xpEl);setTimeout(()=>xpEl.remove(),2000);}
+    function showLevelUp(level){const el=document.createElement('div');el.className='level-up';el.textContent=`🎉 NIVEAU ${level} ! 🎉`;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
 
-/* ========== EDIT MODE ========== */
-function applyEditModeUI(){
-  const on=!!state.edit;
-  $("#toggleEdit").textContent=on?"✏️ Modifier (ON)":"✏️ Modifier (OFF)";
-  $$("[data-editable]").forEach(i=>i.disabled=!on);
-  ["manageDailyTasks","manageWeeklyTasks","manageMonthlyTasks","manageRewards","addBonus"].forEach(id=>{const b=$("#"+id);if(b)b.classList.toggle("hidden",!on)});
-  $$('#kpis input[type="number"]').forEach(i=>i.disabled=!on);
-}
-$("#toggleEdit").onclick=()=>{state.edit=!state.edit;save();applyEditModeUI();toast(state.edit?"Mode édition ON":"Mode édition OFF","info")}
-$("#undoBtn").onclick=undo;
+    // === Date handling ===
+    function todayISO(d=new Date()){return d.toISOString().slice(0,10);}
+    let currentDate = todayISO();
+    function loadDay(date){
+      const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
+      state.tasks.daily.forEach(t=>{t.done=!!day.dailyDone[t.id];});
+      renderTasks();
+      const dv=document.getElementById('date_validated'); if(dv) dv.textContent=day.validated?'oui':'non';
+    }
+    function saveDay(date){
+      const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
+      state.tasks.daily.forEach(t=>{day.dailyDone[t.id]=!!t.done;});
+      day.dailyXP = state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);
+      state.byDate[date]=day; save();
+    }
 
-/* ========== PROFILE / XP ========== */
-function drawPlayerName(){ $("#player_title_name").textContent= state.profile.name ? state.profile.name : "Joueur" }
-$("#save_name").onclick=()=>{ const val=$("#player_name").value.trim(); pushHistory(); state.profile.name=val; save(); drawPlayerName(); toast("Pseudo sauvegardé","success") };
-function updateXP(){ const need=xpNeed(state.profile.level); const xp=Math.max(0,state.profile.xp||0); $("#xp_text").textContent=`${xp} / ${need}`; $("#xp_bar").style.width=Math.min(100,Math.round(xp/need*100))+"%"; $("#level").textContent=state.profile.level }
-function showLevelUp(level){const el=document.createElement("div");el.className='level-up';el.textContent=`🎉 NIVEAU ${level} ! 🎉`;document.body.appendChild(el);setTimeout(()=>el.remove(),3000)}
-function addXP(x,srcEl=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);state.profile.stats.dailyXP+=x;state.profile.stats.weeklyXP+=x;state.profile.stats.monthlyXP+=x;while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level);state.profile.level++;showLevelUp(state.profile.level)}save();updateXP();updateStreaks();}
+    /* ====== MENU ====== */
+    $("#menuToggle").addEventListener("click",()=>$("#mobileMenu").classList.toggle("show"));
+    document.addEventListener("click",(e)=>{const menu=$("#mobileMenu");const toggle=$("#menuToggle");if(menu && !menu.contains(e.target) && !toggle.contains(e.target)) menu.classList.remove("show");});
 
-/* ========== MONEY ========== */
-function renderMoney(){
-  $("#money_week_target").value = state.money.week.target||0;
-  $("#money_month_target").value = state.money.month.target||0;
-  $("#money_week_done_input").value = state.money.week.done||0;
-  $("#money_month_done_input").value = state.money.month.done||0;
-  $("#money_week_left").textContent = Math.max(0,(state.money.week.target||0)-(state.money.week.done||0));
-  $("#money_month_left").textContent = Math.max(0,(state.money.month.target||0)-(state.money.month.done||0));
-}
-$("#money_week_target").oninput=()=>{ if(!state.edit) return; pushHistory(); state.money.week.target=+$("#money_week_target").value||0; save(); renderMoney() };
-$("#money_month_target").oninput=()=>{ if(!state.edit) return; pushHistory(); state.money.month.target=+$("#money_month_target").value||0; save(); renderMoney() };
-$("#save_money_week_done").onclick=()=>{ pushHistory(); state.money.week.done=+$("#money_week_done_input").value||0; save(); renderMoney(); toast("Montant semaine sauvegardé","success") };
-$("#save_money_month_done").onclick=()=>{ pushHistory(); state.money.month.done=+$("#money_month_done_input").value||0; save(); renderMoney(); toast("Montant mois sauvegardé","success") };
+    // NAV TABS — event delegation robuste
+    document.addEventListener('click',(e)=>{
+      const b=e.target.closest('.tab'); if(!b) return;
+      const goto=b.dataset.goto; if(!goto) return;
+      $$('.tab').forEach(t=>t.classList.remove('active')); b.classList.add('active');
+      $$('.view').forEach(v=>v.classList.remove('active'));
+      const v=document.getElementById(`view-${goto}`); if(v) v.classList.add('active');
+      $("#mobileMenu")?.classList.remove('show');
+      const backBtn=$("#backButton"); if(backBtn) backBtn.style.display=(goto==='goals')?'none':'block';
+    });
+    $("#backButton").addEventListener('click',()=>{
+      $$('.view').forEach(v=>v.classList.remove('active')); $("#view-goals").classList.add('active');
+      $$('.tab').forEach(t=>t.classList.remove('active')); document.querySelector('.tab[data-goto="goals"]')?.classList.add('active');
+      $("#backButton").style.display='none';
+    });
 
-// ====== ENTER TO VALIDATE (pseudo + argent) ======
-const enterClick = (inputId, buttonId, onEnter) => {
-  const inp = document.getElementById(inputId);
-  if (!inp) return;
-  inp.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    /* ====== XP SYSTEM ====== */
+    function xpNeed(l){return 50 + l*50;}
+    // Gauges weekly — définies EN DEHORS d’updateXP (bug fixe)
+    function getWeeklySectorXP(){
+      const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
+      ['daily','weekly','monthly'].forEach(scope=>{
+        state.tasks[scope].forEach(t=>{
+          if(!t.done) return;
+          if(t.category==='business') W.biz+=t.xp;
+          if(t.category==='ugc') W.ugc+=t.xp;
+          if(t.category==='sport') W.sport+=t.xp;
+          if(t.category==='dev') W.dev+=t.xp;
+          if(t.category==='spirituality') W.spi+=t.xp;
+        });
+      });
+      return W;
+    }
+    function renderSectorGauges(){
+      const W=getWeeklySectorXP();
+      const set=(idFill,idTxt,now,goal)=>{
+        const fill=document.getElementById(idFill);
+        const txt=document.getElementById(idTxt);
+        const pct=goal?Math.min(100,Math.round(now/goal*100)):0;
+        if(fill) fill.style.width=pct+'%';
+        if(txt) txt.textContent=`${now}/${goal}`;
+      };
+      set('g_biz','g_biz_txt',W.biz,100);
+      set('g_ugc','g_ugc_txt',W.ugc,100);
+      set('g_sport','g_sport_txt',W.sport,60);
+      set('g_dev','g_dev_txt',W.dev,50);
+      set('g_spi','g_spi_txt',W.spi,60);
+    }
+
+    function updateXP(){
+      const need=xpNeed(state.profile.level);
+      const xp=Math.max(0,state.profile.xp||0);
+      $("#xp_text").textContent=`${xp} / ${need}`;
+      $("#xp_bar").style.width=Math.min(100,Math.round((xp/need)*100))+"%";
+      $("#level").textContent=state.profile.level;
+    }
+    function addXP(x, sourceElement=null){
+      state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
+      state.profile.stats.dailyXP+=x;
+      state.profile.stats.weeklyXP+=x;
+      state.profile.stats.monthlyXP+=x;
+      if(sourceElement) showXPGain(x,sourceElement);
+      while(state.profile.xp>=xpNeed(state.profile.level)){
+        state.profile.xp-=xpNeed(state.profile.level);
+        state.profile.level++; showLevelUp(state.profile.level);
+        toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');
+      }
+      save(); updateXP(); updateStreaks(); renderSectorGauges();
+    }
+    function updateStreaks(){
+      $("#streak_pr").textContent = state.profile.streaks.prayer||0;
+      $("#active_malus").textContent = state.malus.active.length||0;
+    }
+
+    /* ====== GOALS ====== */
+    function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0;}
+    function renderKPIs(){
+      const kpis=$("#kpis"); kpis.innerHTML="";
+      for(const [key,cat] of Object.entries(state.goals)){
+        const card=document.createElement("div"); card.className="kpi"; card.dataset.cat=key;
+        let html=`<h3>${cat.label}</h3>`;
+        cat.bars.forEach(b=>{
+          const p=pct(b.now,b.goal);
+          html+=`<div class="row"><strong>${b.label}</strong>
+                   <span>
+                     <input id="${b.id}_now" type="number" value="${b.now}" min="0" disabled> /
+                     <input id="${b.id}_goal" type="number" value="${b.goal}" min="0" disabled>
+                   </span>
+                 </div>
+                 <div class="bar"><span id="${b.id}_bar" style="width:${p}%"></span></div>`;
+        });
+        card.innerHTML=html; kpis.appendChild(card);
+      }
+      // Bindings: quand on édite les valeurs manuellement
+      for(const cat of Object.values(state.goals)){
+        cat.bars.forEach(b=>{
+          const nowEl=$("#"+b.id+"_now"), goalEl=$("#"+b.id+"_goal"), bar=$("#"+b.id+"_bar");
+          const recalc=()=>{
+            b.now=+nowEl.value||0; b.goal=+goalEl.value||0;
+            bar.style.width=pct(b.now,b.goal)+'%';
+            save();
+          };
+          nowEl.addEventListener("input",recalc);
+          goalEl.addEventListener("input",recalc);
+        });
+      }
+    }
+
+    function checkBonuses(){
+      // Bonus simple : streak prières
+      if(state.profile.streaks.prayer>=7 && state.profile.streaks.prayer%7===0){
+        addXP(50); toast("🎉 Bonus streak prières +50 XP!",'success');
+      }
+    }
+
+    /* ====== TASKS ====== */
+    function renderTasks(){
+      const mount=(id,list)=>{
+        const el=$("#"+id); el.innerHTML="";
+        list.forEach(t=>{
+          const row=document.createElement("div"); row.className="quest";
+          row.innerHTML=`<label><input type="checkbox" data-scope="${id}" data-id="${t.id}" ${t.done?'checked':''}> ${t.label}</label><span class="muted">+${t.xp} XP</span>`;
+          el.appendChild(row);
+        });
+      };
+      mount("daily_tasks",state.tasks.daily);
+      mount("weekly_tasks",state.tasks.weekly);
+      mount("monthly_tasks",state.tasks.monthly);
+    }
+
+    document.addEventListener("change",(e)=>{
+      const el=e.target;
+      if(!el.matches('input[type="checkbox"][data-scope]')) return;
+      const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
+      const list= scope==="daily_tasks" ? state.tasks.daily : scope==="weekly_tasks" ? state.tasks.weekly : state.tasks.monthly;
+      const t=list.find(x=>x.id===id); if(!t) return;
+
+      const wasCompleted=t.done;
+      t.done=el.checked;
+
+      // Tâches spéciales
+      if(t.id==="prayers_5" && t.done && !wasCompleted){
+        state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers");
+      }else if(t.id==="prayers_5" && !t.done && wasCompleted){
+        state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1);
+      }
+
+      if(t.id==="mlm_prospect_20" && t.done && !wasCompleted) updateGoalFromTask("mlm_prospects",20);
+      if(t.id==="ugc_prospect_20" && t.done && !wasCompleted) updateGoalFromTask("ugc_prospects",20);
+
+      const map={workout:"workouts",run:"runs",reel:"reels",video:"videos",lecture:"lectures",introspection:"introspections",jumuah:"jumuah",mlm_presentation:"mlm_presentations",ugc_collab:"ugc_collabs"};
+      if(map[t.id] && t.done && !wasCompleted) updateGoalFromTask(map[t.id]);
+
+      addXP(t.done?t.xp:-t.xp, el.closest('.quest'));
+      if(t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`,'success');
+      saveDay(currentDate); save(); renderKPIs(); // gauges hebdo via addXP -> renderSectorGauges()
+    });
+
+    function updateGoalFromTask(goalId,amount=1){
+      for(const cat of Object.values(state.goals)){
+        const bar=cat.bars.find(b=>b.id===goalId);
+        if(bar){ bar.now+=amount; break; }
+      }
+    }
+
+    $("#resetDaily").addEventListener("click",()=>{state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});
+    $("#resetWeekly").addEventListener("click",()=>{state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
+    $("#resetMonthly").addEventListener("click",()=>{state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
+
+    /* ====== VALIDATE DAY ====== */
+    $("#validateDay").addEventListener("click",()=>{
+      checkBonuses();
+      // Quelques bonus hebdo
+      const g=state.goals;
+      if(g.sport.bars[0].now>=5) {addXP(30); toast("🏋️ Bonus 5 workouts +30 XP!",'success');}
+      if(g.sport.bars[1].now>=3) {addXP(20); toast("🏃 Bonus 3 courses +20 XP!",'success');}
+      if(g.social.bars[0].now>=5){addXP(40); toast("📱 Bonus 5 reels +40 XP!",'success');}
+      if(g.social.bars[1].now>=6){addXP(30); toast("🎬 Bonus 6 vidéos +30 XP!",'success');}
+      if(g.dev.bars[0].now>=5){addXP(25); toast("📚 Bonus 5 lectures +25 XP!",'success');}
+      if(g.dev.bars[1].now>=5){addXP(25); toast("📝 Bonus 5 introspections +25 XP!",'success');}
+      if(g.business.bars[2].now>=1){addXP(60); toast("💸 Bonus inscription MLM +60 XP!",'success');}
+      if(g.business.bars[2].now>=2){addXP(120); toast("💸 Bonus 2 inscriptions +120 XP!",'success');}
+      if(g.ugc.bars[1].now>=1){addXP(50); toast("🎥 Bonus collab UGC +50 XP!",'success');}
+      if(g.ugc.bars[1].now>=2){addXP(120); toast("🎥 Bonus 2 collabs +120 XP!",'success');}
+
+      // Marque la journée comme validée
+      if(!state.byDate[currentDate]) state.byDate[currentDate]={dailyDone:{},dailyXP:0,validated:false};
+      state.byDate[currentDate].validated=true;
+      const dv=document.getElementById('date_validated'); if(dv) dv.textContent='oui';
+      save(); toast("Journée validée ✅",'success');
+    });
+
+    /* ====== REWARDS ====== */
+    function renderRewards(){
+      const wrap=$("#rewards_list"), log=$("#rewards_log"); wrap.innerHTML="";
+      state.rewards.catalog.forEach(it=>{
+        const card=document.createElement("div"); card.className="card half";
+        const isBlocked=it.blocked || !canUseReward(it);
+        card.innerHTML=`
+          <div class="row">
+            <div>
+              <h3 style="margin:.2rem 0">${it.name}</h3>
+              <div class="muted">${it.tag}${isBlocked?' - BLOQUÉ':''}</div>
+            </div>
+            <b>${it.cost} XP</b>
+          </div>
+          <button data-redeem="${it.id}" ${isBlocked?'disabled style="opacity:.5"':''}>
+            ${isBlocked?'Bloqué':`Utiliser ${it.cost} XP`}
+          </button>`;
+        wrap.appendChild(card);
+      });
+
+      wrap.onclick=(e)=>{
+        const btn=e.target.closest("[data-redeem]"); if(!btn||btn.disabled) return;
+        const it=state.rewards.catalog.find(x=>x.id===btn.dataset.redeem); if(!it) return;
+        if((state.profile.xp||0)<it.cost) return toast("Pas assez d'XP.",'error');
+        if(!canUseReward(it)) return toast("Récompense bloquée par les malus.",'error');
+        state.profile.xp -= it.cost;
+        state.rewards.log.unshift(`🎁 ${it.name} (${it.cost} XP) — ${new Date().toLocaleString()}`);
+        save(); updateXP(); renderRewards(); toast("Profite bien ! 🎉",'success');
+      };
+
+      log.innerHTML=state.rewards.log.slice(0,10).map(x=>`<li>${x}</li>`).join("");
+    }
+    function canUseReward(reward){
+      const a=state.malus.active;
+      if(a.includes('no_rewards_daily')) return false;
+      if(a.includes('no_rewards_weekend') && (reward.id==='weekend'||reward.id==='day_off')) return false;
+      if(a.includes('no_shopping') && reward.id==='shopping') return false;
+      if(a.includes('no_social') && reward.id==='friends') return false;
+      if(a.includes('no_pleasure') && (reward.id==='activity'||reward.id==='day_off')) return false;
+      return true;
+    }
+
+    /* ====== MALUS ====== */
+    function renderMalus(){
+      const content=$("#malus_status");
+      const active=state.malus.active; const penalties=state.malus.penalties;
+      let html=`
+        <h3>Règles de malus</h3>
+        <div class="manage-item">
+          <div>
+            <strong>Malus globaux :</strong>
+            <ul style="margin:6px 0 0 16px">
+              <li>&lt;100 XP/jour → pas de récompense ce jour-là</li>
+              <li>&lt;250 XP/semaine → pas de récompense le week-end</li>
+              <li>&lt;200 XP/mois → défi exceptionnel</li>
+            </ul>
+          </div>
+          <div class="manage-item-actions">
+            <button id="checkMalusInline" class="warning">Vérifier</button>
+          </div>
+        </div>
+        <h3>Malus actifs (${active.length})</h3>
+      `;
+      if(active.length===0) html+=`<p class="muted">Aucun malus actif - Continue comme ça ! 🎉</p>`;
+      else active.forEach(m=>{html+=`<div class="manage-item" style="background:#4a1e1e;border-color:#ff6b6b">${getMalusDescription(m)}</div>`;});
+      html+=`<h3>Pénalités en cours (${penalties.length})</h3>`;
+      if(penalties.length===0) html+=`<p class="muted">Aucune pénalité active</p>`;
+      else penalties.forEach(p=>{html+=`<div class="manage-item">${p}</div>`;});
+      content.innerHTML=html;
+      document.getElementById('checkMalusInline')?.addEventListener('click',checkAndApplyMalus);
+    }
+    function getMalusDescription(m){
+      const d={'no_rewards_daily':"🚫 Pas de récompense aujourd'hui (<100 XP)",
+      'no_rewards_weekend':'🚫 Pas de récompense week-end (<250 XP/semaine)',
+      'no_shopping':'🚫 Pas de shopping (<100 XP business/semaine)',
+      'no_social':'🚫 Pas de soirée amis (<3 lectures/semaine)',
+      'no_pleasure':"🚫 Pas d'activité plaisir (<3 workouts/semaine)",
+      'extra_prospects_mlm':'📈 +50 prospections MLM obligatoires',
+      'extra_calls':'📞 +5 appels obligatoires',
+      'extra_prospects_ugc':'📈 +30 prospections UGC obligatoires',
+      'extra_workout':'🏋️ Workout extra week-end',
+      'long_cardio':'🏃 Cardio long (45min) obligatoire',
+      'sunday_reading':'📚 1h lecture dimanche obligatoire',
+      'quran_reading':'📖 1h lecture coranique obligatoire'};
+      return d[m]||m;
+    }
+    document.getElementById('checkMalus').addEventListener('click',checkAndApplyMalus);
+    document.getElementById('applyMalus').addEventListener('click',checkAndApplyMalus);
+    function checkAndApplyMalus(){
+      const newMalus=[], newPen=[];
+      if(state.profile.stats.dailyXP<100) newMalus.push('no_rewards_daily');
+      if(state.profile.stats.weeklyXP<250) newMalus.push('no_rewards_weekend');
+      const businessXP=calculateCategoryXP('business'); if(businessXP<100) newMalus.push('no_shopping');
+      if(state.goals.business.bars[2].now===0){newPen.push('+50 prospections MLM obligatoires'); newPen.push('+5 appels téléphoniques obligatoires');}
+      if(state.goals.ugc.bars[1].now===0){newPen.push('+30 prospections UGC obligatoires');}
+      if(state.goals.sport.bars[0].now<3){newPen.push('Workout extra le week-end');}
+      if(state.goals.sport.bars[1].now===0){newPen.push('Cardio long (45min) la semaine suivante');}
+      if(state.goals.dev.bars[0].now<3){newMalus.push('no_social'); newPen.push('1h lecture le dimanche');}
+      const missed=7 - state.goals.spirituality.bars[0].now; if(missed>0) newMalus.push('no_rewards_daily');
+      if(state.goals.spirituality.bars[1].now===0){newPen.push('Lecture coranique (1h) le week-end');}
+      state.malus.active=newMalus; state.malus.penalties=newPen;
+      save(); renderMalus(); renderRewards(); updateStreaks();
+      if(newMalus.length||newPen.length) toast(`⚠️ ${newMalus.length} malus et ${newPen.length} pénalités appliqués`,'warning');
+      else toast('✅ Aucun malus - Excellent travail !','success');
+    }
+    function calculateCategoryXP(category){
+      let xp=0; ['daily','weekly','monthly'].forEach(type=>{
+        state.tasks[type].forEach(task=>{ if(task.category===category && task.done) xp+=task.xp; });
+      }); return xp;
+    }
+
+    /* ====== STATS ====== */
+    function renderStats(){
+      const s=state.profile.stats, content=$("#stats_content");
+      let html=`
+        <div class="stats-grid">
+          <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem;color:var(--grad)">${s.dailyXP}</div></div>
+          <div class="stat-card"><h3>XP Hebdomadaire</h3><div style="font-size:2rem;color:var(--grad)">${s.weeklyXP}</div></div>
+          <div class="stat-card"><h3>XP Mensuel</h3><div style="font-size:2rem;color:var(--grad)">${s.monthlyXP}</div></div>
+          <div class="stat-card"><h3>Niveau</h3><div style="font-size:2rem;color:var(--grad)">${state.profile.level}</div></div>
+        </div>
+        <h3>Progression par catégorie</h3>
+      `;
+      for(const cat of Object.values(state.goals)){
+        html+=`<div class="card" style="margin-bottom:12px"><h4>${cat.label}</h4>`;
+        cat.bars.forEach(bar=>{
+          const p=pct(bar.now,bar.goal);
+          html+=`<div class="row" style="margin-bottom:8px"><span>${bar.label}</span><span>${bar.now}/${bar.goal} (${p}%)</span></div>
+                 <div class="bar"><span style="width:${p}%"></span></div>`;
+        });
+        html+=`</div>`;
+      }
+      content.innerHTML=html;
+    }
+
+    /* ====== EXPORT/IMPORT/RESET ====== */
+    $("#exportData").addEventListener("click",()=>{
+      const dataStr=JSON.stringify(state,null,2);
+      const blob=new Blob([dataStr],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=`gamelife-v2-backup-${new Date().toISOString().split('T')[0]}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      toast("Données exportées avec succès !",'success');
+    });
+    $("#importData").addEventListener("click",()=>{
+      const input=document.createElement('input'); input.type='file'; input.accept='.json';
+      input.onchange=(e)=>{
+        const file=e.target.files[0]; if(!file) return;
+        const reader=new FileReader();
+        reader.onload=(ev)=>{
+          try{
+            const imported=JSON.parse(ev.target.result);
+            if(confirm("Remplacer toutes vos données actuelles ?")){
+              state=imported; save(); init(); toast("Données importées avec succès !",'success');
+            }
+          }catch(err){ toast("Erreur lors de l'import du fichier",'error'); }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+    $("#resetAll").addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; state=dflt(); save(); init(); toast("Données réinitialisées",'info'); });
+
+    /* ====== GESTION DES TÂCHES ====== */
+    let currentEditType=null, currentEditId=null;
+    $("#manageDailyTasks").addEventListener("click",()=>openTaskManager('daily'));
+    $("#manageWeeklyTasks").addEventListener("click",()=>openTaskManager('weekly'));
+    $("#manageMonthlyTasks").addEventListener("click",()=>openTaskManager('monthly'));
+
+    function openTaskManager(type){
+      currentEditType=type;
+      $("#taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`;
+      renderTaskManager(type); $("#taskModal").classList.add("active");
+    }
+    function renderTaskManager(type){
+      const list=$("#taskManageList"), tasks=state.tasks[type];
+      list.innerHTML=tasks.map(task=>`
+        <div class="manage-item">
+          <div><strong>${task.label}</strong><div class="muted">${task.xp} XP - ${task.category}</div></div>
+          <div class="manage-item-actions">
+            <button onclick="editTask('${type}','${task.id}')">✏️</button>
+            <button onclick="deleteTask('${type}','${task.id}')" class="danger">🗑️</button>
+          </div>
+        </div>`).join('');
+    }
+    function editTask(type,id){
+      const t=state.tasks[type].find(x=>x.id===id); if(!t) return;
+      $("#editModalTitle").textContent="Modifier la tâche";
+      $("#editName").value=t.label; $("#editValue").value=t.xp; $("#editCategory").value=t.category;
+      $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
+      currentEditType=type; currentEditId=id; $("#editModal").classList.add("active");
+    }
+    function deleteTask(type,id){
+      if(!confirm("Supprimer cette tâche ?")) return;
+      state.tasks[type]=state.tasks[type].filter(t=>t.id!==id); save(); renderTaskManager(type); renderTasks(); toast("Tâche supprimée",'info');
+    }
+    $("#addNewTask").addEventListener("click",()=>{
+      $("#editModalTitle").textContent="Ajouter une tâche";
+      $("#editName").value=""; $("#editValue").value=10; $("#editCategory").value="discipline";
+      $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
+      currentEditId=null; currentEditType=currentEditType||'daily'; $("#editModal").classList.add("active");
+    });
+
+    /* ====== GESTION RÉCOMPENSES ====== */
+    $("#manageRewards").addEventListener("click",()=>{ renderRewardManager(); $("#rewardModal").classList.add("active"); });
+    function renderRewardManager(){
+      const list=$("#rewardManageList"), rewards=state.rewards.catalog;
+      list.innerHTML=rewards.map(r=>`
+        <div class="manage-item">
+          <div><strong>${r.name}</strong><div class="muted">${r.cost} XP - ${r.tag}</div></div>
+          <div class="manage-item-actions">
+            <button onclick="editReward('${r.id}')">✏️</button>
+            <button onclick="deleteReward('${r.id}')" class="danger">🗑️</button>
+          </div>
+        </div>`).join('');
+    }
+    function editReward(id){
+      const r=state.rewards.catalog.find(x=>x.id===id); if(!r) return;
+      $("#editModalTitle").textContent="Modifier la récompense";
+      $("#editName").value=r.name; $("#editValue").value=r.cost; $("#editTag").value=r.tag;
+      $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block";
+      currentEditType='reward'; currentEditId=id; $("#editModal").classList.add("active");
+    }
+    function deleteReward(id){
+      if(!confirm("Supprimer cette récompense ?")) return;
+      state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id); save(); renderRewardManager(); renderRewards(); toast("Récompense supprimée",'info');
+    }
+    $("#addNewReward").addEventListener("click",()=>{
+      $("#editModalTitle").textContent="Ajouter une récompense";
+      $("#editName").value=""; $("#editValue").value=100; $("#editTag").value="Détente";
+      $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block";
+      currentEditType='reward'; currentEditId=null; $("#editModal").classList.add("active");
+    });
+
+    /* ====== FORM D'ÉDITION COMMUN ====== */
+    $("#editForm").addEventListener("submit",(e)=>{
       e.preventDefault();
-      if (typeof onEnter === 'function') return onEnter(e);
-      const btn = document.getElementById(buttonId);
-      if (btn) btn.click();
-    }
-  });
-};
+      const name=$("#editName").value.trim();
+      const value=parseInt($("#editValue").value);
+      if(!name || isNaN(value)) return;
 
-// Pseudo => Enter = clique sur "Valider"
-enterClick('player_name', 'save_name');
-
-// Argent: "Fait" semaine => Enter = clique sur "Valider"
-enterClick('money_week_done_input', 'save_money_week_done');
-
-// Argent: "Fait" mois => Enter = clique sur "Valider"
-enterClick('money_month_done_input', 'save_money_month_done');
-
-// (Optionnel) Objectifs argent: Enter sauvegarde si mode édition ON
-enterClick('money_week_target', null, () => {
-  if (!state.edit) return;
-  pushHistory();
-  state.money.week.target = +document.getElementById('money_week_target').value || 0;
-  save(); renderMoney(); toast("Objectif semaine sauvegardé", "success");
-});
-enterClick('money_month_target', null, () => {
-  if (!state.edit) return;
-  pushHistory();
-  state.money.month.target = +document.getElementById('money_month_target').value || 0;
-  save(); renderMoney(); toast("Objectif mois sauvegardé", "success");
-});
-  
-/* ========== TASKS / GOALS ========== */
-function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0}
-function renderKPIs(){
-  const wrap=$("#kpis"); wrap.innerHTML="";
-  for(const [key,cat] of Object.entries(state.goals)){
-    const card=document.createElement("div"); card.className="kpi"; card.dataset.cat=key;
-    let html=`<h3>${cat.label}</h3>`;
-    cat.bars.forEach(b=>{
-      const p=pct(b.now,b.goal);
-      html+=`<div class="row"><strong>${b.label}</strong>
-      <span><input data-editable id="${b.id}_now" type="number" value="${b.now}" min="0" ${state.edit?"":"disabled"}> / 
-      <input data-editable id="${b.id}_goal" type="number" value="${b.goal}" min="0" ${state.edit?"":"disabled"}></span></div>
-      <div class="bar"><span id="${b.id}_bar" style="width:${p}%"></span></div>`;
+      if(currentEditType==='reward'){
+        const tag=$("#editTag").value.trim();
+        if(currentEditId){
+          const r=state.rewards.catalog.find(x=>x.id===currentEditId);
+          if(r){ r.name=name; r.cost=value; r.tag=tag; }
+        }else{
+          const id='reward_'+Date.now();
+          state.rewards.catalog.push({id,name,cost:value,tag,blocked:false});
+        }
+        renderRewardManager(); renderRewards();
+      }else{
+        const category=$("#editCategory").value;
+        if(currentEditId){
+          const t=state.tasks[currentEditType].find(x=>x.id===currentEditId);
+          if(t){ t.label=name; t.xp=value; t.category=category; }
+        }else{
+          const id='task_'+Date.now();
+          state.tasks[currentEditType].push({id,label:name,xp:value,category,done:false});
+        }
+        renderTaskManager(currentEditType); renderTasks();
+      }
+      save(); $("#editModal").classList.remove("active"); toast("Modifications sauvegardées",'success');
     });
-    card.innerHTML=html; wrap.appendChild(card);
-  }
-  for(const cat of Object.values(state.goals)){
-    cat.bars.forEach(b=>{
-      const now=$("#"+b.id+"_now"), goal=$("#"+b.id+"_goal"), bar=$("#"+b.id+"_bar");
-      const recalc=()=>{ if(!state.edit) return; pushHistory(); b.now=+now.value||0; b.goal=+goal.value||0; bar.style.width=pct(b.now,b.goal)+'%'; save(); renderPriorities() };
-      now.oninput=recalc; goal.oninput=recalc;
+
+    // Fermeture modales
+    ['closeTaskModal','closeRewardModal','cancelEdit'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.onclick=()=>{
+        document.getElementById('taskModal').classList.remove('active');
+        document.getElementById('rewardModal').classList.remove('active');
+        document.getElementById('editModal').classList.remove('active');
+      };
     });
-  }
-}
-function allGoalBars(){
-  const list=[]; for(const cat of Object.values(state.goals)){ cat.bars.forEach(b=>{ const remaining=Math.max(0,(b.goal||0)-(b.now||0)); list.push({label:b.label,now:b.now,goal:b.goal,remaining}) }) }
-  return list;
-}
-function renderPriorities(){
-  const bars=allGoalBars().filter(b=>b.goal>0);
-  const closest=[...bars].sort((a,b)=>a.remaining-b.remaining).slice(0,5);
-  const farthest=[...bars].sort((a,b)=>b.remaining-a.remaining).slice(0,5);
-  $("#goals_closest").innerHTML=closest.map(x=>`<li><span>${x.label}</span><b>${x.now}/${x.goal} (reste ${x.remaining})</b></li>`).join("");
-  $("#goals_farthest").innerHTML=farthest.map(x=>`<li><span>${x.label}</span><b>${x.now}/${x.goal} (reste ${x.remaining})</b></li>`).join("");
-}
-function tasksGroupedByCategory(){
-  const map={}; const push=(t,scope)=>{(map[t.category]=map[t.category]||[]).push({...t,_scope:scope})};
-  state.tasks.daily.forEach(t=>push(t,'daily')); state.tasks.weekly.forEach(t=>push(t,'weekly')); state.tasks.monthly.forEach(t=>push(t,'monthly'));
-  return map;
-}
-function renderTasksByCategory(){
-  const mount=$("#tasks_by_cat"); mount.innerHTML=""; const groups=tasksGroupedByCategory();
-  Object.entries(groups).forEach(([cat,items])=>{
-    const box=document.createElement("div"); box.className="half card";
-    let html=`<h3>${cat.toUpperCase()}</h3>`;
-    items.forEach(t=>{
-      const scopeChip = t._scope==='daily'?'🗓️Q':t._scope==='weekly'?'🗓️H':'🗓️M';
-      html+=`<div class="row"><label><input type="checkbox" data-scope="${t._scope}" data-id="${t.id}" ${t.done?'checked':''}> ${t.label} <span class="muted small">${scopeChip}</span></label><span class="muted">+${t.xp} XP</span></div>`;
+    $("#taskModal, #rewardModal, #editModal").addEventListener("click",(e)=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active"); });
+
+    // Rendre les fonctions globales pour les boutons inline
+    window.editTask=editTask; window.deleteTask=deleteTask;
+    window.editReward=editReward; window.deleteReward=deleteReward;
+
+    /* ====== AUTO-HIDE NAV ====== */
+    let lastScrollY=0, ticking=false;
+    function updateNavbar(){
+      const y=window.scrollY, nav=$(".top");
+      if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden");
+      lastScrollY=y; ticking=false;
+    }
+    function onScroll(){ if(!ticking){ requestAnimationFrame(updateNavbar); ticking=true; } }
+    window.addEventListener("scroll",onScroll);
+
+    /* ====== MODE EDIT (toggle) ====== */
+    function setEditMode(on){
+      state.edit=!!on; save();
+      // objectifs jauges
+      document.querySelectorAll('[id$="_now"],[id$="_goal"],#money_week_target,#money_month_target')
+        .forEach(inp=>{ if(inp) inp.disabled=!state.edit; });
+      // champs "fait" restent modifiables
+      ['money_week_done_input','money_month_done_input'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.disabled=false;
+      });
+      const btn=document.getElementById('toggleEdit'); if(btn) btn.textContent=state.edit?'✅ Terminer':'✏️ Modifier';
+    }
+    document.getElementById('toggleEdit').addEventListener('click',()=>setEditMode(!state.edit));
+
+    /* ====== ARGENT ====== */
+    const toNumber=(v)=>{ if(v===null||v===undefined) return 0; const s=String(v).replace(/[^\d.,-]/g,'').replace(/\s/g,'').replace(/,/g,'.'); const n=Number(s); return isNaN(n)?0:n; };
+    function renderMoney(){
+      const wT=state.money?.week?.target??0, wD=state.money?.week?.done??0;
+      const mT=state.money?.month?.target??0, mD=state.money?.month?.done??0;
+      const wR=Math.max(0,wT-wD), mR=Math.max(0,mT-mD);
+      const wTarget=$("#money_week_target"), wDone=$("#money_week_done_input"), wRest=$("#money_week_rest");
+      const mTarget=$("#money_month_target"), mDone=$("#money_month_done_input"), mRest=$("#money_month_rest");
+      if(wTarget) wTarget.value=wT; if(wDone) wDone.value=wD; if(wRest) wRest.textContent=wR;
+      if(mTarget) mTarget.value=mT; if(mDone) mDone.value=mD; if(mRest) mRest.textContent=mR;
+    }
+    $("#save_money_week_done").addEventListener('click',()=>{
+      state.money.week.done = toNumber($("#money_week_done_input")?.value); save(); renderMoney(); toast('Montant semaine mis à jour','success');
     });
-    box.innerHTML=html; mount.appendChild(box);
-  });
-}
-document.addEventListener("change",(e)=>{
-  const el=e.target; if(!el.matches('input[type="checkbox"][data-scope]')) return;
-  const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
-  const list=scope==="daily"?state.tasks.daily:scope==="weekly"?state.tasks.weekly:state.tasks.monthly;
-  const t=list.find(x=>x.id===id); if(!t) return;
-  pushHistory();
-  const was=t.done; t.done=el.checked;
+    $("#save_money_month_done").addEventListener('click',()=>{
+      state.money.month.done = toNumber($("#money_month_done_input")?.value); save(); renderMoney(); toast('Montant mois mis à jour','success');
+    });
+    $("#money_week_target").addEventListener('change',()=>{
+      if(!state.edit) return; state.money.week.target = toNumber($("#money_week_target").value); save(); renderMoney(); toast('Objectif semaine sauvegardé','success');
+    });
+    $("#money_month_target").addEventListener('change',()=>{
+      if(!state.edit) return; state.money.month.target = toNumber($("#money_month_target").value); save(); renderMoney(); toast('Objectif mois sauvegardé','success');
+    });
 
-  if(t.id==="prayers_5" && t.done && !was){ state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers"); }
-  if(t.id==="mlm_prospect_20" && t.done && !was){ updateGoalFromTask("mlm_prospects",20) }
-  if(t.id==="ugc_prospect_20" && t.done && !was){ updateGoalFromTask("ugc_prospects",20) }
+    /* ====== INIT ====== */
+    function init(){
+      renderKPIs();
+      renderSectorGauges();
+      renderTasks();
+      renderRewards();
+      renderMalus();
+      renderStats();
+      renderMoney();
 
-  const map={ "workout":"workouts","run":"runs","reel":"reels","video":"videos","lecture":"lectures","introspection":"introspections","jumuah":"jumuah","mlm_presentation":"mlm_presentations","ugc_collab":"ugc_collabs","wake_early":"wake_early","wake_very_early":"wake_very_early","wake_extreme":"wake_extreme" };
-  if(map[t.id] && t.done && !was) updateGoalFromTask(map[t.id]);
+      // Pseudo → met dans le titre
+      const nameEl=$("#player_name"), saveNameBtn=$("#save_name"), title=$("#playerTitle");
+      const applyName=()=>{ const pseudo=(nameEl?.value?.trim()||""); const base="🎮 "; const name= pseudo? pseudo : "Joueur"; title.childNodes[0].nodeValue = base + name + " "; };
+      if(nameEl){ nameEl.value=state.profile?.name||""; nameEl.addEventListener('input',()=>{ state.profile.name=nameEl.value; save(); applyName(); }); }
+      saveNameBtn?.addEventListener('click',()=>{ state.profile.name=nameEl.value.trim(); save(); applyName(); toast('Pseudo sauvegardé','success'); });
+      applyName();
 
-  addXP(t.done? t.xp : -t.xp, el.closest('.row')||el);
-  saveDay(currentDate); save(); renderKPIs(); renderPriorities(); renderSectorGauges();
-});
-function updateGoalFromTask(goalId,amount=1){ for(const cat of Object.values(state.goals)){ const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount;break} } }
+      // Datepicker
+      const dEl=$("#selected_date");
+      if(dEl){
+        dEl.value=currentDate;
+        dEl.onchange=(e)=>{ currentDate=e.target.value || todayISO(); loadDay(currentDate); };
+        loadDay(currentDate);
+      }
 
-/* ========== DATE STORAGE ========== */
-let currentDate=todayISO();
-function loadDay(date){
-  const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};
-  state.tasks.daily.forEach(t=>{ t.done=!!day.dailyDone[t.id] });
-  $("#date_validated").textContent = day.validated? "oui" : "non";
-  renderTasksByCategory();
-}
-function saveDay(date){
-  const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};
-  state.tasks.daily.forEach(t=>day.dailyDone[t.id]=!!t.done);
-  day.dailyXP = state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);
-  state.byDate[date]=day; save();
-}
-const dEl=$("#selected_date"); dEl.value=currentDate;
-dEl.onchange=(e)=>{currentDate=e.target.value||todayISO(); loadDay(currentDate)};
-
-$("#validateDay").onclick=()=>{ pushHistory();
-  const g=state.goals;
-  if(g.sport.bars[0].now>=5) addXP(30);
-  if(g.sport.bars[1].now>=3) addXP(20);
-  if(g.social.bars[0].now>=5) addXP(40);
-  if(g.social.bars[1].now>=6) addXP(30);
-  if(g.dev.bars[0].now>=5) addXP(25);
-  if(g.dev.bars[1].now>=5) addXP(25);
-  if(g.business.bars[2].now>=1) addXP(60);
-  if(g.business.bars[2].now>=2) addXP(150);
-  if(g.ugc.bars[1].now>=1) addXP(50);
-  if(g.ugc.bars[1].now>=2) addXP(120);
-
-  const day=state.byDate[currentDate]||{dailyDone:{},dailyXP:0,validated:false};
-  day.validated=true; state.byDate[currentDate]=day; $("#date_validated").textContent='oui'; save(); toast("Journée validée ✅","success");
-};
-
-/* ========== REWARDS ========== */
-function canUseReward(reward){
-  const a=state.malus.active;
-  if(a.includes('no_rewards_daily')) return false;
-  if(a.includes('no_rewards_weekend')&&(reward.id==='weekend'||reward.id==='day_off')) return false;
-  if(a.includes('no_shopping')&&reward.id==='shopping') return false;
-  if(a.includes('no_social')&&reward.id==='friends') return false;
-  if(a.includes('no_pleasure')&&(reward.id==='activity'||reward.id==='day_off')) return false;
-  return true;
-}
-function renderRewards(){
-  const wrap=$("#rewards_list"), log=$("#rewards_log"); wrap.innerHTML="";
-  state.rewards.catalog.forEach(it=>{
-    const inv=state.rewards.inventory[it.id]||0;
-    const blocked=!canUseReward(it);
-    const card=document.createElement("div"); card.className="card half";
-    card.innerHTML=`
-      <div class="row">
-        <div><h3 style="margin:.2rem 0">${it.name}</h3>
-          <div class="muted small">${it.tag}${blocked?' — BLOQUÉ':''}</div></div>
-        <b>${it.cost} XP</b>
-      </div>
-      <div class="row" style="gap:8px;flex-wrap:wrap">
-        <button data-buy="${it.id}" class="ok" ${blocked?'disabled':''}>Acheter (+1)</button>
-        <button data-use="${it.id}" ${inv<=0?'disabled':''}>Utiliser (reste: ${inv})</button>
-        <button data-editreward="${it.id}" class="ghost ${state.edit?'':'hidden'}">✏️ Modifier</button>
-        <button data-delreward="${it.id}" class="danger ${state.edit?'':'hidden'}">🗑️</button>
-      </div>`;
-    wrap.appendChild(card);
-  });
-  wrap.onclick=(e)=>{
-    const buy=e.target.closest("[data-buy]"), use=e.target.closest("[data-use]"), ed=e.target.closest("[data-editreward]"), del=e.target.closest("[data-delreward]");
-    if(buy){ const id=buy.dataset.buy; const it=state.rewards.catalog.find(x=>x.id===id); if(!it) return;
-      if((state.profile.xp||0)<it.cost){toast("Pas assez d'XP","error");return}
-      pushHistory(); state.profile.xp-=it.cost; state.rewards.inventory[id]=(state.rewards.inventory[id]||0)+1;
-      state.rewards.log.unshift(`🛒 Acheté: ${it.name} (−${it.cost} XP) — ${new Date().toLocaleString()}`);
-      save(); updateXP(); renderRewards(); toast("Récompense achetée","success"); return;
+      updateXP();
+      updateStreaks();
+      setEditMode(state.edit); // verrouille/déverrouille les champs selon le mode
     }
-    if(use){ const id=use.dataset.use; const inv=(state.rewards.inventory[id]||0); if(inv<=0) return;
-      pushHistory(); state.rewards.inventory[id]=inv-1;
-      const it=state.rewards.catalog.find(x=>x.id===id);
-      state.rewards.log.unshift(`🎁 Utilisé: ${it?it.name:id} — ${new Date().toLocaleString()}`);
-      save(); renderRewards(); toast("Utilisation OK","success"); return;
-    }
-    if(ed){ if(!state.edit) return; openRewardEditor(ed.dataset.editreward); return; }
-    if(del){ if(!state.edit) return; const id=del.dataset.delreward;
-      pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id); delete state.rewards.inventory[id];
-      save(); renderRewards(); toast("Récompense supprimée","info"); return;
-    }
-  };
-  log.innerHTML=state.rewards.log.slice(0,20).map(x=>`<li>${x}</li>`).join("");
-}
-function openRewardEditor(id){
-  const r=state.rewards.catalog.find(x=>x.id===id); if(!r) return;
-  $("#editModalTitle").textContent="Modifier la récompense";
-  $("#editName").value=r.name; $("#editValue").value=r.cost; $("#editTag").value=r.tag;
-  $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="block";
-  currentEditType='reward'; currentEditId=id; $("#editModal").classList.add("active");
-}
-
-/* ========== MALUS ========== */
-function getMalusDescription(m){
-  const d={
-    'no_rewards_daily':"🚫 Pas de récompense aujourd'hui (< min/jour)",
-    'no_rewards_weekend':"🚫 Pas de récompense week-end (< min/semaine)",
-    'no_shopping':"🚫 Pas de shopping (Business < min)",
-    'no_social':"🚫 Pas de soirée amis (Lectures < min)",
-    'no_pleasure':"🚫 Pas d'activité plaisir (<3 workouts/semaine)"
-  }; return d[m]||m;
-}
-function calculateCategoryXP(cat){ let xp=0; ['daily','weekly','monthly'].forEach(scope=>{ state.tasks[scope].forEach(t=>{ if(t.category===cat && t.done) xp+=t.xp; }) }); return xp; }
-function malusPreview(){
-  const rules=state.malus.rules, newMalus=[], newPen=[];
-  if(state.profile.stats.dailyXP < (rules.dayMin||0)) newMalus.push('no_rewards_daily');
-  if(state.profile.stats.weeklyXP < (rules.weekMin||0)) newMalus.push('no_rewards_weekend');
-  const bizXP=calculateCategoryXP('business'); if(bizXP < (rules.bizMin||0)) newMalus.push('no_shopping');
-  const devLect=(state.goals.dev.bars.find(b=>b.id==='lectures')||{now:0}).now;
-  if(devLect < (rules.readMin||0)) { newMalus.push('no_social'); newPen.push('1h lecture le dimanche') }
-  if((state.goals.business.bars.find(b=>b.id==='mlm_inscriptions')||{now:0}).now===0){ newPen.push('+50 prospections MLM obligatoires'); newPen.push('+5 appels téléphoniques obligatoires') }
-  if((state.goals.ugc.bars.find(b=>b.id==='ugc_collabs')||{now:0}).now===0){ newPen.push('+30 prospections UGC obligatoires') }
-  if((state.goals.sport.bars.find(b=>b.id==='workouts')||{now:0}).now<3){ newPen.push('Workout extra le week-end') }
-  if((state.goals.sport.bars.find(b=>b.id==='runs')||{now:0}).now===0){ newPen.push('Cardio long (45min) la semaine suivante') }
-  if((state.goals.spirituality.bars.find(b=>b.id==='jumuah')||{now:0}).now===0){ newPen.push('Lecture coranique (1h) le week-end') }
-  return {newMalus:newMalus,newPen:newPen};
-}
-function renderMalus(){
-  const active=state.malus.active, pen=state.malus.penalties, rules=state.malus.rules;
-  $("#rule_day_min").value=rules.dayMin||0; $("#rule_week_min").value=rules.weekMin||0; $("#rule_biz_min").value=rules.bizMin||0; $("#rule_read_min").value=rules.readMin||0;
-  $("#malus_status").innerHTML = (active.length? active.map(m=>`<div class="malus-item malus-active">${getMalusDescription(m)}</div>`).join("") : `<p class="muted">Aucun malus actif</p>`)
-    + `<h4>Pénalités</h4>` + (pen.length? pen.map(p=>`<div class="malus-item">${p}</div>`).join("") : `<p class="muted">Aucune pénalité</p>`);
-}
-function renderMalusPreviewBox(){ const {newMalus,newPen}=malusPreview(); $("#malus_preview").innerHTML=`<div><b>Malus potentiels (${newMalus.length})</b><ul class="small">${newMalus.map(m=>`<li>${getMalusDescription(m)}</li>`).join("")||"<li>—</li>"}</ul></div><div style="margin-top:6px"><b>Pénalités potentielles (${newPen.length})</b><ul class="small">${newPen.map(p=>`<li>${p}</li>`).join("")||"<li>—</li>"}</ul></div>` }
-$("#btnPreviewMalus").onclick=()=>{renderMalusPreviewBox();toast("Aperçu calculé","info")}
-$("#applyMalus").onclick=()=>{ pushHistory(); const {newMalus,newPen}=malusPreview(); state.malus.active=newMalus; state.malus.penalties=newPen; save(); renderMalus(); updateStreaks(); toast(`Malus appliqués (${newMalus.length})`,"warning") };
-
-/* ========== BONUS ========== */
-function renderBonus(){
-  const wrap=$("#bonus_list");
-  if(!state.bonus.length){wrap.innerHTML=`<p class="muted">Aucun bonus. (Mode édition → “+ Ajouter un bonus”)</p>`;return}
-  wrap.innerHTML=state.bonus.map(b=>`
-    <div class="manage-item">
-      <div><strong>${b.name}</strong><div class="muted small">+${b.xp} XP — ${b.claimed?"déjà réclamé":"disponible"}</div></div>
-      <div class="manage-item-actions">
-        <button data-claim="${b.id}" ${b.claimed?"disabled":""}>Réclamer</button>
-        <button data-editbonus="${b.id}" class="ghost ${state.edit?'':'hidden'}">✏️</button>
-        <button data-delbonus="${b.id}" class="danger ${state.edit?'':'hidden'}">🗑️</button>
-      </div>
-    </div>`).join("");
-  wrap.onclick=(e)=>{
-    const c=e.target.closest("[data-claim]"), ed=e.target.closest("[data-editbonus]"), del=e.target.closest("[data-delbonus]");
-    if(c){ const id=c.dataset.claim; const b=state.bonus.find(x=>x.id===id); if(!b||b.claimed) return;
-      pushHistory(); b.claimed=true; save(); addXP(b.xp,c); renderBonus(); toast("Bonus réclamé 🎉","success"); }
-    if(ed){ if(!state.edit) return; const id=ed.dataset.editbonus; openBonusEditor(id); }
-    if(del){ if(!state.edit) return; const id=del.dataset.delbonus; pushHistory(); state.bonus=state.bonus.filter(x=>x.id!==id); save(); renderBonus(); toast("Bonus supprimé","info"); }
-  };
-}
-$("#addBonus").onclick=()=>{ if(!state.edit) return; currentEditType='bonus'; currentEditId=null; $("#editModalTitle").textContent="Ajouter un bonus"; $("#editName").value=""; $("#editValue").value=50; $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="none"; $("#editModal").classList.add("active") };
-function openBonusEditor(id){ const b=state.bonus.find(x=>x.id===id); if(!b) return; currentEditType='bonus'; currentEditId=id; $("#editModalTitle").textContent="Modifier le bonus"; $("#editName").value=b.name; $("#editValue").value=b.xp; $("#editCategoryGroup").style.display="none"; $("#editTagGroup").style.display="none"; $("#editModal").classList.add("active") }
-
-/* ========== EXPORT / IMPORT / RESET ========== */
-$("#exportData").onclick=()=>{ const s=JSON.stringify(state,null,2); const blob=new Blob([s],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`gamelife-backup-${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); toast("Export OK","success") };
-$("#importData").onclick=()=>{ const input=document.createElement('input'); input.type='file'; input.accept='.json'; input.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=(ev)=>{ try{ pushHistory(); state=JSON.parse(ev.target.result); save(); init(); toast("Import OK","success") }catch(err){ toast("Import invalide","error") } }; rd.readAsText(f) }; input.click() };
-$("#resetAll").onclick=()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info") };
-
-/* ========== MODALES (tâches & rewards & form) ========== */
-let currentEditType=null, currentEditId=null;
-
-// Tâches
-function renderTaskManager(type){
-  const list=$("#taskManageList"); const tasks=state.tasks[type];
-  list.innerHTML = tasks.map(t=>`
-    <div class="manage-item">
-      <div><strong>${t.label}</strong><div class="muted small">${t.xp} XP — ${t.category}</div></div>
-      <div class="manage-item-actions">
-        <button onclick="editTask('${type}','${t.id}')" class="ghost">✏️</button>
-        <button onclick="deleteTask('${type}','${t.id}')" class="danger">🗑️</button>
-      </div>
-    </div>`).join("");
-}
-function openTaskManager(type){ if(!state.edit){toast("Active le mode édition pour modifier","info");return}
-  $("#taskModalTitle").textContent=`Gérer les tâches ${type}`; renderTaskManager(type); currentEditType=type; $("#taskModal").classList.add("active");
-}
-$("#manageDailyTasks").onclick=()=>openTaskManager('daily');
-$("#manageWeeklyTasks").onclick=()=>openTaskManager('weekly');
-$("#manageMonthlyTasks").onclick=()=>openTaskManager('monthly');
-window.editTask=(type,id)=>{ const t=state.tasks[type].find(x=>x.id===id); if(!t) return;
-  $("#editModalTitle").textContent="Modifier la tâche"; $("#editName").value=t.label; $("#editValue").value=t.xp; $("#editCategory").value=t.category; $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none"; currentEditType=type; currentEditId=id; $("#editModal").classList.add("active") };
-window.deleteTask=(type,id)=>{ if(!confirm("Supprimer cette tâche ?")) return; pushHistory(); state.tasks[type]=state.tasks[type].filter(t=>t.id!==id); save(); renderTaskManager(type); renderTasksByCategory(); toast("Tâche supprimée","info") };
-$("#addNewTask").onclick=()=>{ if(!currentEditType) return; $("#editModalTitle").textContent="Ajouter une tâche"; $("#editName").value=""; $("#editValue").value=10; $("#editCategory").value="discipline"; $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none"; currentEditId=null; $("#editModal").classList.add("active") };
-
-// Rewards manager
-$("#manageRewards").onclick=()=>{ if(!state.edit){toast("Active le mode édition","info");return} renderRewardManager(); $("#rewardModal").classList.add("active") };
-function renderRewardManager(){
-  const list=$("#rewardManageList"), R=state.rewards.catalog;
-  list.innerHTML=R.map(r=>`
-    <div class="manage-item">
-      <div><strong>${r.name}</strong><div class="muted small">${r.cost} XP — ${r.tag}</div></div>
-      <div class="manage-item-actions">
-        <button onclick="editReward('${r.id}')" class="ghost">✏️</button>
-        <button onclick="deleteReward('${r.id}')" class="danger">🗑️</button>
-      </div>
-    </div>`).join("");
-}
-window.editReward=(id)=>openRewardEditor(id);
-window.deleteReward=(id)=>{ if(!confirm("Supprimer ?")) return; pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id); delete state.rewards.inventory[id]; save(); renderRewardManager(); renderRewards(); toast("Supprimé","info") };
-
-// Formulaire d’édition (tâches / reward / bonus)
-document.getElementById("editForm").addEventListener("submit",(e)=>{
-  e.preventDefault();
-  const name=$("#editName").value.trim(), value=parseInt($("#editValue").value);
-  if(!name || isNaN(value)){toast("Champs invalides","error");return}
-  pushHistory();
-  if(currentEditType==='reward'){
-    const tag=$("#editTag").value.trim();
-    if(currentEditId){ const r=state.rewards.catalog.find(x=>x.id===currentEditId); if(r){r.name=name;r.cost=value;r.tag=tag} }
-    else{ state.rewards.catalog.push({id:'rw_'+Date.now(),name,cost:value,tag}) }
-    save(); renderRewardManager(); renderRewards();
-  }else if(currentEditType==='bonus'){
-    if(currentEditId){ const b=state.bonus.find(x=>x.id===currentEditId); if(b){b.name=name;b.xp=value} }
-    else{ state.bonus.push({id:'bn_'+Date.now(),name,xp:value,claimed:false}) }
-    save(); renderBonus();
-  }else{
-    const cat=$("#editCategory").value;
-    if(currentEditId){ const t=state.tasks[currentEditType].find(x=>x.id===currentEditId); if(t){t.label=name;t.xp=value;t.category=cat} }
-    else{ state.tasks[currentEditType].push({id:'tsk_'+Date.now(),label:name,xp:value,category:cat,done:false}) }
-    save(); renderTaskManager(currentEditType); renderTasksByCategory();
-  }
-  $("#editModal").classList.remove("active"); toast("Sauvegardé","success");
-});
-
-// Fermer modales
-["closeTaskModal","closeRewardModal","cancelEdit"].forEach(id=>{
-  const el=document.getElementById(id); if(!el) return;
-  el.onclick=()=>{ ["taskModal","rewardModal","editModal"].forEach(mid=>{const m=document.getElementById(mid); if(m) m.classList.remove("active")}) };
-});
-["taskModal","rewardModal","editModal"].forEach(mid=>{
-  const m=document.getElementById(mid); if(!m) return;
-  m.addEventListener("click",(e)=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active") });
-});
-
-// Resets rapides
-$("#resetDaily").onclick=()=>{ state.tasks.daily.forEach(t=>t.done=false); save(); renderTasksByCategory(); toast("Quotidien réinitialisé","info") };
-$("#resetWeekly").onclick=()=>{ state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasksByCategory(); toast("Hebdo réinitialisé","info") };
-$("#resetMonthly").onclick=()=>{ state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasksByCategory(); toast("Mensuel réinitialisé","info") };
-
-/* ========== CHECKS / STATS ========== */
-function updateStreaks(){ $("#streak_pr").textContent=state.profile.streaks.prayer||0; $("#active_malus").textContent=state.malus.active.length||0 }
-function renderStats(){
-  const stats=state.profile.stats; const content=$("#stats_content");
-  let html=`<div class="stats-grid">
-    <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem;">${stats.dailyXP}</div></div>
-    <div class="stat-card"><h3>XP Hebdomadaire</h3><div style="font-size:2rem;">${stats.weeklyXP}</div></div>
-    <div class="stat-card"><h3>XP Mensuel</h3><div style="font-size:2rem;">${stats.monthlyXP}</div></div>
-    <div class="stat-card"><h3>Niveau</h3><div style="font-size:2rem;">${state.profile.level}</div></div>
-  </div>`;
-  content.innerHTML=html;
-}
-
-/* ========== SECTORS ========== */
-function getWeeklySectorXP(){ const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
-  ['daily','weekly','monthly'].forEach(scope=>{ state.tasks[scope].forEach(t=>{ if(!t.done) return;
-    if(t.category==='business') W.biz+=t.xp; if(t.category==='ugc') W.ugc+=t.xp; if(t.category==='sport') W.sport+=t.xp; if(t.category==='dev') W.dev+=t.xp; if(t.category==='spirituality') W.spi+=t.xp; }) });
-  return W;
-}
-function renderSectorGauges(){ const W=getWeeklySectorXP(); const set=(fill,txt,now,goal)=>{const f=$("#"+fill),t=$("#"+txt),p=goal?Math.min(100,Math.round(now/goal*100)):0; if(f) f.style.width=p+"%"; if(t) t.textContent=`${now}/${goal}`};
-  set('g_biz','g_biz_txt',W.biz,100); set('g_ugc','g_ugc_txt',W.ugc,100); set('g_sport','g_sport_txt',W.sport,60); set('g_dev','g_dev_txt',W.dev,50); set('g_spi','g_spi_txt',W.spi,60);
-}
-
-/* ========== AUTO-HIDE NAV ========== */
-let lastScrollY=0,ticking=false;
-function updateNavbar(){ const y=window.scrollY, nav=$(".top"); if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden"); lastScrollY=y; ticking=false }
-window.addEventListener("scroll",()=>{ if(!ticking){ requestAnimationFrame(updateNavbar); ticking=true }});
-
-/* ========== INIT ========== */
-function init(){
-  if(!state.profile) state.profile={name:"",level:1,xp:0,streaks:{prayer:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}};
-  drawPlayerName();
-  $("#player_name").value=state.profile.name||"";
-  currentDate=todayISO(); $("#selected_date").value=currentDate; loadDay(currentDate);
-
-  renderKPIs(); renderTasksByCategory(); renderRewards(); renderMalus(); renderMalusPreviewBox(); renderBonus(); renderMoney(); renderPriorities(); renderSectorGauges(); renderStats();
-  updateXP(); updateStreaks(); applyEditModeUI();
-}
-function renderMalusPreviewBox(){ const P=malusPreview(); $("#malus_preview").innerHTML=`<div><b>Malus potentiels (${P.newMalus.length})</b><ul class="small">${P.newMalus.map(m=>`<li>${getMalusDescription(m)}</li>`).join("")||"<li>—</li>"}</ul></div><div style="margin-top:6px"><b>Pénalités potentielles (${P.newPen.length})</b><ul class="small">${P.newPen.map(p=>`<li>${p}</li>`).join("")||"<li>—</li>"}</ul></div>` }
-init();
-</script>
+    init();
+  </script>
 </body>
 </html>
