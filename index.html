@@ -11,18 +11,16 @@
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
-    .top{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s}
+    .top{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(11,15,20,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s ease-in-out}
     .top.hidden{transform:translateY(-100%)}
     .container{width:min(1100px,94vw);margin:0 auto;padding:70px 0 40px}
     .header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
     .title{flex:1;text-align:center}
     .title h1{margin:0;font-size:1.2rem}
-    .title p{margin:0;font-size:.75rem}
-    .muted{color:var(--muted)}
-    .menu-toggle,.back-btn-header{background:none;border:none;color:var(--text);cursor:pointer;border-radius:8px;transition:background .2s}
-    .menu-toggle{font-size:1.5rem;padding:8px}
+    .title p{margin:0;font-size:.75rem}.muted{color:var(--muted)}
+    .menu-toggle,.back-btn-header{background:none;border:none;color:var(--text);cursor:pointer;padding:8px;border-radius:8px;transition:background .2s}
+    .menu-toggle{font-size:1.5rem}.back-btn-header{font-size:1rem}
     .menu-toggle:hover,.back-btn-header:hover{background:rgba(255,255,255,.1)}
-    .back-btn-header{font-size:1rem;padding:8px}
     .mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;padding:8px;gap:4px}
     .mobile-menu.show{display:flex}
     .tab{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer;font-size:.9rem;text-align:left;width:100%}
@@ -35,24 +33,17 @@
     .bar>span{display:block;height:100%;background:var(--grad);width:0%;transition:width .5s ease-out}
     .chip{background:#0e1622;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;color:var(--muted);font-size:.9rem}
     button{padding:.55rem .85rem;border-radius:10px;border:1px solid var(--line);background:#0d1520;color:var(--text);cursor:pointer}
-    button.ghost{opacity:.8}
-    button.danger{background:#4a1e1e;border-color:#8b3a3a}
-    button.warning{background:#5a3a1e;border-color:#8b6a3a}
+    button.ghost{opacity:.8}button.danger{background:#4a1e1e;border-color:#8b3a3a}button.warning{background:#5a3a1e;border-color:#8b6a3a}
     .kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
     .kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:border-color .2s}
-    .kpi:hover{border-color:rgba(255,255,255,.25)}
-    .kpi.malus{background:#2a1a1a;border-color:#8b3a3a}
+    .kpi:hover{border-color:rgba(255,255,255,.25)}.kpi.malus{background:#2a1a1a;border-color:#8b3a3a}
     @media(min-width:860px){.kpi{grid-column:span 6}}
     input[type="number"],input[type="text"]{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text);text-align:center;width:100px}
-    input[type="text"]{width:auto;min-width:150px;text-align:left}
-    .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-    .half{grid-column:span 12}
-    @media(min-width:860px){.half{grid-column:span 6}}
+    input[type="text"]{width:auto;min-width:150px}
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}.half{grid-column:span 12}@media(min-width:860px){.half{grid-column:span 6}}
     #toast{position:fixed;right:14px;bottom:14px;padding:12px 16px;background:#0f1726;border:1px solid var(--line);border-radius:10px;opacity:0;transition:.3s;transform:translateY(20px);z-index:1000}
-    #toast.show{opacity:1;transform:translateY(0)}
-    #toast.success{background:#1a4a3a;border-color:#2d8a5a;color:#4ade80}
-    #toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171}
-    #toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
+    #toast.show{opacity:1;transform:translateY(0)}#toast.success{background:#1a4a3a;border-color:#2d8a5a;color:#4ade80}
+    #toast.error{background:#4a1e1e;border-color:#8b3a3a;color:#f87171}#toast.info{background:#1e3a8a;border-color:#3b82f6;color:#60a5fa}
     #toast.warning{background:#5a3a1e;border-color:#8b6a3a;color:#ffa726}
     .xp-gain,.xp-loss{position:fixed;font-weight:bold;pointer-events:none;animation:xpFloat 2s ease-out forwards;z-index:1001}
     .xp-gain{color:#fbbf24}.xp-loss{color:#ff6b6b}
@@ -64,20 +55,17 @@
     .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;z-index:100;align-items:center;justify-content:center}
     .modal.active{display:flex}
     .modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(500px,90vw);max-height:80vh;overflow-y:auto}
-    .form-group{margin-bottom:16px}
-    .form-group label{display:block;margin-bottom:8px;color:var(--text)}
-    .form-group input,select{width:100%;text-align:left}
-    .back-btn{margin-bottom:16px}
-    .category-actions{display:flex;gap:8px;margin-top:12px}
-    .task-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
-    .task-item .row{margin-bottom:4px}
+    .form-group{margin-bottom:16px}.form-group label{display:block;margin-bottom:8px;color:var(--text)}.form-group input{width:100%;text-align:left}
+    .back-btn{margin-bottom:16px}.category-actions{display:flex;gap:8px;margin-top:12px}
+    .task-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}.task-item .row{margin-bottom:4px}
     .manage-item{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
     .manage-item-actions{display:flex;gap:8px}
+    select{padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text)}
     .malus-item{background:#2a1a1a;border:1px solid #8b3a3a;border-radius:8px;padding:12px;margin-bottom:8px}
     .malus-active{background:#4a1e1e;border-color:#ff6b6b}
     .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
     .stat-card{background:#0e1622;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
-    /* mini-gauges / badge */
+    /* Upgrade v1.1: badge + gauges */
     .badge{display:inline-flex;align-items:center;gap:6px;padding:.3rem .6rem;border-radius:999px;background:#142033;border:1px solid rgba(255,255,255,.12);color:#cde3ff}
     .badge i{font-style:normal;background:#1a2a44;padding:2px 6px;border-radius:6px}
     .gbar{height:12px;border-radius:999px;background:#0e1622;border:1px solid var(--line);overflow:hidden;position:relative}
@@ -199,9 +187,7 @@
       <section class="card">
         <h2>⚠️ Système de malus</h2>
         <div id="malus_status"></div>
-        <div class="category-actions">
-          <button id="applyMalus" class="danger">Appliquer les malus</button>
-        </div>
+        <button id="applyMalus" class="danger">Appliquer les malus</button>
       </section>
     </section>
 
@@ -216,7 +202,7 @@
 
   <div id="toast"></div>
 
-  <!-- MODALES DE GESTION -->
+  <!-- MODALES -->
   <div id="taskModal" class="modal">
     <div class="modal-content">
       <h2 id="taskModalTitle">Gérer les tâches</h2>
@@ -280,35 +266,35 @@
     const KEY = "gamelife_v2";
     function dflt(){
       return {
-        profile:{ level:1, xp:0, name:"", streaks:{prayer:0, /*wake supprimé*/}, stats:{dailyXP:0,weeklyXP:0,monthlyXP:0} },
+        profile:{level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0},name:""},
         goals:{
-          discipline:{ label:"⏰ Discipline/Réveil", bars:[
+          discipline:{label:"⏰ Discipline/Réveil",bars:[
             {id:"wake_early",label:"Réveils avant 8h",now:0,goal:7},
             {id:"wake_very_early",label:"Réveils avant 7h",now:0,goal:3},
             {id:"wake_extreme",label:"Réveils avant 6h",now:0,goal:1}
           ]},
-          business:{ label:"💸 Business MLM", bars:[
+          business:{label:"💸 Business MLM",bars:[
             {id:"mlm_prospects",label:"Prospections MLM",now:0,goal:140},
             {id:"mlm_presentations",label:"Présentations",now:0,goal:7},
             {id:"mlm_inscriptions",label:"Inscriptions",now:0,goal:1}
           ]},
-          ugc:{ label:"🎥 UGC", bars:[
+          ugc:{label:"🎥 UGC",bars:[
             {id:"ugc_prospects",label:"Prospections marques",now:0,goal:140},
             {id:"ugc_collabs",label:"Collabs signées",now:0,goal:1}
           ]},
-          sport:{ label:"🏋️ Sport", bars:[
+          sport:{label:"🏋️ Sport",bars:[
             {id:"workouts",label:"Workouts",now:0,goal:5},
             {id:"runs",label:"Courses",now:0,goal:3}
           ]},
-          social:{ label:"📱 Réseaux sociaux", bars:[
+          social:{label:"📱 Réseaux sociaux",bars:[
             {id:"reels",label:"Reels postés",now:0,goal:5},
             {id:"videos",label:"Vidéos produites",now:0,goal:6}
           ]},
-          dev:{ label:"📚 Développement perso", bars:[
+          dev:{label:"📚 Développement perso",bars:[
             {id:"lectures",label:"Lectures (20min)",now:0,goal:5},
             {id:"introspections",label:"Introspections",now:0,goal:5}
           ]},
-          spirituality:{ label:"🕌 Spiritualité", bars:[
+          spirituality:{label:"🕌 Spiritualité",bars:[
             {id:"daily_prayers",label:"Journées 5 prières",now:0,goal:7},
             {id:"jumuah",label:"Jumu'ah",now:0,goal:1}
           ]}
@@ -336,34 +322,37 @@
           ],
           monthly:[]
         },
-        rewards:{ catalog:[
-          {id:"film",name:"Film/épisode (1h30)",cost:100,tag:"Détente",blocked:false},
-          {id:"activity",name:"Activité plaisir (1-2h)",cost:150,tag:"Plaisir",blocked:false},
-          {id:"friends",name:"Soirée amis/famille",cost:200,tag:"Social",blocked:false},
-          {id:"spa",name:"Spa/détente (2h)",cost:250,tag:"Bien-être",blocked:false},
-          {id:"shopping",name:"Shopping ≤50 CHF",cost:300,tag:"Shopping",blocked:false},
-          {id:"day_off",name:"Day off complet",cost:300,tag:"Repos",blocked:false},
-          {id:"weekend",name:"Weekend détente",cost:800,tag:"Voyage",blocked:false}
-        ], log:[] },
-        malus:{ active:[], penalties:[] },
-        byDate:{} // stockage journalier
-      }
+        rewards:{
+          catalog:[
+            {id:"film",name:"Film/épisode (1h30)",cost:100,tag:"Détente",blocked:false},
+            {id:"activity",name:"Activité plaisir (1-2h)",cost:150,tag:"Plaisir",blocked:false},
+            {id:"friends",name:"Soirée amis/famille",cost:200,tag:"Social",blocked:false},
+            {id:"spa",name:"Spa/détente (2h)",cost:250,tag:"Bien-être",blocked:false},
+            {id:"shopping",name:"Shopping ≤50 CHF",cost:300,tag:"Shopping",blocked:false},
+            {id:"day_off",name:"Day off complet",cost:300,tag:"Repos",blocked:false},
+            {id:"weekend",name:"Weekend détente",cost:800,tag:"Voyage",blocked:false}
+          ],
+          log:[]
+        },
+        malus:{active:[],penalties:[]},
+        byDate:{} // 'YYYY-MM-DD': { dailyDone:{id:true}, dailyXP:number, validated:boolean }
+      };
     }
     let state = load();
-    if(!state.profile) state.profile = {level:1,xp:0,name:"",streaks:{prayer:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}};
+    if(!state.profile) state.profile = {level:1,xp:0,streaks:{prayer:0,wake:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0},name:""};
     if(state.profile.name===undefined) state.profile.name = "";
     if(!state.byDate) state.byDate = {};
-    function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || dflt(); } catch(e){ return dflt(); } }
+    function load(){ try{return JSON.parse(localStorage.getItem(KEY))||dflt();}catch(e){return dflt();} }
     function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
-    const $ = s=>document.querySelector(s); const $$ = s=>document.querySelectorAll(s);
+    const $ = s=>document.querySelector(s), $$ = s=>document.querySelectorAll(s);
 
     function toast(text,type='info'){
       const el=$("#toast"); el.textContent=text; el.className=type; el.classList.add('show');
-      setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.className='',300); },2500);
+      setTimeout(()=>{el.classList.remove('show'); setTimeout(()=>el.className='',300);},2500);
     }
     function showXPGain(amount,element){
       const xpEl=document.createElement('div'); xpEl.className=amount>0?'xp-gain':'xp-loss'; xpEl.textContent=amount>0?`+${amount} XP`:`${amount} XP`;
-      const rect=element.getBoundingClientRect(); xpEl.style.left=(rect.left+rect.width/2)+'px'; xpEl.style.top=rect.top+'px';
+      const rect=element.getBoundingClientRect(); xpEl.style.left=rect.left+rect.width/2+'px'; xpEl.style.top=rect.top+'px';
       document.body.appendChild(xpEl); setTimeout(()=>xpEl.remove(),2000);
     }
     function showLevelUp(level){
@@ -371,14 +360,32 @@
       document.body.appendChild(el); setTimeout(()=>el.remove(),3000);
     }
 
-    // === Stockage par date (daily) ===
+    // ===== MENU =====
+    $("#menuToggle").addEventListener("click",()=>$("#mobileMenu").classList.toggle("show"));
+    document.addEventListener("click",(e)=>{
+      const menu=$("#mobileMenu"), toggle=$("#menuToggle");
+      if(!menu.contains(e.target)&&!toggle.contains(e.target)) menu.classList.remove("show");
+    });
+    $$(".tab").forEach(b=>b.addEventListener("click",()=>{
+      $$(".tab").forEach(t=>t.classList.remove("active")); b.classList.add("active");
+      $$(".view").forEach(v=>v.classList.remove("active"));
+      const id='view-'+b.dataset.goto; $("#"+id).classList.add("active"); $("#mobileMenu").classList.remove("show");
+      $("#backButton").style.display = b.dataset.goto==='goals'?'none':'block';
+    }));
+    $("#backButton").addEventListener("click",()=>{
+      $$(".view").forEach(v=>v.classList.remove("active")); $("#view-goals").classList.add("active");
+      $$(".tab").forEach(t=>t.classList.remove("active")); $(".tab[data-goto='goals']").classList.add("active");
+      $("#backButton").style.display='none';
+    });
+
+    // ===== DATE STORAGE =====
     function todayISO(d=new Date()){ return d.toISOString().slice(0,10); }
     let currentDate = todayISO();
     function loadDay(date){
       const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
       state.tasks.daily.forEach(t=>{ t.done = !!day.dailyDone[t.id]; });
       save(); renderTasks();
-      const dv=document.getElementById('date_validated'); if(dv) dv.textContent = day.validated ? 'oui' : 'non';
+      const dv = document.getElementById('date_validated'); if(dv) dv.textContent = day.validated?'oui':'non';
     }
     function saveDay(date){
       const day = state.byDate[date] || {dailyDone:{},dailyXP:0,validated:false};
@@ -387,61 +394,20 @@
       state.byDate[date] = day; save();
     }
 
-    /* ====== MENU ====== */
-    $("#menuToggle").addEventListener("click",()=>{ $("#mobileMenu").classList.toggle("show"); });
-    document.addEventListener("click",(e)=>{
-      const menu=$("#mobileMenu"), toggle=$("#menuToggle");
-      if(menu && !menu.contains(e.target) && !toggle.contains(e.target)) menu.classList.remove("show");
-    });
-    $$(".tab").forEach(b=>b.addEventListener("click",()=>{
-      $$(".tab").forEach(t=>t.classList.remove("active")); b.classList.add("active");
-      $$(".view").forEach(v=>v.classList.remove("active"));
-      const id="view-"+b.dataset.goto; $("#"+id).classList.add("active"); $("#mobileMenu").classList.remove("show");
-      $("#backButton").style.display = (b.dataset.goto==="goals") ? "none" : "block";
-    }));
-    $("#backButton").addEventListener("click",()=>{
-      $$(".view").forEach(v=>v.classList.remove("active"));
-      $("#view-goals").classList.add("active");
-      $$(".tab").forEach(t=>t.classList.remove("active"));
-      $(".tab[data-goto='goals']").classList.add("active");
-      $("#backButton").style.display="none";
-    });
-
-    /* ====== XP SYSTEM ====== */
+    // ===== XP SYSTEM =====
     function xpNeed(l){ return 50 + l*50; }
-    function updateXP(){
-      const need = xpNeed(state.profile.level);
-      const xp = Math.max(0, state.profile.xp||0);
-      $("#xp_text").textContent = `${xp} / ${need}`;
-      $("#xp_bar").style.width = Math.min(100, Math.round((xp/need)*100)) + "%";
-      $("#level").textContent = state.profile.level;
-    }
-    function addXP(x, sourceElement=null){
-      state.profile.xp = Math.max(0,(state.profile.xp||0)+x);
-      state.profile.stats.dailyXP += x; state.profile.stats.weeklyXP += x; state.profile.stats.monthlyXP += x;
-      if(sourceElement) showXPGain(x, sourceElement);
-      while(state.profile.xp >= xpNeed(state.profile.level)){
-        state.profile.xp -= xpNeed(state.profile.level); state.profile.level++; showLevelUp(state.profile.level);
-        toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');
-      }
-      save(); updateXP(); updateStreaks();
-    }
-    function updateStreaks(){
-      $("#streak_pr").textContent = state.profile.streaks.prayer || 0;
-      $("#active_malus").textContent = state.malus.active.length || 0;
-    }
 
-    /* ==== v1.1 Sector XP (hebdo) ==== */
+    // Sector XP (hebdo) — GLOBAL (pas dans updateXP)
     function getWeeklySectorXP(){
       const W={biz:0,ugc:0,sport:0,dev:0,spi:0};
       ['daily','weekly','monthly'].forEach(scope=>{
         state.tasks[scope].forEach(t=>{
           if(!t.done) return;
-          if(t.category==='business') W.biz+=t.xp;
-          if(t.category==='ugc') W.ugc+=t.xp;
-          if(t.category==='sport') W.sport+=t.xp;
-          if(t.category==='dev') W.dev+=t.xp;
-          if(t.category==='spirituality') W.spi+=t.xp;
+          if(t.category==='business')W.biz+=t.xp;
+          if(t.category==='ugc')W.ugc+=t.xp;
+          if(t.category==='sport')W.sport+=t.xp;
+          if(t.category==='dev')W.dev+=t.xp;
+          if(t.category==='spirituality')W.spi+=t.xp;
         });
       });
       return W;
@@ -450,8 +416,8 @@
       const W = getWeeklySectorXP();
       const set=(idFill,idTxt,now,goal)=>{
         const f=document.getElementById(idFill), t=document.getElementById(idTxt);
-        const pct = goal? Math.min(100, Math.round(now/goal*100)) : 0;
-        if(f) f.style.width = pct+'%';
+        const p = goal?Math.min(100,Math.round(now/goal*100)):0;
+        if(f) f.style.width = p+'%';
         if(t) t.textContent = `${now}/${goal}`;
       };
       set('g_biz','g_biz_txt',W.biz,100);
@@ -461,20 +427,40 @@
       set('g_spi','g_spi_txt',W.spi,60);
     }
 
-    /* ====== GOALS ====== */
-    function pct(n,g){ n=Math.max(0,+n||0); g=Math.max(0,+g||0); return g? Math.min(100,Math.round(n/g*100)) : 0; }
+    function updateXP(){
+      const need=xpNeed(state.profile.level);
+      const xp=Math.max(0,state.profile.xp||0);
+      $("#xp_text").textContent=`${xp} / ${need}`;
+      $("#xp_bar").style.width=Math.min(100,Math.round(xp/need*100))+'%';
+      $("#level").textContent=state.profile.level;
+    }
+    function addXP(x,src=null){
+      state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
+      state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
+      if(src) showXPGain(x,src);
+      while(state.profile.xp>=xpNeed(state.profile.level)){
+        state.profile.xp-=xpNeed(state.profile.level); state.profile.level++;
+        showLevelUp(state.profile.level); toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');
+      }
+      save(); updateXP(); updateStreaks();
+    }
+    function updateStreaks(){
+      $("#streak_pr").textContent=state.profile.streaks.prayer||0;
+      $("#active_malus").textContent=state.malus.active.length||0;
+    }
+
+    // ===== GOALS =====
+    function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0;}
     function renderKPIs(){
       const kpis=$("#kpis"); kpis.innerHTML="";
       for(const [key,cat] of Object.entries(state.goals)){
-        const card=document.createElement("div");
-        card.className = key==="malus" ? "kpi malus" : "kpi";
-        card.dataset.cat = key;
+        const card=document.createElement("div"); card.className=key==="malus"?"kpi malus":"kpi"; card.dataset.cat=key;
         let html=`<h3>${cat.label}</h3>`;
         cat.bars.forEach(b=>{
-          const percentage=pct(b.now,b.goal);
+          const p=pct(b.now,b.goal);
           html+=`<div class="row"><strong>${b.label}</strong>
             <span><input id="${b.id}_now" type="number" value="${b.now}" min="0"> / <input id="${b.id}_goal" type="number" value="${b.goal}" min="0"></span></div>
-            <div class="bar"><span id="${b.id}_bar" style="width:${percentage}%"></span></div>`;
+            <div class="bar"><span id="${b.id}_bar" style="width:${p}%"></span></div>`;
         });
         card.innerHTML=html; kpis.appendChild(card);
       }
@@ -493,7 +479,7 @@
       }
     }
 
-    /* ====== TASKS ====== */
+    // ===== TASKS =====
     function renderTasks(){
       const mount=(id,list)=>{
         const el=$("#"+id); el.innerHTML="";
@@ -507,87 +493,71 @@
       mount("weekly_tasks",state.tasks.weekly);
       mount("monthly_tasks",state.tasks.monthly);
     }
-
     document.addEventListener("change",(e)=>{
       const el=e.target;
-      if(!el.matches('input[type="checkbox"][data-scope]')) return;
+      if(!el.matches('input[type="checkbox"][data-scope]'))return;
       const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
-      const list = scope==="daily_tasks" ? state.tasks.daily : scope==="weekly_tasks" ? state.tasks.weekly : state.tasks.monthly;
+      const list = scope==="daily_tasks"?state.tasks.daily:scope==="weekly_tasks"?state.tasks.weekly:state.tasks.monthly;
       const t=list.find(x=>x.id===id); if(!t) return;
-      const wasCompleted=t.done; t.done=el.checked;
 
-      // taches spéciales
-      if(t.id==="prayers_5" && t.done && !wasCompleted){ state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers"); }
-      else if(t.id==="prayers_5" && !t.done && wasCompleted){ state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1); }
+      const was=t.done; t.done = el.checked;
 
-      if(t.id==="mlm_prospect_20" && t.done && !wasCompleted){ updateGoalFromTask("mlm_prospects",20); }
-      if(t.id==="ugc_prospect_20" && t.done && !wasCompleted){ updateGoalFromTask("ugc_prospects",20); }
+      // Spéciales
+      if(t.id==="prayers_5" && t.done && !was){ state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers"); }
+      else if(t.id==="prayers_5" && !t.done && was){ state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1); }
 
-      const taskGoalMap={ "workout":"workouts","run":"runs","reel":"reels","video":"videos","lecture":"lectures","introspection":"introspections","jumuah":"jumuah","mlm_presentation":"mlm_presentations","ugc_collab":"ugc_collabs" };
-      if(taskGoalMap[t.id] && t.done && !wasCompleted){ updateGoalFromTask(taskGoalMap[t.id]); }
+      if(t.id==="mlm_prospect_20" && t.done && !was) updateGoalFromTask("mlm_prospects",20);
+      if(t.id==="ugc_prospect_20" && t.done && !was) updateGoalFromTask("ugc_prospects",20);
 
-      addXP(t.done? t.xp : -t.xp, el.closest('.quest'));
+      const map={
+        "workout":"workouts","run":"runs","reel":"reels","video":"videos",
+        "lecture":"lectures","introspection":"introspections","jumuah":"jumuah",
+        "mlm_presentation":"mlm_presentations","ugc_collab":"ugc_collabs"
+      };
+      if(map[t.id] && t.done && !was) updateGoalFromTask(map[t.id]);
+
+      addXP(t.done?t.xp:-t.xp, el.closest('.quest'));
       if(t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`,'success');
-
-      if(scope==="daily_tasks") saveDay(currentDate); // écrit dans byDate
-      save(); renderKPIs(); renderSectorGauges();
+      saveDay(currentDate); save(); renderKPIs(); renderSectorGauges();
     });
-
     function updateGoalFromTask(goalId,amount=1){
       for(const cat of Object.values(state.goals)){
         const bar=cat.bars.find(b=>b.id===goalId); if(bar){ bar.now+=amount; break; }
       }
     }
+    $("#resetDaily").addEventListener("click",()=>{state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks();});
+    $("#resetWeekly").addEventListener("click",()=>{state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
+    $("#resetMonthly").addEventListener("click",()=>{state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
 
-    $("#resetDaily").addEventListener("click",()=>{
-      state.tasks.daily.forEach(t=>t.done=false);
-      saveDay(currentDate); save(); renderTasks();
-      toast("Journée réinitialisée",'info');
-      renderSectorGauges();
-    });
-    $("#resetWeekly").addEventListener("click",()=>{ state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks(); toast("Semaine réinitialisée",'info'); renderSectorGauges(); });
-    $("#resetMonthly").addEventListener("click",()=>{ state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks(); toast("Mois réinitialisé",'info'); renderSectorGauges(); });
-
-    /* ====== VALIDATE DAY ====== */
+    // ===== VALIDATE DAY =====
     $("#validateDay").addEventListener("click",()=>{
       checkBonuses();
       const g=state.goals;
-
-      // Sport
       if(g.sport.bars[0].now>=5){ addXP(30); toast("🏋️ Bonus 5 workouts +30 XP!",'success'); }
       if(g.sport.bars[1].now>=3){ addXP(20); toast("🏃 Bonus 3 courses +20 XP!",'success'); }
-
-      // Social
       if(g.social.bars[0].now>=5){ addXP(40); toast("📱 Bonus 5 reels +40 XP!",'success'); }
       if(g.social.bars[1].now>=6){ addXP(30); toast("🎬 Bonus 6 vidéos +30 XP!",'success'); }
-
-      // Dev
       if(g.dev.bars[0].now>=5){ addXP(25); toast("📚 Bonus 5 lectures +25 XP!",'success'); }
       if(g.dev.bars[1].now>=5){ addXP(25); toast("📝 Bonus 5 introspections +25 XP!",'success'); }
-
-      // Business
       if(g.business.bars[2].now>=1){ addXP(60); toast("💸 Bonus inscription MLM +60 XP!",'success'); }
       if(g.business.bars[2].now>=2){ addXP(150); toast("💸 Bonus 2 inscriptions +150 XP!",'success'); }
-
-      // UGC
       if(g.ugc.bars[1].now>=1){ addXP(50); toast("🎥 Bonus collab UGC +50 XP!",'success'); }
       if(g.ugc.bars[1].now>=2){ addXP(120); toast("🎥 Bonus 2 collabs +120 XP!",'success'); }
 
-      // Validation du jour
-      if(!state.byDate[currentDate]) state.byDate[currentDate]={dailyDone:{},dailyXP:0,validated:false};
-      state.byDate[currentDate].validated=true;
+      toast("Journée validée ✅",'success');
+      if(!state.byDate[currentDate]) state.byDate[currentDate] = {dailyDone:{},dailyXP:0,validated:false};
+      state.byDate[currentDate].validated = true;
       const dv=document.getElementById('date_validated'); if(dv) dv.textContent='oui';
-
-      toast("Journée validée ✅",'success'); save();
+      save();
     });
 
-    /* ====== REWARDS ====== */
+    // ===== REWARDS =====
     function renderRewards(){
       const wrap=$("#rewards_list"), log=$("#rewards_log");
       wrap.innerHTML="";
       state.rewards.catalog.forEach(it=>{
-        const isBlocked = it.blocked || !canUseReward(it);
         const card=document.createElement("div"); card.className="card half";
+        const isBlocked=it.blocked || !canUseReward(it);
         card.innerHTML=`
           <div class="row">
             <div>
@@ -596,58 +566,38 @@
             </div>
             <b>${it.cost} XP</b>
           </div>
-          <button data-redeem="${it.id}" ${isBlocked?'disabled style="opacity:.5"':''}>
+          <button data-redeem="${it.id}" ${isBlocked?'disabled style="opacity:0.5"':''}>
             ${isBlocked?'Bloqué':`Utiliser ${it.cost} XP`}
           </button>`;
         wrap.appendChild(card);
       });
-      wrap.onclick=(e)=>{
-        const btn=e.target.closest("[data-redeem]"); if(!btn || btn.disabled) return;
+      wrap.addEventListener("click",(e)=>{
+        const btn=e.target.closest("[data-redeem]"); if(!btn||btn.disabled) return;
         const it=state.rewards.catalog.find(x=>x.id===btn.dataset.redeem); if(!it) return;
-        if((state.profile.xp||0) < it.cost) return toast("Pas assez d'XP.",'error');
+        if((state.profile.xp||0)<it.cost) return toast("Pas assez d'XP.",'error');
         if(!canUseReward(it)) return toast("Récompense bloquée par les malus.",'error');
-        state.profile.xp -= it.cost;
+        state.profile.xp-=it.cost;
         state.rewards.log.unshift(`🎁 ${it.name} (${it.cost} XP) — ${new Date().toLocaleString()}`);
         save(); updateXP(); renderRewards(); toast("Profite bien ! 🎉",'success');
-      };
-      log.innerHTML = state.rewards.log.slice(0,10).map(x=>`<li>${x}</li>`).join("");
+      });
+      log.innerHTML=state.rewards.log.slice(0,10).map(x=>`<li>${x}</li>`).join("");
     }
     function canUseReward(reward){
-      const active=state.malus.active;
-      if(active.includes('no_rewards_daily')) return false;
-      if(active.includes('no_rewards_weekend') && (reward.id==='weekend'||reward.id==='day_off')) return false;
-      if(active.includes('no_shopping') && reward.id==='shopping') return false;
-      if(active.includes('no_social') && reward.id==='friends') return false;
-      if(active.includes('no_pleasure') && (reward.id==='activity'||reward.id==='day_off')) return false;
+      const a=state.malus.active;
+      if(a.includes('no_rewards_daily')) return false;
+      if(a.includes('no_rewards_weekend') && (reward.id==='weekend'||reward.id==='day_off')) return false;
+      if(a.includes('no_shopping') && reward.id==='shopping') return false;
+      if(a.includes('no_social') && reward.id==='friends') return false;
+      if(a.includes('no_pleasure') && (reward.id==='activity'||reward.id==='day_off')) return false;
       return true;
     }
 
-    /* ====== MALUS SYSTEM ====== */
-    function computeMalus(){
-      const newMalus=[]; const newPen=[];
-      // globaux
-      if(state.profile.stats.dailyXP < 100) newMalus.push('no_rewards_daily');
-      if(state.profile.stats.weeklyXP < 250) newMalus.push('no_rewards_weekend');
-      // business
-      const businessXP = calculateCategoryXP('business');
-      if(businessXP < 100) newMalus.push('no_shopping');
-      if(state.goals.business.bars[2].now===0){ newPen.push('+50 prospections MLM obligatoires'); newPen.push('+5 appels téléphoniques obligatoires'); }
-      // ugc
-      if(state.goals.ugc.bars[1].now===0) newPen.push('+30 prospections UGC obligatoires');
-      // sport
-      if(state.goals.sport.bars[0].now<3) newPen.push('Workout extra le week-end');
-      if(state.goals.sport.bars[1].now===0) newPen.push('Cardio long (45min) la semaine suivante');
-      // dev
-      if(state.goals.dev.bars[0].now<3){ newMalus.push('no_social'); newPen.push('1h lecture le dimanche'); }
-      // spiritualité
-      const missedPrayers = 7 - state.goals.spirituality.bars[0].now;
-      if(missedPrayers>0) newMalus.push('no_rewards_daily');
-      if(state.goals.spirituality.bars[1].now===0) newPen.push('Lecture coranique (1h) le week-end');
-      return {malus:newMalus, penalties:newPen};
-    }
-    function renderMalusView(activeMalus, penalties, isPreview=false){
+    // ===== MALUS =====
+    function renderMalus(){
       const content=$("#malus_status");
-      let html=`<h3>${isPreview?'Prévisualisation des malus':'Règles de malus'}</h3>
+      const active=state.malus.active, penalties=state.malus.penalties;
+      let html=`
+        <h3>Règles de malus</h3>
         <div class="malus-item">
           <strong>Malus globaux :</strong>
           <ul>
@@ -656,55 +606,66 @@
             <li>&lt;200 XP/mois → défi exceptionnel</li>
           </ul>
         </div>
-        <h3>${isPreview?'Malus potentiels':'Malus actifs'} (${activeMalus.length})</h3>`;
-      if(activeMalus.length===0){ html+=`<p class="muted">${isPreview?'Aucun malus ne serait appliqué.':'Aucun malus actif - Continue comme ça ! 🎉'}</p>`; }
-      else{
-        activeMalus.forEach(m=>{ html+=`<div class="malus-item ${isPreview?'': 'malus-active'}">${getMalusDescription(m)}</div>`; });
-      }
-      html+=`<h3>${isPreview?'Pénalités potentielles':'Pénalités en cours'} (${penalties.length})</h3>`;
-      if(penalties.length===0){ html+=`<p class="muted">${isPreview?'Aucune pénalité ne serait ajoutée.':'Aucune pénalité active'}</p>`; }
+        <h3>Malus actifs (${active.length})</h3>`;
+      if(active.length===0){ html+=`<p class="muted">Aucun malus actif - Continue comme ça ! 🎉</p>`; }
+      else{ active.forEach(m=>{ html+=`<div class="malus-item malus-active">${getMalusDescription(m)}</div>`; }); }
+      html+=`<h3>Pénalités en cours (${penalties.length})</h3>`;
+      if(penalties.length===0){ html+=`<p class="muted">Aucune pénalité active</p>`; }
       else{ penalties.forEach(p=>{ html+=`<div class="malus-item">${p}</div>`; }); }
-      if(isPreview) html+=`<p class="muted">Ceci est une prévisualisation. Appuie sur <b>Appliquer les malus</b> pour enregistrer.</p>`;
       content.innerHTML=html;
     }
-    function renderMalus(){ renderMalusView(state.malus.active, state.malus.penalties, false); }
     function getMalusDescription(m){
       const d={
         'no_rewards_daily':"🚫 Pas de récompense aujourd'hui (&lt;100 XP)",
-        'no_rewards_weekend':'🚫 Pas de récompense week-end (&lt;250 XP/semaine)',
-        'no_shopping':'🚫 Pas de shopping (&lt;100 XP business/semaine)',
-        'no_social':'🚫 Pas de soirée amis (&lt;3 lectures/semaine)',
+        'no_rewards_weekend':"🚫 Pas de récompense week-end (&lt;250 XP/semaine)",
+        'no_shopping':"🚫 Pas de shopping (&lt;100 XP business/semaine)",
+        'no_social':"🚫 Pas de soirée amis (&lt;3 lectures/semaine)",
         'no_pleasure':"🚫 Pas d'activité plaisir (&lt;3 workouts/semaine)",
-        'extra_prospects_mlm':'📈 +50 prospections MLM obligatoires',
-        'extra_calls':'📞 +5 appels obligatoires',
-        'extra_prospects_ugc':'📈 +30 prospections UGC obligatoires',
-        'extra_workout':'🏋️ Workout extra week-end',
-        'long_cardio':'🏃 Cardio long (45min) obligatoire',
-        'sunday_reading':'📚 1h lecture dimanche obligatoire',
-        'quran_reading':'📖 1h lecture coranique obligatoire'
+        'extra_prospects_mlm':"📈 +50 prospections MLM obligatoires",
+        'extra_calls':"📞 +5 appels obligatoires",
+        'extra_prospects_ugc':"📈 +30 prospections UGC obligatoires",
+        'extra_workout':"🏋️ Workout extra week-end",
+        'long_cardio':"🏃 Cardio long (45min) obligatoire",
+        'sunday_reading':"📚 1h lecture dimanche obligatoire",
+        'quran_reading':"📖 1h lecture coranique obligatoire"
       };
       return d[m]||m;
     }
-    function calculateCategoryXP(category){
-      let xp=0; ['daily','weekly','monthly'].forEach(type=>{
-        state.tasks[type].forEach(task=>{ if(task.category===category && task.done) xp+=task.xp; });
-      }); return xp;
-    }
-    // BIND: preview vs apply
-    $("#checkMalus").addEventListener("click",()=>{
-      const {malus,penalties}=computeMalus();
-      renderMalusView(malus,penalties,true);
-      toast("Prévisualisation des malus (rien n'est enregistré).",'info');
-    });
-    $("#applyMalus").addEventListener("click",()=>{
-      const {malus,penalties}=computeMalus();
-      state.malus.active=malus; state.malus.penalties=penalties; save();
-      renderMalus(); renderRewards(); updateStreaks();
-      if(malus.length>0 || penalties.length>0) toast(`⚠️ ${malus.length} malus et ${penalties.length} pénalités appliqués`,'warning');
-      else toast('✅ Aucun malus - Excellent travail !','success');
-    });
+    $("#checkMalus").addEventListener("click",checkAndApplyMalus);
+    $("#applyMalus").addEventListener("click",checkAndApplyMalus);
+    function checkAndApplyMalus(){
+      const newMalus=[], newPen=[];
+      if(state.profile.stats.dailyXP<100) newMalus.push('no_rewards_daily');
+      if(state.profile.stats.weeklyXP<250) newMalus.push('no_rewards_weekend');
 
-    /* ====== STATS ====== */
+      const bizXP=calculateCategoryXP('business');
+      if(bizXP<100) newMalus.push('no_shopping');
+      if(state.goals.business.bars[2].now===0){ newPen.push('+50 prospections MLM obligatoires'); newPen.push('+5 appels téléphoniques obligatoires'); }
+
+      if(state.goals.ugc.bars[1].now===0) newPen.push('+30 prospections UGC obligatoires');
+
+      if(state.goals.sport.bars[0].now<3) newPen.push('Workout extra le week-end');
+      if(state.goals.sport.bars[1].now===0) newPen.push('Cardio long (45min) la semaine suivante');
+
+      if(state.goals.dev.bars[0].now<3){ newMalus.push('no_social'); newPen.push('1h lecture le dimanche'); }
+
+      const missed=7 - state.goals.spirituality.bars[0].now;
+      if(missed>0) newMalus.push('no_rewards_daily');
+      if(state.goals.spirituality.bars[1].now===0) newPen.push('Lecture coranique (1h) le week-end');
+
+      state.malus.active=newMalus; state.malus.penalties=newPen;
+      save(); renderMalus(); renderRewards(); updateStreaks();
+      if(newMalus.length>0||newPen.length>0) toast(`⚠️ ${newMalus.length} malus et ${newPen.length} pénalités appliqués`,'warning');
+      else toast('✅ Aucun malus - Excellent travail !','success');
+    }
+    function calculateCategoryXP(category){
+      let xp=0; ['daily','weekly','monthly'].forEach(scope=>{
+        state.tasks[scope].forEach(t=>{ if(t.category===category && t.done) xp+=t.xp; });
+      });
+      return xp;
+    }
+
+    // ===== STATS =====
     function renderStats(){
       const content=$("#stats_content"), s=state.profile.stats;
       let html=`
@@ -715,7 +676,7 @@
           <div class="stat-card"><h3>Niveau</h3><div style="font-size:2rem;color:var(--grad)">${state.profile.level}</div></div>
         </div>
         <h3>Progression par catégorie</h3>`;
-      for(const cat of Object.values(state.goals)){
+      for(const [k,cat] of Object.entries(state.goals)){
         html+=`<div class="card" style="margin-bottom:12px"><h4>${cat.label}</h4>`;
         cat.bars.forEach(bar=>{
           const p=pct(bar.now,bar.goal);
@@ -727,7 +688,7 @@
       content.innerHTML=html;
     }
 
-    /* ====== EXPORT/IMPORT ====== */
+    // ===== EXPORT / IMPORT / RESET =====
     $("#exportData").addEventListener("click",()=>{
       const dataStr=JSON.stringify(state,null,2);
       const url=URL.createObjectURL(new Blob([dataStr],{type:'application/json'}));
@@ -740,36 +701,27 @@
       input.onchange=(e)=>{
         const file=e.target.files[0]; if(!file) return;
         const reader=new FileReader();
-        reader.onload=(e)=>{
+        reader.onload=(ev)=>{
           try{
-            const imported=JSON.parse(e.target.result);
-            if(confirm("Remplacer toutes vos données actuelles ?")){
-              state=imported; save(); init(); toast("Données importées avec succès !",'success');
-            }
+            const imported=JSON.parse(ev.target.result);
+            if(confirm("Remplacer toutes vos données actuelles ?")){ state=imported; save(); init(); toast("Données importées avec succès !",'success'); }
           }catch(err){ toast("Erreur lors de l'import du fichier",'error'); }
         };
         reader.readAsText(file);
       };
       input.click();
     });
-
     $("#resetAll").addEventListener("click",()=>{
       if(!confirm("Tout remettre à zéro ?")) return;
       state=dflt(); save(); init(); toast("Données réinitialisées",'info');
     });
 
-    /* ====== GESTION DES TÂCHES & RÉCOMPENSES ====== */
+    // ===== GESTION DES TÂCHES / RÉCOMPENSES =====
     let currentEditType=null, currentEditId=null;
-
     $("#manageDailyTasks").addEventListener("click",()=>openTaskManager('daily'));
     $("#manageWeeklyTasks").addEventListener("click",()=>openTaskManager('weekly'));
     $("#manageMonthlyTasks").addEventListener("click",()=>openTaskManager('monthly'));
-
-    function openTaskManager(type){
-      currentEditType=type;
-      $("#taskModalTitle").textContent = `Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`;
-      renderTaskManager(type); $("#taskModal").classList.add("active");
-    }
+    function openTaskManager(type){ currentEditType=type; $("#taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`; renderTaskManager(type); $("#taskModal").classList.add("active"); }
     function renderTaskManager(type){
       const list=$("#taskManageList"), tasks=state.tasks[type];
       list.innerHTML=tasks.map(task=>`
@@ -782,9 +734,9 @@
         </div>`).join('');
     }
     function editTask(type,id){
-      const task=state.tasks[type].find(t=>t.id===id); if(!task) return;
+      const t=state.tasks[type].find(x=>x.id===id); if(!t) return;
       $("#editModalTitle").textContent="Modifier la tâche";
-      $("#editName").value=task.label; $("#editValue").value=task.xp; $("#editCategory").value=task.category;
+      $("#editName").value=t.label; $("#editValue").value=t.xp; $("#editCategory").value=t.category;
       $("#editCategoryGroup").style.display="block"; $("#editTagGroup").style.display="none";
       currentEditType=type; currentEditId=id; $("#editModal").classList.add("active");
     }
@@ -801,13 +753,13 @@
 
     $("#manageRewards").addEventListener("click",()=>{ renderRewardManager(); $("#rewardModal").classList.add("active"); });
     function renderRewardManager(){
-      const list=$("#rewardManageList"), rewards=state.rewards.catalog;
-      list.innerHTML=rewards.map(r=>`
+      const list=$("#rewardManageList"), r=state.rewards.catalog;
+      list.innerHTML=r.map(rew=>`
         <div class="manage-item">
-          <div><strong>${r.name}</strong><div class="muted">${r.cost} XP - ${r.tag}</div></div>
+          <div><strong>${rew.name}</strong><div class="muted">${rew.cost} XP - ${rew.tag}</div></div>
           <div class="manage-item-actions">
-            <button onclick="editReward('${r.id}')">✏️</button>
-            <button onclick="deleteReward('${r.id}')" class="danger">🗑️</button>
+            <button onclick="editReward('${rew.id}')">✏️</button>
+            <button onclick="deleteReward('${rew.id}')" class="danger">🗑️</button>
           </div>
         </div>`).join('');
     }
@@ -831,8 +783,8 @@
 
     $("#editForm").addEventListener("submit",(e)=>{
       e.preventDefault();
-      const name=$("#editName").value.trim(); const value=parseInt($("#editValue").value);
-      if(!name || !value) return;
+      const name=$("#editName").value.trim(), value=parseInt($("#editValue").value);
+      if(!name||!value) return;
       if(currentEditType==='reward'){
         const tag=$("#editTag").value.trim();
         if(currentEditId){
@@ -855,7 +807,7 @@
       save(); $("#editModal").classList.remove("active"); toast("Modifications sauvegardées",'success');
     });
 
-    // Fermeture modales (boutons)
+    // FERMETURE MODALES
     ['closeTaskModal','closeRewardModal','cancelEdit'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.onclick=()=>{
@@ -864,17 +816,12 @@
         document.getElementById('editModal').classList.remove('active');
       };
     });
-    // Fermeture modales (clic hors contenu)
-    ["taskModal","rewardModal","editModal"].forEach(mid=>{
-      const m=document.getElementById(mid);
-      if(m){ m.addEventListener("click",(e)=>{ if(e.target.classList.contains("modal")) e.target.classList.remove("active"); }); }
+    $("#taskModal,#rewardModal,#editModal").addEventListener("click",(e)=>{
+      if(e.target.classList.contains("modal")) e.target.classList.remove("active");
     });
 
-    // Rendre les fonctions globales pour les boutons inline
-    window.editTask=editTask; window.deleteTask=deleteTask; window.editReward=editReward; window.deleteReward=deleteReward;
-
-    /* ====== AUTO-HIDE NAVIGATION ====== */
-    let lastScrollY=0, ticking=false;
+    // AUTO-HIDE NAV
+    let lastScrollY=0,ticking=false;
     function updateNavbar(){
       const y=window.scrollY, nav=$(".top");
       if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden");
@@ -883,22 +830,18 @@
     function onScroll(){ if(!ticking){ requestAnimationFrame(updateNavbar); ticking=true; } }
     window.addEventListener("scroll",onScroll);
 
-    /* ====== INIT ====== */
+    // INIT
     function init(){
-      renderKPIs(); renderSectorGauges(); renderTasks(); renderRewards(); renderMalus(); renderStats(); updateXP(); updateStreaks();
-
-      // Pseudo
-      const nameEl=$("#player_name");
-      if(nameEl){ nameEl.value=state.profile?.name||""; nameEl.oninput=()=>{ state.profile.name=nameEl.value; save(); }; }
-
-      // Datepicker
+      renderKPIs();
+      renderSectorGauges();
+      renderTasks();
+      renderRewards();
+      renderMalus();
+      renderStats();
+      const nameEl=$("#player_name"); if(nameEl){ nameEl.value=state.profile?.name||""; nameEl.oninput=()=>{ state.profile.name=nameEl.value; save(); }; }
       const dEl=$("#selected_date");
-      if(dEl){
-        currentDate = todayISO(); // default aujourd'hui
-        dEl.value = currentDate;
-        dEl.onchange=(e)=>{ currentDate=e.target.value||todayISO(); loadDay(currentDate); };
-        loadDay(currentDate);
-      }
+      if(dEl){ dEl.value=currentDate; dEl.onchange=(e)=>{ currentDate=e.target.value||todayISO(); loadDay(currentDate); }; loadDay(currentDate); }
+      updateXP(); updateStreaks();
     }
     init();
   </script>
