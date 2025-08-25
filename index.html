@@ -18,7 +18,7 @@
       backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:transform .3s}
     .top.hidden{transform:translateY(-100%)}
     .container{width:min(1100px,94vw);margin:0 auto;padding:116px 0 40px}
-    .header-content{display:flex;align-items:center;justify-content:space-between;padding:8px}
+    .header-content{display:flex;align-items:center;justify-content:space-between;padding:8px;gap:8px}
     .title{flex:1;text-align:center}
     .title h1{margin:0;font-size:1.2rem}
     .title p{margin:0;font-size:.82rem;color:var(--muted)}
@@ -29,6 +29,10 @@
       padding:8px;border-radius:8px;transition:background .2s;font-size:1rem
     }
     .menu-toggle:hover,.back-btn-header:hover,.mini:hover{background:rgba(255,255,255,.08)}
+    .ok{background:#173a2a;border-color:#2d8a5a}
+    .ghost{opacity:.85}
+    .danger{background:#4a1e1e;border-color:#8b3a3a}
+    .warning{background:#5a3a1e;border-color:#8b6a3a}
 
     .mobile-menu{position:absolute;top:100%;left:0;right:0;background:rgba(11,15,20,.98);
       backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:none;flex-direction:column;gap:6px;padding:8px}
@@ -55,10 +59,6 @@
 
     button{padding:.55rem .85rem;border-radius:10px;border:1px solid var(--line);
       background:#0d1520;color:var(--text);cursor:pointer}
-    button.ghost{opacity:.85}
-    button.danger{background:#4a1e1e;border-color:#8b3a3a}
-    button.warning{background:#5a3a1e;border-color:#8b6a3a}
-    button.ok{background:#173a2a;border-color:#2d8a5a}
 
     .kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
     .kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}
@@ -99,7 +99,6 @@
     .list{margin:.3rem 0 .2rem;padding-left:18px}
     .col2{display:grid;grid-template-columns:1fr;gap:10px}
     @media(min-width:820px){.col2{grid-template-columns:1fr 1fr}}
-    .soft{opacity:.8}
   </style>
 </head>
 <body>
@@ -112,6 +111,7 @@
       </div>
       <div class="row">
         <button id="undoBtn" class="mini ghost" title="Annuler la dernière action">↩️ Annuler</button>
+        <button id="saveAll" class="mini ok" title="Enregistrer">💾 Enregistrer</button>
         <button id="toggleEdit" class="mini">✏️ Modifier</button>
         <button id="menuToggle" class="menu-toggle">☰</button>
       </div>
@@ -149,7 +149,6 @@
           <div class="row">
             <label class="muted">Pseudo :</label>
             <input id="player_name" type="text" placeholder="Ton nom" style="width:180px" disabled>
-            <button id="save_name" class="mini ok" disabled>✔️</button>
           </div>
 
           <div class="row">
@@ -173,29 +172,17 @@
             <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px">
               <div>
                 <div class="mini-note">Semaine — cible</div>
-                <div class="row">
-                  <input id="week_target" type="number" value="0" disabled>
-                  <button id="save_week_target" class="mini ok" disabled>✔️</button>
-                </div>
+                <input id="week_target" type="number" value="0" disabled>
                 <div class="mini-note">Semaine — fait</div>
-                <div class="row">
-                  <input id="week_done" type="number" value="0">
-                  <button id="save_week_done" class="mini ok">✔️</button>
-                </div>
+                <input id="week_done" type="number" value="0">
                 <div class="mini-note">Semaine — reste</div>
                 <div><b id="week_left">0</b></div>
               </div>
               <div>
                 <div class="mini-note">Mois — cible</div>
-                <div class="row">
-                  <input id="month_target" type="number" value="0" disabled>
-                  <button id="save_month_target" class="mini ok" disabled>✔️</button>
-                </div>
+                <input id="month_target" type="number" value="0" disabled>
                 <div class="mini-note">Mois — fait</div>
-                <div class="row">
-                  <input id="month_done" type="number" value="0">
-                  <button id="save_month_done" class="mini ok">✔️</button>
-                </div>
+                <input id="month_done" type="number" value="0">
                 <div class="mini-note">Mois — reste</div>
                 <div><b id="month_left">0</b></div>
               </div>
@@ -226,11 +213,11 @@
         </div>
 
         <div class="col2" style="margin-top:10px">
-          <div class="card soft">
+          <div class="card" style="opacity:.9">
             <h3 style="margin:.2rem 0">🔽 Reste le moins</h3>
             <ol id="least_remaining" class="list"></ol>
           </div>
-          <div class="card soft">
+          <div class="card" style="opacity:.9">
             <h3 style="margin:.2rem 0">🔼 Reste le plus</h3>
             <ol id="most_remaining" class="list"></ol>
           </div>
@@ -366,9 +353,8 @@
 <script>
 /* ================= STATE + UTIL ================== */
 const KEY="gamelife_v2";
-const deep = x => JSON.parse(JSON.stringify(x));
+const deep=x=>JSON.parse(JSON.stringify(x));
 function todayISO(d=new Date()){return d.toISOString().slice(0,10);}
-
 function dflt(){
   return {
     edit:false,
@@ -443,16 +429,12 @@ function dflt(){
       ],
       log:[]
     },
-    malus:{
-      rules:{dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3},
-      pending:[],active:[],penalties:[]
-    },
+    malus:{rules:{dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3},pending:[],active:[],penalties:[]},
     byDate:{},
     _history:[]
   }
 }
-
-let state = load();
+let state=load();
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||dflt();}catch(e){return dflt();}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));}
 function pushHistory(){state._history=state._history||[];state._history.push(JSON.stringify(state));if(state._history.length>10)state._history.shift();}
@@ -469,63 +451,115 @@ function loadDay(date){const day=state.byDate[date]||{dailyDone:{},dailyXP:0,val
 function saveDay(date){const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};state.tasks.daily.forEach(t=>{day.dailyDone[t.id]=!!t.done;});day.dailyXP=state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);state.byDate[date]=day;save();}
 
 /* MENU / NAV */
-const mobileMenu=document.getElementById("mobileMenu");
-const menuToggle=document.getElementById("menuToggle");
+const mobileMenu=$("#mobileMenu"), menuToggle=$("#menuToggle");
 if(menuToggle){menuToggle.addEventListener("click",()=>{if(mobileMenu) mobileMenu.classList.toggle("show");});}
 document.addEventListener("click",e=>{
   if(!mobileMenu||!menuToggle) return;
   if(!mobileMenu.contains(e.target) && !menuToggle.contains(e.target)){mobileMenu.classList.remove("show");}
 });
-
-/* Onglets (desktop + mobile) */
-function onTabClick(targetBtn){
-  const goto=targetBtn.getAttribute("data-goto");
-  if(!goto) return;
+function onTabClick(btn){
+  const goto=btn.getAttribute("data-goto"); if(!goto) return;
   $$(".tab").forEach(t=>t.classList.remove("active"));
   document.querySelectorAll(`.tab[data-goto="${goto}"]`).forEach(t=>t.classList.add("active"));
   $$(".view").forEach(v=>v.classList.remove("active"));
-  const view=document.getElementById(`view-${goto}`); if(view) view.classList.add("active");
-  const backBtn=document.getElementById("backButton"); if(backBtn) backBtn.style.display = (goto==="goals") ? "none":"block";
+  const view=$("#view-"+goto); if(view) view.classList.add("active");
+  const backBtn=$("#backButton"); if(backBtn) backBtn.style.display=(goto==="goals")?"none":"block";
   if(mobileMenu) mobileMenu.classList.remove("show");
 }
 document.addEventListener("click",(e)=>{
-  const tab = e.target.closest(".tab");
+  const tab=e.target.closest(".tab");
   if(tab && tab.hasAttribute("data-goto")) onTabClick(tab);
 });
 
-/* EDIT MODE */
+/* EDIT MODE + SAVE ALL */
 function setEditMode(on){
   state.edit=!!on; save();
-  const toggle=(id)=>{const el=document.getElementById(id); if(el){ if(state.edit) el.removeAttribute("disabled"); else el.setAttribute("disabled",""); }};
-  ["player_name","save_name","week_target","save_week_target","month_target","save_month_target",
+  const toggle=id=>{const el=document.getElementById(id); if(el){ if(state.edit) el.removeAttribute("disabled"); else el.setAttribute("disabled",""); }};
+  ["player_name","week_target","month_target",
    "rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(toggle);
   document.querySelectorAll(".reward-edit").forEach(inp=>{if(state.edit) inp.removeAttribute("disabled"); else inp.setAttribute("disabled","");});
-  const btn=document.getElementById("toggleEdit"); if(btn) btn.textContent = state.edit ? "✅ Terminer" : "✏️ Modifier";
+  const btn=$("#toggleEdit"); if(btn) btn.textContent = state.edit ? "✅ Terminer" : "✏️ Modifier";
   renderKPIs(); renderRewards(); // refléter disabled sur UI recréée
 }
-const tgl=document.getElementById("toggleEdit"); if(tgl){tgl.addEventListener("click",()=> setEditMode(!state.edit));}
-const undoBtn=document.getElementById("undoBtn"); if(undoBtn){undoBtn.addEventListener("click",undo);}
+const tgl=$("#toggleEdit"); if(tgl){tgl.addEventListener("click",()=> setEditMode(!state.edit));}
+const undoBtn=$("#undoBtn"); if(undoBtn){undoBtn.addEventListener("click",undo);}
+
+const saveAll=$("#saveAll");
+if(saveAll){
+  saveAll.addEventListener("click",()=>{
+    // Récupère toutes les valeurs visibles (objectifs, règles, argent, pseudo)
+    collectGoalInputsIntoState();
+    collectRulesIntoState();
+    collectMoneyIntoState();
+    // Pseudo
+    const nm=$("#player_name"); state.profile.name = nm ? (nm.value||"").trim() : state.profile.name;
+    refreshPlayerLabel();
+    save();
+    toast("Tout enregistré ✔️","success");
+    // Optionnel: sortir du mode édition
+    if(state.edit){ setEditMode(false); }
+  });
+}
+function collectGoalInputsIntoState(){
+  for(const cat of Object.values(state.goals)){
+    cat.bars.forEach(b=>{
+      const nowEl=document.getElementById(b.id+"_now");
+      const goalEl=document.getElementById(b.id+"_goal");
+      if(nowEl) b.now = +nowEl.value || 0;
+      if(goalEl) b.goal = +goalEl.value || 0;
+    });
+  }
+  renderLeastMost(); // MAJ listes reste le +/-
+  renderSectorGauges();
+}
+function collectRulesIntoState(){
+  const r=(id)=>+((document.getElementById(id)||{}).value||0);
+  state.malus.rules={
+    dailyMin:r("rule_daily_min"),
+    weeklyMin:r("rule_weekly_min"),
+    businessWeeklyMin:r("rule_business_weekly_min"),
+    readsMin:r("rule_reads_min"),
+    workoutsMin:r("rule_workouts_min")
+  };
+}
+function collectMoneyIntoState(){
+  const wT=+($("#week_target")?.value||0);
+  const wD=+($("#week_done")?.value||0);
+  const mT=+($("#month_target")?.value||0);
+  const mD=+($("#month_done")?.value||0);
+  state.money.week={target:wT,done:wD};
+  state.money.month={target:mT,done:mD};
+  refreshMoneyUI();
+}
 
 /* XP SYSTEM */
 function xpNeed(l){return 50 + l*50;}
 function updateXP(){const need=xpNeed(state.profile.level);const xp=Math.max(0,state.profile.xp||0);
-  const xpText=document.getElementById("xp_text"); const xpBar=document.getElementById("xp_bar"); const lvl=document.getElementById("level");
-  if(xpText) xpText.textContent=`${xp} / ${need}`;
-  if(xpBar) xpBar.style.width=Math.min(100,Math.round((xp/need)*100))+"%";
-  if(lvl) lvl.textContent=state.profile.level;
+  $("#xp_text").textContent=`${xp} / ${need}`;
+  $("#xp_bar").style.width=Math.min(100,Math.round((xp/need)*100))+"%";
+  $("#level").textContent=state.profile.level;
 }
-function addXP(x, src=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
+function addXP(x,src=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
   state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
   if(src) showXPGain(x,src);
   while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level);state.profile.level++;showLevelUp(state.profile.level);toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');}
   save(); updateXP(); updateStreaks();}
-function updateStreaks(){const pr=document.getElementById("streak_pr"); if(pr) pr.textContent=state.profile.streaks.prayer||0;
-  const am=document.getElementById("active_malus"); if(am) am.textContent=state.malus.active.length||0;}
+
+/* STREAKS + LABEL */
+function updateStreaks(){ $("#streak_pr").textContent=state.profile.streaks.prayer||0; $("#active_malus").textContent=state.malus.active.length||0;}
+function refreshPlayerLabel(){ const label=(state.profile.name||"").trim()||"Joueur"; $("#player_label").textContent=label; }
+const nameInput=$("#player_name");
+if(nameInput){
+  nameInput.addEventListener("input",()=>{ // live update + auto-save léger
+    state.profile.name = (nameInput.value||"").trim();
+    refreshPlayerLabel();
+  });
+}
 
 /* GOALS */
 function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0;}
 function renderKPIs(){
-  const kpis=document.getElementById("kpis"); if(!kpis) return; kpis.innerHTML="";
+  const kpis=$("#kpis"); if(!kpis) return; kpis.innerHTML="";
   for(const [key,cat] of Object.entries(state.goals)){
     const card=document.createElement("div"); card.className="kpi"; card.dataset.cat=key;
     let html=`<h3>${cat.label}</h3>`;
@@ -554,7 +588,7 @@ function renderKPIs(){
 }
 function collectBars(){const list=[]; for(const [k,cat] of Object.entries(state.goals)){cat.bars.forEach(b=>list.push({cat:k,id:b.id,label:`${cat.label} — ${b.label}`,now:b.now,goal:b.goal,rest:Math.max(0,(b.goal||0)-(b.now||0))}));} return list;}
 function renderLeastMost(){
-  const least=document.getElementById("least_remaining"), most=document.getElementById("most_remaining");
+  const least=$("#least_remaining"), most=$("#most_remaining");
   if(!least||!most) return; const bars=collectBars(); const hasGoal=bars.filter(x=>x.goal>0);
   const asc=[...hasGoal].sort((a,b)=>a.rest-b.rest).slice(0,5);
   const desc=[...hasGoal].sort((a,b)=>b.rest-a.rest).slice(0,5);
@@ -617,13 +651,12 @@ document.addEventListener("change",(e)=>{
 function updateGoalFromTask(goalId,amount=1){
   for(const cat of Object.values(state.goals)){const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount; break;}}
 }
-const btnRD=document.getElementById("resetDaily"); if(btnRD){btnRD.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});}
-const btnRW=document.getElementById("resetWeekly"); if(btnRW){btnRW.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});}
-const btnRM=document.getElementById("resetMonthly"); if(btnRM){btnRM.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});}
+$("#resetDaily")?.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});
+$("#resetWeekly")?.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
+$("#resetMonthly")?.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
 
 /* VALIDATE DAY */
-const btnVal=document.getElementById("validateDay");
-if(btnVal){btnVal.addEventListener("click",()=>{
+$("#validateDay")?.addEventListener("click",()=>{
   checkBonuses();
   const g=state.goals;
   if(g.sport.bars.find(b=>b.id==="workouts")?.now>=5){ addXP(30); toast("🏋️ Bonus 5 workouts +30 XP!",'success'); }
@@ -640,14 +673,14 @@ if(btnVal){btnVal.addEventListener("click",()=>{
   pushHistory();
   if(!state.byDate[currentDate]) state.byDate[currentDate]={dailyDone:{},dailyXP:0,validated:false};
   state.byDate[currentDate].validated=true;
-  saveDay(currentDate); // on persiste aussi les tâches du jour
-  const dv=document.getElementById('date_validated'); if(dv) dv.textContent='oui';
+  saveDay(currentDate);
+  $("#date_validated").textContent='oui';
   save(); toast("Journée validée ✅",'success');
-});}
+});
 
 /* REWARDS */
 function renderRewards(){
-  const wrap=document.getElementById("rewards_list"),log=document.getElementById("rewards_log"); if(!wrap) return;
+  const wrap=$("#rewards_list"),log=$("#rewards_log"); if(!wrap) return;
   wrap.innerHTML="";
   state.rewards.catalog.forEach(it=>{
     const isBlocked=it.blocked || !canUseReward(it);
@@ -739,39 +772,39 @@ function simulateMalus(){
 }
 function applyMalus(){pushHistory(); state.malus.active=[...new Set([...(state.malus.active||[]),...(state.malus.pending||[])])]; state.malus.pending=[]; save(); renderMalus(); updateStreaks(); renderRewards(); toast("Malus appliqués.","warning");}
 function renderMalus(){
-  const r1=document.getElementById("rule_daily_min"); if(r1) r1.value=state.malus.rules.dailyMin;
-  const r2=document.getElementById("rule_weekly_min"); if(r2) r2.value=state.malus.rules.weeklyMin;
-  const r3=document.getElementById("rule_business_weekly_min"); if(r3) r3.value=state.malus.rules.businessWeeklyMin;
-  const r4=document.getElementById("rule_reads_min"); if(r4) r4.value=state.malus.rules.readsMin;
-  const r5=document.getElementById("rule_workouts_min"); if(r5) r5.value=state.malus.rules.workoutsMin;
+  const r1=$("#rule_daily_min"); if(r1) r1.value=state.malus.rules.dailyMin;
+  const r2=$("#rule_weekly_min"); if(r2) r2.value=state.malus.rules.weeklyMin;
+  const r3=$("#rule_business_weekly_min"); if(r3) r3.value=state.malus.rules.businessWeeklyMin;
+  const r4=$("#rule_reads_min"); if(r4) r4.value=state.malus.rules.readsMin;
+  const r5=$("#rule_workouts_min"); if(r5) r5.value=state.malus.rules.workoutsMin;
 
   ["rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(id=>{
     const el=document.getElementById(id); if(!el) return;
-    el.onchange=()=>{pushHistory(); state.malus.rules={
-      dailyMin: +document.getElementById("rule_daily_min").value||0,
-      weeklyMin:+document.getElementById("rule_weekly_min").value||0,
-      businessWeeklyMin:+document.getElementById("rule_business_weekly_min").value||0,
-      readsMin:+document.getElementById("rule_reads_min").value||0,
-      workoutsMin:+document.getElementById("rule_workouts_min").value||0
+    el.onchange=()=>{state.malus.rules={
+      dailyMin:+$("#rule_daily_min").value||0,
+      weeklyMin:+$("#rule_weekly_min").value||0,
+      businessWeeklyMin:+$("#rule_business_weekly_min").value||0,
+      readsMin:+$("#rule_reads_min").value||0,
+      workoutsMin:+$("#rule_workouts_min").value||0
     }; save();};
   });
 
-  const box=document.getElementById("malus_status"); if(!box) return;
+  const box=$("#malus_status"); if(!box) return;
   const pending=state.malus.pending||[], active=state.malus.active||[], pen=state.malus.penalties||[];
   let html=`<div class="malus-item"><strong>Proposés (${pending.length})</strong>${pending.length?'<ul>'+pending.map(m=>`<li>${malusDescriptions(m)}</li>`).join('')+'</ul>':'<p class="muted">Aucun</p>'}</div>`;
   html+=`<div class="malus-item"><strong>Actifs (${active.length})</strong>${active.length?'<ul>'+active.map(m=>`<li>${malusDescriptions(m)}</li>`).join('')+'</ul>':'<p class="muted">Aucun malus actif</p>'}</div>`;
   html+=`<div class="malus-item"><strong>Pénalités (${pen.length})</strong>${pen.length?'<ul>'+pen.map(p=>`<li>${p}</li>`).join('')+'</ul>':'<p class="muted">Aucune pénalité</p>'}</div>`;
   box.innerHTML=html;
 }
-const bSim=document.getElementById("btnSimuler"); if(bSim){bSim.addEventListener("click",simulateMalus);}
-const bChk=document.getElementById("checkMalus"); if(bChk){bChk.addEventListener("click",simulateMalus);}
-const bApp=document.getElementById("applyMalus"); if(bApp){bApp.addEventListener("click",applyMalus);}
+$("#btnSimuler")?.addEventListener("click",simulateMalus);
+$("#checkMalus")?.addEventListener("click",simulateMalus);
+$("#applyMalus")?.addEventListener("click",applyMalus);
 
 function calculateCategoryXP(category){let xp=0; ['daily','weekly','monthly'].forEach(type=>{state.tasks[type].forEach(task=>{if(task.category===category && task.done) xp+=task.xp;});}); return xp;}
 
 /* STATS */
 function renderStats(){
-  const content=document.getElementById("stats_content"); if(!content) return;
+  const content=$("#stats_content"); if(!content) return;
   const s=state.profile.stats;
   let html=`<div class="stats-grid">
       <div class="stat-card"><h3>XP Journalier</h3><div style="font-size:2rem">${s.dailyXP}</div></div>
@@ -792,27 +825,26 @@ function renderStats(){
 /* EXPORT / IMPORT / RESET */
 function doExport(){const dataStr=JSON.stringify(state,null,2);const blob=new Blob([dataStr],{type:'application/json'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`gamelife-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast("Données exportées","success");}
-const ex1=document.getElementById("exportData"); if(ex1){ex1.addEventListener("click",doExport);}
-const ex2=document.getElementById("exportDataMobile"); if(ex2){ex2.addEventListener("click",()=>{doExport();if(mobileMenu) mobileMenu.classList.remove("show");});}
+$("#exportData")?.addEventListener("click",doExport);
+$("#exportDataMobile")?.addEventListener("click",()=>{doExport();mobileMenu?.classList.remove("show");});
 
-const imp=document.getElementById("importData");
-if(imp){imp.addEventListener("click",()=>{
+$("#importData")?.addEventListener("click",()=>{
   const input=document.createElement('input'); input.type='file'; input.accept='.json';
   input.onchange=(e)=>{const file=e.target.files[0]; if(!file) return;
     const reader=new FileReader(); reader.onload=(ev)=>{try{pushHistory(); const imported=JSON.parse(ev.target.result); state=imported; save(); init(); toast("Import OK","success");}catch(err){toast("Import invalide","error");}}; reader.readAsText(file);};
   input.click();
-});}
-const rst=document.getElementById("resetAll"); if(rst){rst.addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info");});}
+});
+$("#resetAll")?.addEventListener("click",()=>{ if(!confirm("Tout remettre à zéro ?")) return; pushHistory(); state=dflt(); save(); init(); toast("Reset OK","info");});
 
 /* MODALES (gestion) */
 let currentEditType=null,currentEditId=null;
-const mD=document.getElementById("manageDailyTasks"); if(mD){mD.addEventListener("click",()=>openTaskManager('daily'));}
-const mW=document.getElementById("manageWeeklyTasks"); if(mW){mW.addEventListener("click",()=>openTaskManager('weekly'));}
-const mM=document.getElementById("manageMonthlyTasks"); if(mM){mM.addEventListener("click",()=>openTaskManager('monthly'));}
+$("#manageDailyTasks")?.addEventListener("click",()=>openTaskManager('daily'));
+$("#manageWeeklyTasks")?.addEventListener("click",()=>openTaskManager('weekly'));
+$("#manageMonthlyTasks")?.addEventListener("click",()=>openTaskManager('monthly'));
 
-function openTaskManager(type){currentEditType=type; const ttl=document.getElementById("taskModalTitle"); if(ttl) ttl.textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`; renderTaskManager(type); const md=document.getElementById("taskModal"); if(md) md.style.display='flex';}
+function openTaskManager(type){currentEditType=type; $("#taskModalTitle").textContent=`Gérer les tâches ${type==='daily'?'quotidiennes':type==='weekly'?'hebdomadaires':'mensuelles'}`; renderTaskManager(type); $("#taskModal").style.display='flex';}
 function renderTaskManager(type){
-  const list=document.getElementById("taskManageList"); const tasks=state.tasks[type]; if(!list) return;
+  const list=$("#taskManageList"); const tasks=state.tasks[type];
   list.innerHTML=tasks.map(task=>`
     <div class="manage-item">
       <div><strong>${task.label}</strong><div class="muted">${task.xp} XP - ${task.category}</div></div>
@@ -824,34 +856,33 @@ function renderTaskManager(type){
 }
 window.editTask=function(type,id){
   const task=state.tasks[type].find(t=>t.id===id); if(!task) return;
-  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Modifier la tâche";
-  const n=document.getElementById("editName"); if(n) n.value=task.label;
-  const v=document.getElementById("editValue"); if(v) v.value=task.xp;
-  const c=document.getElementById("editCategory"); if(c) c.value=task.category;
-  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="block";
-  const tg=document.getElementById("editTagGroup"); if(tg) tg.style.display="none";
+  $("#editModalTitle").textContent="Modifier la tâche";
+  $("#editName").value=task.label;
+  $("#editValue").value=task.xp;
+  $("#editCategory").value=task.category;
+  $("#editCategoryGroup").style.display="block";
+  $("#editTagGroup").style.display="none";
   currentEditType=type; currentEditId=id;
-  const em=document.getElementById("editModal"); if(em) em.style.display='flex';
+  $("#editModal").style.display='flex';
 }
 window.deleteTask=function(type,id){
   if(!confirm("Supprimer cette tâche ?")) return;
   pushHistory(); state.tasks[type]=state.tasks[type].filter(t=>t.id!==id);
   save(); renderTaskManager(type); renderTasks(); toast("Tâche supprimée","info");
 }
-const addTaskBtn=document.getElementById("addNewTask");
-if(addTaskBtn){addTaskBtn.addEventListener("click",()=>{
-  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Ajouter une tâche";
-  const n=document.getElementById("editName"); if(n) n.value="";
-  const v=document.getElementById("editValue"); if(v) v.value=10;
-  const c=document.getElementById("editCategory"); if(c) c.value="discipline";
-  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="block";
-  const tg=document.getElementById("editTagGroup"); if(tg) tg.style.display="none";
-  currentEditId=null; const em=document.getElementById("editModal"); if(em) em.style.display='flex';
-});}
+$("#addNewTask")?.addEventListener("click",()=>{
+  $("#editModalTitle").textContent="Ajouter une tâche";
+  $("#editName").value="";
+  $("#editValue").value=10;
+  $("#editCategory").value="discipline";
+  $("#editCategoryGroup").style.display="block";
+  $("#editTagGroup").style.display="none";
+  currentEditId=null; $("#editModal").style.display='flex';
+});
 
-const mR=document.getElementById("manageRewards"); if(mR){mR.addEventListener("click",()=>{ renderRewardManager(); const rm=document.getElementById("rewardModal"); if(rm) rm.style.display='flex'; });}
+$("#manageRewards")?.addEventListener("click",()=>{ renderRewardManager(); $("#rewardModal").style.display='flex'; });
 function renderRewardManager(){
-  const list=document.getElementById("rewardManageList"); const rewards=state.rewards.catalog; if(!list) return;
+  const list=$("#rewardManageList"); const rewards=state.rewards.catalog;
   list.innerHTML=rewards.map(reward=>`
     <div class="manage-item">
       <div><strong>${reward.name}</strong><div class="muted">${reward.cost} XP - ${reward.tag} — stock: ${reward.qty||0}</div></div>
@@ -863,84 +894,69 @@ function renderRewardManager(){
 }
 window.editReward=function(id){
   const r=state.rewards.catalog.find(x=>x.id===id); if(!r) return;
-  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Modifier la récompense";
-  const n=document.getElementById("editName"); if(n) n.value=r.name;
-  const v=document.getElementById("editValue"); if(v) v.value=r.cost;
-  const tg=document.getElementById("editTag"); if(tg) tg.value=r.tag;
-  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="none";
-  const tgg=document.getElementById("editTagGroup"); if(tgg) tgg.style.display="block";
-  currentEditType='reward'; currentEditId=id; const em=document.getElementById("editModal"); if(em) em.style.display='flex';
+  $("#editModalTitle").textContent="Modifier la récompense";
+  $("#editName").value=r.name;
+  $("#editValue").value=r.cost;
+  $("#editTag").value=r.tag;
+  $("#editCategoryGroup").style.display="none";
+  $("#editTagGroup").style.display="block";
+  currentEditType='reward'; currentEditId=id; $("#editModal").style.display='flex';
 }
 window.deleteReward=function(id){
   if(!confirm("Supprimer cette récompense ?")) return;
   pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id);
   save(); renderRewardManager(); renderRewards(); toast("Récompense supprimée","info");
 }
-const addRw=document.getElementById("addNewReward");
-if(addRw){addRw.addEventListener("click",()=>{
-  const t=document.getElementById("editModalTitle"); if(t) t.textContent="Ajouter une récompense";
-  const n=document.getElementById("editName"); if(n) n.value="";
-  const v=document.getElementById("editValue"); if(v) v.value=100;
-  const tg=document.getElementById("editTag"); if(tg) tg.value="Détente";
-  const cg=document.getElementById("editCategoryGroup"); if(cg) cg.style.display="none";
-  const tgg=document.getElementById("editTagGroup"); if(tgg) tgg.style.display="block";
-  currentEditType='reward'; currentEditId=null; const em=document.getElementById("editModal"); if(em) em.style.display='flex';
-});}
+$("#addNewReward")?.addEventListener("click",()=>{
+  $("#editModalTitle").textContent="Ajouter une récompense";
+  $("#editName").value="";
+  $("#editValue").value=100;
+  $("#editTag").value="Détente";
+  $("#editCategoryGroup").style.display="none";
+  $("#editTagGroup").style.display="block";
+  currentEditType='reward'; currentEditId=null; $("#editModal").style.display='flex';
+});
 
 /* FORM MODAL */
-const editForm=document.getElementById("editForm");
-if(editForm){editForm.addEventListener("submit",(e)=>{
+$("#editForm")?.addEventListener("submit",(e)=>{
   e.preventDefault();
-  const nameEl=document.getElementById("editName");
-  const valueEl=document.getElementById("editValue");
-  const name=nameEl?nameEl.value.trim():"";
-  const value=valueEl?parseInt(valueEl.value):NaN;
+  const name=$("#editName").value.trim();
+  const value=parseInt($("#editValue").value);
   if(!name || isNaN(value)) return;
   pushHistory();
 
   if(currentEditType==='reward'){
-    const tagEl=document.getElementById("editTag"); const tag=tagEl?tagEl.value.trim():"";
+    const tag=$("#editTag").value.trim();
     if(currentEditId){const r=state.rewards.catalog.find(x=>x.id===currentEditId); if(r){r.name=name;r.cost=value;r.tag=tag;}}
     else{const id='reward_'+Date.now(); state.rewards.catalog.push({id,name,cost:value,tag,qty:0,blocked:false});}
     renderRewardManager(); renderRewards();
   }else{
-    const catEl=document.getElementById("editCategory"); const category=catEl?catEl.value:"discipline";
+    const category=$("#editCategory").value;
     if(currentEditId){const t=state.tasks[currentEditType].find(x=>x.id===currentEditId); if(t){t.label=name;t.xp=value;t.category=category;}}
     else{const id='task_'+Date.now(); state.tasks[currentEditType].push({id,label:name,xp:value,category,done:false});}
     renderTaskManager(currentEditType); renderTasks();
   }
 
-  save(); const em=document.getElementById("editModal"); if(em) em.style.display='none'; toast("Modifications sauvegardées","success");
-});}
+  save(); $("#editModal").style.display='none'; toast("Modifications sauvegardées","success");
+});
 ["closeTaskModal","closeRewardModal","cancelEdit"].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el){el.addEventListener("click",()=>{const a=document.getElementById('taskModal'); if(a) a.style.display='none';
-                                          const b=document.getElementById('rewardModal'); if(b) b.style.display='none';
-                                          const c=document.getElementById('editModal'); if(c) c.style.display='none';});}
+  document.getElementById(id)?.addEventListener("click",()=>{
+    $("#taskModal").style.display='none';
+    $("#rewardModal").style.display='none';
+    $("#editModal").style.display='none';
+  });
 });
 ["taskModal","rewardModal","editModal"].forEach(mid=>{
-  const el=document.getElementById(mid);
-  if(el){el.addEventListener("click",(e)=>{if(e.target.id===mid) el.style.display='none';});}
+  document.getElementById(mid)?.addEventListener("click",(e)=>{if(e.target.id===mid) document.getElementById(mid).style.display='none';});
 });
 
 /* MONEY + PSEUDO */
 function refreshMoneyUI(){
   const wT=state.money.week.target||0, wD=state.money.week.done||0;
   const mT=state.money.month.target||0, mD=state.money.month.done||0;
-  const wt=document.getElementById("week_target"); if(wt) wt.value=wT;
-  const wd=document.getElementById("week_done"); if(wd) wd.value=wD;
-  const wl=document.getElementById("week_left"); if(wl) wl.textContent=Math.max(0,wT-wD);
-  const mt=document.getElementById("month_target"); if(mt) mt.value=mT;
-  const md=document.getElementById("month_done"); if(md) md.value=mD;
-  const ml=document.getElementById("month_left"); if(ml) ml.textContent=Math.max(0,mT-mD);
+  $("#week_target").value=wT; $("#week_done").value=wD; $("#week_left").textContent=Math.max(0,wT-wD);
+  $("#month_target").value=mT; $("#month_done").value=mD; $("#month_left").textContent=Math.max(0,mT-mD);
 }
-const swt=document.getElementById("save_week_target"); if(swt){swt.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("week_target").value)||0; state.money.week.target=v; save(); refreshMoneyUI(); toast("Cible semaine enregistrée","success");});}
-const smt=document.getElementById("save_month_target"); if(smt){smt.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("month_target").value)||0; state.money.month.target=v; save(); refreshMoneyUI(); toast("Cible mois enregistrée","success");});}
-const swd=document.getElementById("save_week_done"); if(swd){swd.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("week_done").value)||0; state.money.week.done=v; save(); refreshMoneyUI(); toast("Montant semaine enregistré","success");});}
-const smd=document.getElementById("save_month_done"); if(smd){smd.addEventListener("click",()=>{pushHistory(); const v=parseInt(document.getElementById("month_done").value)||0; state.money.month.done=v; save(); refreshMoneyUI(); toast("Montant mois enregistré","success");});}
-
-function refreshPlayerLabel(){const label=(state.profile.name||"").trim()||"Joueur"; const pl=document.getElementById("player_label"); if(pl) pl.textContent=label;}
-const saveName=document.getElementById("save_name"); if(saveName){saveName.addEventListener("click",()=>{pushHistory(); const nm=document.getElementById("player_name"); state.profile.name=(nm?nm.value.trim():""); save(); refreshPlayerLabel(); toast("Pseudo enregistré","success");});}
 
 /* DATE PICKER */
 const dEl=document.getElementById('selected_date');
@@ -953,7 +969,7 @@ function init(){
   if(!state.malus||!state.malus.rules) state.malus={rules:{dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3},pending:[],active:[],penalties:[]};
   save();
 
-  const pn=document.getElementById("player_name"); if(pn) pn.value=state.profile.name||"";
+  $("#player_name").value=state.profile.name||"";
   refreshPlayerLabel();
 
   if(dEl){ dEl.value=currentDate; loadDay(currentDate); }
