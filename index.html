@@ -111,7 +111,7 @@
       </div>
       <div class="row">
         <button id="undoBtn" class="mini ghost" title="Annuler la dernière action">↩️ Annuler</button>
-        <button id="saveAll" class="mini ok" title="Enregistrer">💾 Enregistrer</button>
+        <button id="saveAll" class="mini ok" title="Enregistrer" disabled>💾 Enregistrer</button>
         <button id="toggleEdit" class="mini">✏️ Modifier</button>
         <button id="menuToggle" class="menu-toggle">☰</button>
       </div>
@@ -338,6 +338,7 @@
             <option value="sport">Sport</option>
             <option value="social">Social</option>
             <option value="dev">Développement</option>
+            <option value="spiritualité">Spiritualité</option>
             <option value="spirituality">Spiritualité</option>
           </select>
         </div>
@@ -353,7 +354,9 @@
 <script>
 /* ================= STATE + UTIL ================== */
 const KEY="gamelife_v2";
-const deep=x=>JSON.parse(JSON.stringify(x));
+let isDirty=false;
+function markDirty(){isDirty=true; const btn=$("#saveAll"); if(btn){btn.disabled=false; btn.classList.add('ok');}}
+function clearDirty(){isDirty=false; const btn=$("#saveAll"); if(btn){btn.disabled=true;}}
 function todayISO(d=new Date()){return d.toISOString().slice(0,10);}
 function dflt(){
   return {
@@ -442,34 +445,26 @@ function undo(){if(!state._history||state._history.length===0){toast("Rien à an
   const last=state._history.pop();try{const prev=JSON.parse(last);prev._history=state._history;state=prev;save();init();toast("Annulé.","info");}catch(e){toast("Impossible d'annuler","error");}}
 const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);
 function toast(text,type='info'){const el=$("#toast");if(!el)return;el.textContent=text;el.className=type;el.classList.add('show');setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.className='',280);},2400);}
-function showXPGain(a,el){const d=document.createElement('div');d.className=a>0?'xp-gain':'xp-loss';d.textContent=a>0?`+${a} XP`:`${a} XP`;const r=(el&&el.getBoundingClientRect?el.getBoundingClientRect():{left:innerWidth/2,top:40,width:0});d.style.left=(r.left+r.width/2)+'px';d.style.top=r.top+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),2000);}
-function showLevelUp(l){const d=document.createElement('div');d.className='level-up';d.textContent=`🎉 NIVEAU ${l} ! 🎉`;document.body.appendChild(d);setTimeout(()=>d.remove(),3000);}
 
 /* DATE STORAGE */
 let currentDate=todayISO();
-function loadDay(date){const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};state.tasks.daily.forEach(t=>{t.done=!!day.dailyDone[t.id];});save();renderTasks();const dv=document.getElementById('date_validated');if(dv) dv.textContent=day.validated?'oui':'non';}
+function loadDay(date){const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};state.tasks.daily.forEach(t=>{t.done=!!day.dailyDone[t.id];});save();renderTasks();const dv=$("#date_validated");if(dv) dv.textContent=day.validated?'oui':'non';}
 function saveDay(date){const day=state.byDate[date]||{dailyDone:{},dailyXP:0,validated:false};state.tasks.daily.forEach(t=>{day.dailyDone[t.id]=!!t.done;});day.dailyXP=state.tasks.daily.filter(t=>t.done).reduce((s,t)=>s+t.xp,0);state.byDate[date]=day;save();}
 
 /* MENU / NAV */
 const mobileMenu=$("#mobileMenu"), menuToggle=$("#menuToggle");
-if(menuToggle){menuToggle.addEventListener("click",()=>{if(mobileMenu) mobileMenu.classList.toggle("show");});}
-document.addEventListener("click",e=>{
-  if(!mobileMenu||!menuToggle) return;
-  if(!mobileMenu.contains(e.target) && !menuToggle.contains(e.target)){mobileMenu.classList.remove("show");}
-});
+menuToggle?.addEventListener("click",()=>mobileMenu?.classList.toggle("show"));
+document.addEventListener("click",e=>{if(!mobileMenu||!menuToggle)return; if(!mobileMenu.contains(e.target)&&!menuToggle.contains(e.target)) mobileMenu.classList.remove("show");});
 function onTabClick(btn){
   const goto=btn.getAttribute("data-goto"); if(!goto) return;
   $$(".tab").forEach(t=>t.classList.remove("active"));
   document.querySelectorAll(`.tab[data-goto="${goto}"]`).forEach(t=>t.classList.add("active"));
   $$(".view").forEach(v=>v.classList.remove("active"));
-  const view=$("#view-"+goto); if(view) view.classList.add("active");
+  $("#view-"+goto)?.classList.add("active");
   const backBtn=$("#backButton"); if(backBtn) backBtn.style.display=(goto==="goals")?"none":"block";
-  if(mobileMenu) mobileMenu.classList.remove("show");
+  mobileMenu?.classList.remove("show");
 }
-document.addEventListener("click",(e)=>{
-  const tab=e.target.closest(".tab");
-  if(tab && tab.hasAttribute("data-goto")) onTabClick(tab);
-});
+document.addEventListener("click",(e)=>{const tab=e.target.closest(".tab"); if(tab && tab.hasAttribute("data-goto")) onTabClick(tab);});
 
 /* EDIT MODE + SAVE ALL */
 function setEditMode(on){
@@ -479,27 +474,22 @@ function setEditMode(on){
    "rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(toggle);
   document.querySelectorAll(".reward-edit").forEach(inp=>{if(state.edit) inp.removeAttribute("disabled"); else inp.setAttribute("disabled","");});
   const btn=$("#toggleEdit"); if(btn) btn.textContent = state.edit ? "✅ Terminer" : "✏️ Modifier";
-  renderKPIs(); renderRewards(); // refléter disabled sur UI recréée
+  renderKPIs(); renderRewards();
 }
-const tgl=$("#toggleEdit"); if(tgl){tgl.addEventListener("click",()=> setEditMode(!state.edit));}
-const undoBtn=$("#undoBtn"); if(undoBtn){undoBtn.addEventListener("click",undo);}
+$("#toggleEdit")?.addEventListener("click",()=> setEditMode(!state.edit));
+$("#undoBtn")?.addEventListener("click",undo);
 
-const saveAll=$("#saveAll");
-if(saveAll){
-  saveAll.addEventListener("click",()=>{
-    // Récupère toutes les valeurs visibles (objectifs, règles, argent, pseudo)
-    collectGoalInputsIntoState();
-    collectRulesIntoState();
-    collectMoneyIntoState();
-    // Pseudo
-    const nm=$("#player_name"); state.profile.name = nm ? (nm.value||"").trim() : state.profile.name;
-    refreshPlayerLabel();
-    save();
-    toast("Tout enregistré ✔️","success");
-    // Optionnel: sortir du mode édition
-    if(state.edit){ setEditMode(false); }
-  });
-}
+$("#saveAll")?.addEventListener("click",()=>{
+  collectGoalInputsIntoState();
+  collectRulesIntoState();
+  collectMoneyIntoState();
+  const nm=$("#player_name"); state.profile.name = nm ? (nm.value||"").trim() : state.profile.name;
+  refreshPlayerLabel();
+  save();
+  clearDirty();
+  toast("Tout enregistré ✔️","success");
+  if(state.edit){ setEditMode(false); }
+});
 function collectGoalInputsIntoState(){
   for(const cat of Object.values(state.goals)){
     cat.bars.forEach(b=>{
@@ -509,7 +499,7 @@ function collectGoalInputsIntoState(){
       if(goalEl) b.goal = +goalEl.value || 0;
     });
   }
-  renderLeastMost(); // MAJ listes reste le +/-
+  renderLeastMost();
   renderSectorGauges();
 }
 function collectRulesIntoState(){
@@ -541,20 +531,16 @@ function updateXP(){const need=xpNeed(state.profile.level);const xp=Math.max(0,s
 }
 function addXP(x,src=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
   state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
-  if(src) showXPGain(x,src);
+  if(src) { // petit effet sans bloquer
+    try{showXPGain(x,src);}catch(_){}
+  }
   while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level);state.profile.level++;showLevelUp(state.profile.level);toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');}
   save(); updateXP(); updateStreaks();}
 
 /* STREAKS + LABEL */
 function updateStreaks(){ $("#streak_pr").textContent=state.profile.streaks.prayer||0; $("#active_malus").textContent=state.malus.active.length||0;}
 function refreshPlayerLabel(){ const label=(state.profile.name||"").trim()||"Joueur"; $("#player_label").textContent=label; }
-const nameInput=$("#player_name");
-if(nameInput){
-  nameInput.addEventListener("input",()=>{ // live update + auto-save léger
-    state.profile.name = (nameInput.value||"").trim();
-    refreshPlayerLabel();
-  });
-}
+$("#player_name")?.addEventListener("input",()=>{ state.profile.name = ($("#player_name").value||"").trim(); refreshPlayerLabel(); markDirty(); });
 
 /* GOALS */
 function pct(n,g){n=Math.max(0,+n||0);g=Math.max(0,+g||0);return g?Math.min(100,Math.round(n/g*100)):0;}
@@ -578,10 +564,10 @@ function renderKPIs(){
   }
   for(const cat of Object.values(state.goals)){
     cat.bars.forEach(b=>{
-      const now=document.getElementById(b.id+"_now"), goal=document.getElementById(b.id+"_goal"), bar=document.getElementById(b.id+"_bar");
-      const recalc=()=>{b.now=+now.value||0; b.goal=+goal.value||0; bar.style.width=pct(b.now,b.goal)+'%'; save(); checkBonuses(); renderLeastMost();};
-      if(now) now.addEventListener("input",recalc);
-      if(goal) goal.addEventListener("input",recalc);
+      const now=$("#"+b.id+"_now"), goal=$("#"+b.id+"_goal"), bar=$("#"+b.id+"_bar");
+      const recalc=()=>{b.now=+now.value||0; b.goal=+goal.value||0; bar.style.width=pct(b.now,b.goal)+'%'; save(); checkBonuses(); renderLeastMost(); markDirty();};
+      now?.addEventListener("input",recalc);
+      goal?.addEventListener("input",recalc);
     });
   }
   renderLeastMost();
@@ -614,6 +600,20 @@ function renderSectorGauges(){const W=getWeeklySectorXP();
     const p=goal?Math.min(100,Math.round(now/goal*100)):0; if(fill) fill.style.width=p+'%'; if(txt) txt.textContent=`${now}/${goal}`;};
   set('g_biz','g_biz_txt',W.biz,100); set('g_ugc','g_ugc_txt',W.ugc,100); set('g_sport','g_sport_txt',W.sport,60); set('g_dev','g_dev_txt',W.dev,50); set('g_spi','g_spi_txt',W.spi,80);}
 
+/* ==== BATCH REFRESH (anti-perte lors de clics rapides) ==== */
+let refreshScheduled=false;
+function scheduleUIRefresh(){
+  if(refreshScheduled) return;
+  refreshScheduled=true;
+  queueMicrotask(()=>{ // regroupe tous les clics de la même "rafale"
+    refreshScheduled=false;
+    renderKPIs();      // se base sur l'état déjà mis à jour par les clics
+    renderSectorGauges();
+    renderStats();
+    save();           // on persiste après la rafale
+  });
+}
+
 /* TASKS */
 function renderTasks(){
   const mount=(id,list)=>{const el=document.getElementById(id); if(!el) return; el.innerHTML="";
@@ -629,7 +629,9 @@ document.addEventListener("change",(e)=>{
   const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
   const list= scope==="daily_tasks"? state.tasks.daily : scope==="weekly_tasks"? state.tasks.weekly : state.tasks.monthly;
   const t=list.find(x=>x.id===id); if(!t) return;
-  pushHistory(); const was=t.done; t.done=el.checked;
+
+  pushHistory();
+  const was=t.done; t.done=el.checked;
 
   if(t.id==="prayers_5" && t.done && !was){state.profile.streaks.prayer++; updateGoalFromTask("daily_prayers");}
   else if(t.id==="prayers_5" && !t.done && was){state.profile.streaks.prayer=Math.max(0,state.profile.streaks.prayer-1);}
@@ -646,14 +648,18 @@ document.addEventListener("change",(e)=>{
 
   addXP(t.done ? t.xp : -t.xp, el.closest('.quest'));
   if(t.done) toast(`Tâche terminée : ${t.label} (+${t.xp} XP)`,'success');
-  saveDay(currentDate); save(); renderKPIs(); renderSectorGauges();
+
+  saveDay(currentDate);
+  save();
+  markDirty();          // le bouton Enregistrer s'active immédiatement
+  scheduleUIRefresh();  // on regroupe les renders pour ne rien perdre
 });
 function updateGoalFromTask(goalId,amount=1){
   for(const cat of Object.values(state.goals)){const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount; break;}}
 }
-$("#resetDaily")?.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate);});
-$("#resetWeekly")?.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks();});
-$("#resetMonthly")?.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks();});
+$("#resetDaily")?.addEventListener("click",()=>{pushHistory(); state.tasks.daily.forEach(t=>t.done=false); save(); renderTasks(); saveDay(currentDate); markDirty(); scheduleUIRefresh();});
+$("#resetWeekly")?.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks(); markDirty(); scheduleUIRefresh();});
+$("#resetMonthly")?.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks(); markDirty(); scheduleUIRefresh();});
 
 /* VALIDATE DAY */
 $("#validateDay")?.addEventListener("click",()=>{
@@ -675,7 +681,10 @@ $("#validateDay")?.addEventListener("click",()=>{
   state.byDate[currentDate].validated=true;
   saveDay(currentDate);
   $("#date_validated").textContent='oui';
-  save(); toast("Journée validée ✅",'success');
+  save();
+  markDirty();
+  scheduleUIRefresh();
+  toast("Journée validée ✅",'success');
 });
 
 /* REWARDS */
@@ -714,7 +723,7 @@ function renderRewards(){
       const r=state.rewards.catalog.find(x=>x.id===id); if(!r) return;
       pushHistory();
       if(field==="cost") r[field]=parseInt(inp.value)||0; else r[field]=inp.value;
-      save(); renderRewards();
+      save(); renderRewards(); markDirty();
     });
   });
 
@@ -726,13 +735,13 @@ function renderRewards(){
       if(!canUseReward(it)) return toast("Récompense bloquée par les malus.","error");
       pushHistory(); state.profile.xp-=it.cost; it.qty=(it.qty||0)+1;
       state.rewards.log.unshift(`🛒 Achat ${it.name} (${it.cost} XP) — ${new Date().toLocaleString()}`);
-      save(); updateXP(); renderRewards(); toast("Acheté ✔️",'success');
+      save(); updateXP(); renderRewards(); markDirty(); toast("Acheté ✔️",'success');
     }
     if(use){
       const id=use.dataset.use; const it=state.rewards.catalog.find(x=>x.id===id); if(!it) return;
       if((it.qty||0)<=0) return;
       pushHistory(); it.qty--; state.rewards.log.unshift(`🎁 Utilisé ${it.name} — ${new Date().toLocaleString()}`);
-      save(); renderRewards(); toast("Utilisé ✔️",'success');
+      save(); renderRewards(); markDirty(); toast("Utilisé ✔️",'success');
     }
   });
 
@@ -770,7 +779,7 @@ function simulateMalus(){
 
   state.malus.pending=[...new Set(pending)]; state.malus.penalties=penalties; save(); renderMalus();
 }
-function applyMalus(){pushHistory(); state.malus.active=[...new Set([...(state.malus.active||[]),...(state.malus.pending||[])])]; state.malus.pending=[]; save(); renderMalus(); updateStreaks(); renderRewards(); toast("Malus appliqués.","warning");}
+function applyMalus(){pushHistory(); state.malus.active=[...new Set([...(state.malus.active||[]),...(state.malus.pending||[])])]; state.malus.pending=[]; save(); renderMalus(); updateStreaks(); renderRewards(); toast("Malus appliqués.","warning"); markDirty();}
 function renderMalus(){
   const r1=$("#rule_daily_min"); if(r1) r1.value=state.malus.rules.dailyMin;
   const r2=$("#rule_weekly_min"); if(r2) r2.value=state.malus.rules.weeklyMin;
@@ -779,14 +788,8 @@ function renderMalus(){
   const r5=$("#rule_workouts_min"); if(r5) r5.value=state.malus.rules.workoutsMin;
 
   ["rule_daily_min","rule_weekly_min","rule_business_weekly_min","rule_reads_min","rule_workouts_min"].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
-    el.onchange=()=>{state.malus.rules={
-      dailyMin:+$("#rule_daily_min").value||0,
-      weeklyMin:+$("#rule_weekly_min").value||0,
-      businessWeeklyMin:+$("#rule_business_weekly_min").value||0,
-      readsMin:+$("#rule_reads_min").value||0,
-      workoutsMin:+$("#rule_workouts_min").value||0
-    }; save();};
+    document.getElementById(id)?.addEventListener("input",()=>{markDirty();});
+    document.getElementById(id)?.addEventListener("change",()=>{collectRulesIntoState(); save();});
   });
 
   const box=$("#malus_status"); if(!box) return;
@@ -868,7 +871,7 @@ window.editTask=function(type,id){
 window.deleteTask=function(type,id){
   if(!confirm("Supprimer cette tâche ?")) return;
   pushHistory(); state.tasks[type]=state.tasks[type].filter(t=>t.id!==id);
-  save(); renderTaskManager(type); renderTasks(); toast("Tâche supprimée","info");
+  save(); renderTaskManager(type); renderTasks(); markDirty(); scheduleUIRefresh(); toast("Tâche supprimée","info");
 }
 $("#addNewTask")?.addEventListener("click",()=>{
   $("#editModalTitle").textContent="Ajouter une tâche";
@@ -905,7 +908,7 @@ window.editReward=function(id){
 window.deleteReward=function(id){
   if(!confirm("Supprimer cette récompense ?")) return;
   pushHistory(); state.rewards.catalog=state.rewards.catalog.filter(r=>r.id!==id);
-  save(); renderRewardManager(); renderRewards(); toast("Récompense supprimée","info");
+  save(); renderRewardManager(); renderRewards(); markDirty(); toast("Récompense supprimée","info");
 }
 $("#addNewReward")?.addEventListener("click",()=>{
   $("#editModalTitle").textContent="Ajouter une récompense";
@@ -937,7 +940,8 @@ $("#editForm")?.addEventListener("submit",(e)=>{
     renderTaskManager(currentEditType); renderTasks();
   }
 
-  save(); $("#editModal").style.display='none'; toast("Modifications sauvegardées","success");
+  save(); markDirty(); scheduleUIRefresh();
+  $("#editModal").style.display='none'; toast("Modifications sauvegardées","success");
 });
 ["closeTaskModal","closeRewardModal","cancelEdit"].forEach(id=>{
   document.getElementById(id)?.addEventListener("click",()=>{
@@ -957,6 +961,10 @@ function refreshMoneyUI(){
   $("#week_target").value=wT; $("#week_done").value=wD; $("#week_left").textContent=Math.max(0,wT-wD);
   $("#month_target").value=mT; $("#month_done").value=mD; $("#month_left").textContent=Math.max(0,mT-mD);
 }
+["week_target","week_done","month_target","month_done"].forEach(id=>{
+  document.getElementById(id)?.addEventListener("input",()=>{markDirty();});
+  document.getElementById(id)?.addEventListener("change",()=>{collectMoneyIntoState(); save();});
+});
 
 /* DATE PICKER */
 const dEl=document.getElementById('selected_date');
@@ -964,6 +972,9 @@ if(dEl){ dEl.value=currentDate; dEl.onchange=(e)=>{ currentDate=e.target.value||
 
 /* INIT */
 function init(){
+  $("#saveAll")?.setAttribute("disabled",""); // au départ désactivé
+  isDirty=false;
+
   if(!state.profile) state.profile={name:"",level:1,xp:0,streaks:{prayer:0},stats:{dailyXP:0,weeklyXP:0,monthlyXP:0}};
   if(!state.money) state.money={week:{target:0,done:0},month:{target:0,done:0}};
   if(!state.malus||!state.malus.rules) state.malus={rules:{dailyMin:100,weeklyMin:250,businessWeeklyMin:100,readsMin:3,workoutsMin:3},pending:[],active:[],penalties:[]};
@@ -986,7 +997,6 @@ function updateNavbar(){const y=window.scrollY, nav=document.querySelector(".top
   if(y>lastScrollY && y>100) nav.classList.add("hidden"); else nav.classList.remove("hidden");
   lastScrollY=y; ticking=false;}
 window.addEventListener("scroll",()=>{ if(!ticking){requestAnimationFrame(updateNavbar); ticking=true;} });
-
 </script>
 </body>
 </html>
