@@ -58,7 +58,7 @@
     .chip{background:#0e1622;border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;color:var(--muted);font-size:.9rem}
 
     button{padding:.55rem .85rem;border-radius:10px;border:1px solid var(--line);
-      background:#0d1520;color:var(--text);cursor:pointer}
+      background:#0d1520;color:#fff;cursor:pointer}
 
     .kpis{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
     .kpi{grid-column:span 12;background:#0f1726;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}
@@ -67,7 +67,7 @@
     .half{grid-column:span 12}@media(min-width:860px){.half{grid-column:span 6}}
     .third{grid-column:span 12}@media(min-width:860px){.third{grid-column:span 4}}
 
-    input[type="number"],input[type="text"],input[type="date"]{
+    input[type="number"],input[type="text"],input[type="date"],select{
       padding:.45rem;border-radius:10px;border:1px solid var(--line);background:#0c121a;color:var(--text);text-align:left
     }
     input[type="number"]{text-align:center;width:110px}
@@ -99,6 +99,10 @@
     .list{margin:.3rem 0 .2rem;padding-left:18px}
     .col2{display:grid;grid-template-columns:1fr;gap:10px}
     @media(min-width:820px){.col2{grid-template-columns:1fr 1fr}}
+
+    /* Modales (fallback inline styles) */
+    .modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.8);z-index:100}
+    .modal-content{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(500px,90vw);max-height:80vh;overflow:auto}
   </style>
 </head>
 <body>
@@ -231,24 +235,43 @@
     <section id="view-tasks" class="view">
       <section class="card">
         <h2>Tâches quotidiennes</h2>
+
+        <!-- Ajout rapide visible, simple et sans modale -->
+        <div id="quickAddDaily" class="row" style="gap:6px;margin:8px 0">
+          <input id="qa_name" type="text" placeholder="Nom de la tâche (ex: Appels)" style="min-width:180px">
+          <input id="qa_xp" type="number" placeholder="XP" value="10" style="width:90px">
+          <select id="qa_cat">
+            <option value="discipline">Discipline</option>
+            <option value="business">Business</option>
+            <option value="ugc">UGC</option>
+            <option value="sport">Sport</option>
+            <option value="social">Social</option>
+            <option value="dev">Développement</option>
+            <option value="spirituality">Spiritualité</option>
+          </select>
+          <button id="qa_add" class="ok">+ Ajouter</button>
+        </div>
+
         <div class="category-actions">
-          <button id="manageDailyTasks" class="ghost">✏️ Gérer les tâches</button>
+          <button id="manageDailyTasks" class="ghost">⚙️ Gérer (modale)</button>
           <button id="resetDaily" class="ghost">Réinitialiser la journée</button>
         </div>
         <div id="daily_tasks"></div>
       </section>
+
       <section class="card">
         <h2>Tâches hebdomadaires</h2>
         <div class="category-actions">
-          <button id="manageWeeklyTasks" class="ghost">✏️ Gérer les tâches</button>
+          <button id="manageWeeklyTasks" class="ghost">⚙️ Gérer (modale)</button>
           <button id="resetWeekly" class="ghost">Réinitialiser la semaine</button>
         </div>
         <div id="weekly_tasks"></div>
       </section>
+
       <section class="card">
         <h2>Tâches mensuelles</h2>
         <div class="category-actions">
-          <button id="manageMonthlyTasks" class="ghost">✏️ Gérer les tâches</button>
+          <button id="manageMonthlyTasks" class="ghost">⚙️ Gérer (modale)</button>
           <button id="resetMonthly" class="ghost">Réinitialiser le mois</button>
         </div>
         <div id="monthly_tasks"></div>
@@ -307,7 +330,7 @@
   <div id="toast"></div>
 
   <!-- MODALES -->
-  <div id="taskModal" class="modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.8);z-index:100">
+  <div id="taskModal" class="modal">
     <div class="modal-content">
       <h2 id="taskModalTitle">Gérer les tâches</h2>
       <div id="taskManageList"></div>
@@ -315,7 +338,7 @@
       <div class="category-actions"><button id="closeTaskModal">Fermer</button></div>
     </div>
   </div>
-  <div id="rewardModal" class="modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.8);z-index:100">
+  <div id="rewardModal" class="modal">
     <div class="modal-content">
       <h2>Gérer les récompenses</h2>
       <div id="rewardManageList"></div>
@@ -323,7 +346,7 @@
       <div class="category-actions"><button id="closeRewardModal">Fermer</button></div>
     </div>
   </div>
-  <div id="editModal" class="modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.8);z-index:100">
+  <div id="editModal" class="modal">
     <div class="modal-content">
       <h2 id="editModalTitle">Modifier</h2>
       <form id="editForm">
@@ -338,7 +361,6 @@
             <option value="sport">Sport</option>
             <option value="social">Social</option>
             <option value="dev">Développement</option>
-            <option value="spiritualité">Spiritualité</option>
             <option value="spirituality">Spiritualité</option>
           </select>
         </div>
@@ -531,9 +553,7 @@ function updateXP(){const need=xpNeed(state.profile.level);const xp=Math.max(0,s
 }
 function addXP(x,src=null){pushHistory();state.profile.xp=Math.max(0,(state.profile.xp||0)+x);
   state.profile.stats.dailyXP+=x; state.profile.stats.weeklyXP+=x; state.profile.stats.monthlyXP+=x;
-  if(src) { // petit effet sans bloquer
-    try{showXPGain(x,src);}catch(_){}
-  }
+  if(src) { try{showXPGain(x,src);}catch(_){} }
   while(state.profile.xp>=xpNeed(state.profile.level)){state.profile.xp-=xpNeed(state.profile.level);state.profile.level++;showLevelUp(state.profile.level);toast(`Félicitations ! Niveau ${state.profile.level} atteint !`,'success');}
   save(); updateXP(); updateStreaks();}
 
@@ -600,17 +620,17 @@ function renderSectorGauges(){const W=getWeeklySectorXP();
     const p=goal?Math.min(100,Math.round(now/goal*100)):0; if(fill) fill.style.width=p+'%'; if(txt) txt.textContent=`${now}/${goal}`;};
   set('g_biz','g_biz_txt',W.biz,100); set('g_ugc','g_ugc_txt',W.ugc,100); set('g_sport','g_sport_txt',W.sport,60); set('g_dev','g_dev_txt',W.dev,50); set('g_spi','g_spi_txt',W.spi,80);}
 
-/* ==== BATCH REFRESH (anti-perte lors de clics rapides) ==== */
+/* ==== BATCH REFRESH (anti-perte + anti-lag) ==== */
 let refreshScheduled=false;
 function scheduleUIRefresh(){
   if(refreshScheduled) return;
   refreshScheduled=true;
-  queueMicrotask(()=>{ // regroupe tous les clics de la même "rafale"
+  requestAnimationFrame(()=>{  // rAF = fluide même avec beaucoup de clics
     refreshScheduled=false;
-    renderKPIs();      // se base sur l'état déjà mis à jour par les clics
+    renderKPIs();
     renderSectorGauges();
     renderStats();
-    save();           // on persiste après la rafale
+    save();
   });
 }
 
@@ -624,6 +644,20 @@ function renderTasks(){
   mount("weekly_tasks",state.tasks.weekly);
   mount("monthly_tasks",state.tasks.monthly);
 }
+
+/* Ajout rapide (quotidien) */
+$("#qa_add")?.addEventListener("click",()=>{
+  const name=($("#qa_name")?.value||"").trim();
+  const xp=parseInt($("#qa_xp")?.value||"0",10);
+  const cat=$("#qa_cat")?.value||"discipline";
+  if(!name || !xp){ toast("Nom et XP requis.","warning"); return; }
+  pushHistory();
+  const id="task_"+Date.now();
+  state.tasks.daily.push({id,label:name,xp,category:cat,done:false});
+  save(); renderTasks(); markDirty(); toast("Tâche ajoutée ✔️","success");
+  $("#qa_name").value=""; $("#qa_xp").value="10"; $("#qa_cat").value="discipline";
+});
+
 document.addEventListener("change",(e)=>{
   const el=e.target; if(!el.matches('input[type="checkbox"][data-scope]')) return;
   const scope=el.getAttribute("data-scope"), id=el.getAttribute("data-id");
@@ -651,9 +685,10 @@ document.addEventListener("change",(e)=>{
 
   saveDay(currentDate);
   save();
-  markDirty();          // le bouton Enregistrer s'active immédiatement
-  scheduleUIRefresh();  // on regroupe les renders pour ne rien perdre
+  markDirty();
+  scheduleUIRefresh();
 });
+
 function updateGoalFromTask(goalId,amount=1){
   for(const cat of Object.values(state.goals)){const bar=cat.bars.find(b=>b.id===goalId); if(bar){bar.now+=amount; break;}}
 }
@@ -661,7 +696,7 @@ $("#resetDaily")?.addEventListener("click",()=>{pushHistory(); state.tasks.daily
 $("#resetWeekly")?.addEventListener("click",()=>{pushHistory(); state.tasks.weekly.forEach(t=>t.done=false); save(); renderTasks(); markDirty(); scheduleUIRefresh();});
 $("#resetMonthly")?.addEventListener("click",()=>{pushHistory(); state.tasks.monthly.forEach(t=>t.done=false); save(); renderTasks(); markDirty(); scheduleUIRefresh();});
 
-/* VALIDATE DAY */
+/* VALIDATE DAY (robuste) */
 $("#validateDay")?.addEventListener("click",()=>{
   checkBonuses();
   const g=state.goals;
@@ -680,7 +715,7 @@ $("#validateDay")?.addEventListener("click",()=>{
   if(!state.byDate[currentDate]) state.byDate[currentDate]={dailyDone:{},dailyXP:0,validated:false};
   state.byDate[currentDate].validated=true;
   saveDay(currentDate);
-  $("#date_validated").textContent='oui';
+  const dv=$("#date_validated"); if(dv) dv.textContent='oui';
   save();
   markDirty();
   scheduleUIRefresh();
